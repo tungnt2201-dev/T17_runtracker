@@ -7,3 +7,4 @@
 - Lưu dữ liệu chỉ qua `saveDb()` → `T17Platform.save()`; tham chiếu bài theo `id` (`resolveRef`), không tin chỉ số `wi/di/ii`.
 - Giữ exe nhỏ: không dùng Electron hay thư viện UI nặng.
 - Kiểm tra trước khi đẩy: `npm run check && npm test`.
+- Phát hành: tăng `version` trong `package.json` + ghi CHANGELOG; Actions tự tạo Release `yymmdd_T17_runtracker_vX.Y.Z.zip`.

@@ -20,11 +20,13 @@ Toàn bộ logic nằm ở `src/core/legacy.js` và được kiểm thử bằng
                                               "segments": [], "fitImport": { } } } ] } ] } ],
   "templates": [ { "id": "tpl…", "name": "…" } ],
   "templatesSeeded": true,
+  "profile": { "sex": "male", "hrRest": 50, "hrMax": 190, "lthr": 170,   // v2.1 — hồ sơ VĐV (tuỳ chọn)
+               "thresholdPace": "5:15", "weightKg": "", "updatedAt": "…" },
   "orphans": [ ]                   // bài trong file cũ không có ngày hợp lệ: giữ lại, không xoá
 }
 ```
 
-Khác với v1.8.9 chỉ ở chỗ **thêm** `app`, `schemaVersion`, `orphans`. Mọi field cũ giữ nguyên tên và ý nghĩa,
+Khác với v1.8.9 chỉ ở chỗ **thêm** `app`, `schemaVersion`, `orphans`, `profile` (v2.1). Mọi field cũ giữ nguyên tên và ý nghĩa,
 nên RunPlan v1.8.x đọc được file sao lưu của T17.
 
 ## Các định dạng đầu vào được nhận

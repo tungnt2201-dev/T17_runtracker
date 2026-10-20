@@ -18,7 +18,7 @@ function open(file, setup) {
   const vc = new VirtualConsole();
   vc.on('jsdomError', e => errors.push(e.message)); vc.on('error', e => errors.push(String(e)));
   const html = fs.readFileSync(path.join(ROOT, file), 'utf8').replace('<script src="js/neutralino.js"></script>', '');
-  const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'http://localhost/', virtualConsole: vc, beforeParse(w) {
+  const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'http://localhost/', virtualConsole: vc, pretendToBeVisual: true, beforeParse(w) {
     w.TextEncoder = TextEncoder; w.TextDecoder = TextDecoder;
     w.alert = m => errors.push('alert: ' + m); w.confirm = () => true; w.prompt = () => '';
     w.HTMLElement.prototype.scrollIntoView = () => {};
@@ -71,4 +71,26 @@ test('bản desktop: lưu file data/ cạnh exe, sao lưu theo ngày, flush khi 
   await wait(800);
   assert.ok(app.w.eval('db.weeks.some(w=>w.days.some(d=>d.workouts.length))'), 'phải nạp lại từ bản sao lưu');
   assert.match(app.doc.getElementById('supportBox').textContent, /bị lỗi/);
+});
+
+test('Analytics + Hồ sơ VĐV + xuất Garmin chạy không lỗi', async () => {
+  const days = [];
+  for (let i = 0; i < 40; i++) { const d = new Date(Date.UTC(2026, 7, 1 + i)).toISOString().slice(0, 10); days.push({ date: d, workouts: i % 2 ? [] : [{ id: 'a' + i, workoutName: 'Easy', workoutType: 'Easy', planKm: 8, planMinutes: 48, workoutStructure: { warmup: null, cooldown: null, groups: [{ repeats: 1, steps: [{ activity: 'run', mode: 'time', value: 48, paceFrom: '6:00', paceTo: '6:10' }] }] }, actual: { status: 'done', km: 8, minutes: 48, avgHr: 148 } }] }); }
+  const blobs = [];
+  const { w, doc, errors } = open('dist/web/T17_runtracker.html', w => { w.localStorage.setItem('runplan-tracker-v1', JSON.stringify({ weeks: [{ label: '1', days }] })); w.URL.createObjectURL = b => { blobs.push(b); return 'blob:x'; }; w.URL.revokeObjectURL = () => {}; w.HTMLAnchorElement.prototype.click = function () {}; });
+  await wait(300);
+  doc.getElementById('tabAnalytics').click(); await wait(30);
+  doc.querySelector('#anRange [data-weeks="0"]').click(); await wait(30);
+  assert.equal(doc.querySelectorAll('#anBody .an-kpi').length, 6);
+  assert.ok(doc.querySelector('#anPmc'));
+  assert.match(doc.querySelector('#anBody .an-alert').textContent, /Hồ sơ VĐV chưa đủ/);
+  doc.getElementById('anProfileBtn').click();
+  for (const [id, v] of [['pfHrRest', '50'], ['pfHrMax', '190'], ['pfLthr', '170'], ['pfPace', '5:15']]) doc.getElementById(id).value = v;
+  doc.getElementById('profileForm').dispatchEvent(new w.Event('submit', { cancelable: true })); await wait(30);
+  assert.equal(w.eval('db.profile.lthr'), 170);
+  assert.ok(![...doc.querySelectorAll('#anBody .an-alert')].some(a => /Hồ sơ VĐV chưa đủ/.test(a.textContent)));
+  doc.getElementById('tabCalendar').click();
+  w.eval('exportGarminWorkout("Easy", db.weeks[0].days.find(d=>d.workouts.length).workouts[0].workoutStructure)'); await wait(50);
+  assert.equal(blobs.length, 1);
+  assert.deepEqual(errors, []);
 });

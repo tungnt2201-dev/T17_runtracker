@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.1.0 — 2026-10-20 (P1)
+
+Gói phát hành từ bản này: **`yymmdd_T17_runtracker_vX.Y.Z.zip`** (exe + bản web + hướng dẫn). Giải nén đè lên thư mục cũ, dữ liệu trong `data\` được giữ nguyên.
+
+### Mới
+- **Hồ sơ VĐV** (nút ♥ ở thanh trái hoặc trong Analytics): HR nghỉ, HR tối đa, LTHR, pace ngưỡng; xem trước 5 vùng nhịp tim và 5 vùng pace. Có nút lấy HR tối đa từ các file FIT đã nhập.
+- **Điểm tải từng buổi** (thang TSS: 100 = 60 phút đúng ngưỡng), hiện trên thẻ bài: ưu tiên chuỗi nhịp tim FIT → nhịp tim TB → pace → RPE → loại bài. Bài kế hoạch hiện tải dự kiến.
+- **Tab Analytics**: Thể lực (CTL) · Mệt mỏi (ATL) · Độ tươi (TSB) kèm dự báo theo kế hoạch tới 4 tuần; cảnh báo tăng tải quá nhanh; km theo tuần KH/TT; thời gian trong các vùng nhịp tim (tỷ lệ dễ : trung bình : khó); tổng hợp theo loại bài và theo tuần. Chọn 8 tuần / 12 tuần / 6 tháng / 12 tháng / tất cả, rê chuột để xem số liệu.
+- **Xuất bài cho đồng hồ Garmin** (nút ⌚ trên thẻ bài và trong Workout Builder): file Workout `.fit` có warm-up, vòng lặp, cool-down, target pace hoặc nhịp tim. Copy vào `GARMIN\NewFiles` qua USB.
+- Vùng nhịp tim trong màn hình phân tích FIT dùng hồ sơ VĐV (nếu đã nhập) thay cho % HR max của từng file.
+- Tổng quan tuần (cột phải) có thêm Tải TT / Tải KH.
+- Hộp thoại trong app thay cho `prompt()`: chọn khoảng ngày khi xuất (có nút nhanh 4 tuần / 3 tháng / 12 tháng), chọn nhiều ngày khi copy bài, chọn bài khi ghép FIT, đặt tên mẫu.
+
+### Đóng gói
+- GitHub Actions tự tạo **Release vX.Y.Z** kèm file zip mỗi khi version mới được đẩy lên `main`.
+
+### Tương thích dữ liệu
+- Thêm trường `profile` ở cấp cao nhất (không đổi schema các trường cũ). RunPlan v1.8.x và T17 v2.0 vẫn đọc được file sao lưu mới.
+
 ## 2.0.0 — 2026-10-20 (P0)
 
 Bản đầu tiên của **T17 RunTracker**, tách từ RunPlan Tracker v1.8.9. Toàn bộ tính năng cũ được giữ nguyên.

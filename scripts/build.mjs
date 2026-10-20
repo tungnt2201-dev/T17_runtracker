@@ -18,11 +18,17 @@ const MODULES = [
   'src/core/utils.js',
   'src/core/legacy.js',
   'src/core/excel-plan.js',
+  'src/core/athlete.js',
+  'src/core/load.js',
+  'src/core/fit-workout.js',
   'src/lib/xlsx.js',
   'src/lib/fit-decoder.js',
   'src/platform/platform.js',
+  'src/app/dialogs.js',
   'src/app/app.js',
   'src/app/fit-ui.js',
+  'src/app/analytics.js',
+  'src/app/profile.js',
 ];
 
 function inlineScript(file) {
@@ -36,7 +42,7 @@ function render(target) {
   const scripts = [];
   if (target === 'desktop') scripts.push('<script src="js/neutralino.js"></script>');
   scripts.push(...MODULES.map(inlineScript));
-  let body = rd('src/body.html').replace('id="appVersionLabel">v2.0.0<', `id="appVersionLabel">v${VERSION}<`);
+  let body = rd('src/body.html').replace(/id="appVersionLabel">v[0-9.]+</, `id="appVersionLabel">v${VERSION}<`);
   let app = rd('src/index.template.html');
   const map = { VERSION, TARGET: target, ICON: `data:image/png;base64,${iconB64}`, CSS: rd('src/styles/app.css').trim(), BODY: body.trim(), SCRIPTS: scripts.join('\n') };
   app = app.replace(/\{\{(\w+)\}\}/g, (_, k) => { if (!(k in map)) throw new Error('Thiếu placeholder ' + k); return map[k]; });

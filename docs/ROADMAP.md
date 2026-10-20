@@ -8,12 +8,12 @@
   sửa/xoá nhầm bài khi lịch bị sắp xếp lại (nay tra theo `id`).
 - Test tự động (FIT decoder, dữ liệu cũ, Excel, chạy thử app) + GitHub Actions đóng gói exe.
 
-## P1 — Phân tích tải tập
-- Hồ sơ VĐV: HRmax, HR nghỉ, LTHR, pace ngưỡng, zones (HR và pace) — thay cho zones tính theo HR max trong từng file.
-- Điểm tải mỗi buổi (hrTSS/rTSS hoặc TRIMP), biểu đồ CTL / ATL / TSB (Performance Management).
-- Bật tab Analytics: km/giờ theo tuần và tháng, phân bố cường độ, tỷ lệ tuân thủ kế hoạch.
-- Xuất bài tập có cấu trúc thành **Workout FIT** để copy vào `GARMIN\NewFiles` trên đồng hồ.
-- Thay `prompt()` / `confirm()` bằng hộp thoại trong app.
+## P1 — Phân tích tải tập (v2.1.0) ✅
+- ✅ Hồ sơ VĐV: HRmax, HR nghỉ, LTHR, pace ngưỡng, zones (HR và pace) — thay cho zones tính theo HR max trong từng file.
+- ✅ Điểm tải mỗi buổi (hrTSS/rTSS hoặc TRIMP), biểu đồ CTL / ATL / TSB (Performance Management).
+- ✅ Bật tab Analytics: km/giờ theo tuần và tháng, phân bố cường độ, tỷ lệ tuân thủ kế hoạch.
+- ✅ Xuất bài tập có cấu trúc thành **Workout FIT** để copy vào `GARMIN\NewFiles` trên đồng hồ.
+- ✅ Thay `prompt()` bằng hộp thoại trong app (còn lại: `confirm()` cho thao tác xoá/ghi đè — dùng hộp thoại hệ thống).
 
 ## P2 — Thành tích & thiết bị
 - Tự phát hiện best efforts / PR (1 km, 5 km, 10 km, HM, FM) từ bản ghi FIT.

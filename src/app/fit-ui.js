@@ -22,7 +22,7 @@ function fitBuildDashboard(f){if(f._dashboard)return f._dashboard;const recs=Arr
  const stats={movingSec:fitNum(f.durationSec),elapsedSec:fitNum(f.elapsedSec),idleSec:(fitNum(f.elapsedSec)!=null&&fitNum(f.durationSec)!=null)?Math.max(0,f.elapsedSec-f.durationSec):null,distanceKm:fitNum(f.distanceM)!=null?f.distanceM/1000:null,avgPaceSec,maxHr:fitMax(hrVals)||fitNum(f.maxHr),avgHr:fitAvg(hrVals)||fitNum(f.avgHr),avgCad,maxCad,avgPower,maxPower,avgStride,totalAscent:ascent||null,totalDescent:descent||null,recordCount:fitNum(f.recordCount)||recs.length,lapCount:(f.laps||[]).length};
  const charts={pace:{title:'Pace',avg:avgPaceSec,avgLabel:avgPaceSec?`${secToPace(avgPaceSec)}/km`:'—',points:fitDownsample(pacePoints),color:'#4c94e6',invert:true},hr:{title:'Heart Rate',avg:stats.avgHr,avgLabel:stats.avgHr?`${Math.round(stats.avgHr)} bpm`:'—',points:fitDownsample(hrPoints),color:'#e25858'},cadence:{title:'Cadence',avg:avgCad,avgLabel:avgCad?`${Math.round(avgCad)} spm`:'—',points:fitDownsample(cadPoints),color:'#d44545'},stride:{title:'Stride Length',avg:avgStride,avgLabel:avgStride?`${fitRound(avgStride,2)} m`:'—',points:fitDownsample(stridePoints),color:'#2d7fd0'},power:{title:'Power',avg:avgPower,avgLabel:avgPower?`${Math.round(avgPower)} W`:'—',points:fitDownsample(powerPoints),color:'#f0a93b'},elevation:{title:'Elevation',avg:avgAlt,avgLabel:avgAlt!=null?`${Math.round(avgAlt)} m`:'—',points:fitDownsample(altPoints),color:'#48a978'}};
  const laps=(f.laps||[]).map((l,i)=>({index:i+1,time:fitDurationLabel(l.durationSec),dist:l.distanceM!=null?fitRound(l.distanceM/1000,2):null,pace:(l.durationSec>0&&l.distanceM>0)?secToPace(l.durationSec*1000/l.distanceM):null,hr:l.avgHr??null,cad:l.avgCad??null,power:l.avgPower??null,asc:l.totalAscent??null}));
- const zoneSourceHrMax=stats.maxHr||fitMax(hrVals); let zones=[]; if(hrPoints.length&&zoneSourceHrMax){const cuts=[0,.6,.7,.8,.9,1.01].map(x=>zoneSourceHrMax*x);const buckets=[0,0,0,0,0];for(let i=0;i<hrPoints.length;i++){const curr=hrPoints[i],next=hrPoints[i+1];let dt=next?Math.max(1,next.t-curr.t):1;let z=0;while(z<5&&curr.v>=cuts[z+1])z++;buckets[Math.min(4,z)]+=dt}zones=buckets.map((sec,i)=>{const from=Math.round(cuts[i]),to=i<4?Math.round(cuts[i+1]-1):Math.round(zoneSourceHrMax);const pct=stats.movingSec?sec/stats.movingSec*100:0;return {name:'Zone '+(i+1),range:i<4?`${from}–${to} bpm`:`≥ ${from} bpm`,sec,pct,cls:'z'+(i+1)}})}
+ const zoneSourceHrMax=stats.maxHr||fitMax(hrVals); let zones=[]; if(hrPoints.length&&zoneSourceHrMax){const zc=fitZoneCuts(zoneSourceHrMax),cuts=zc.cuts;const buckets=[0,0,0,0,0];for(let i=0;i<hrPoints.length;i++){const curr=hrPoints[i],next=hrPoints[i+1];let dt=next?Math.max(1,next.t-curr.t):1;let z=0;while(z<5&&curr.v>=cuts[z+1])z++;buckets[Math.min(4,z)]+=dt}zones=buckets.map((sec,i)=>{const from=Math.round(cuts[i]),to=i<4?Math.round(cuts[i+1]-1):Math.round(zoneSourceHrMax);const pct=stats.movingSec?sec/stats.movingSec*100:0;return {name:zc.names[i],range:i<4?`${from}–${to} bpm`:`≥ ${from} bpm`,sec,pct,cls:'z'+(i+1),source:zc.source}})}
  return f._dashboard={stats,charts,laps,zones,zoneSourceHrMax};}
 function fitChartDuration(sec){const n=Math.max(0,Math.round(sec||0));if(n>=3600)return `${Math.floor(n/3600)}:${String(Math.floor(n%3600/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;return `${Math.floor(n/60)}:${String(n%60).padStart(2,'0')}`}
 function fitChartYLabel(chart,v){if(chart.title==='Pace')return secToPace(Math.max(0,v));if(chart.title==='Stride Length')return fitRound(v,2)+' m';if(chart.title==='Elevation')return Math.round(v)+' m';return Math.round(v)+' '+({"Heart Rate":"bpm","Cadence":"spm","Power":"W"}[chart.title]||'')}
@@ -65,19 +65,33 @@ function fitRenderChartHost(host,dash){
 function fitRenderRichPreview(f,mount=null){const dash=fitBuildDashboard(f),stats=dash.stats;const pick=(key,id)=>mount?mount.querySelector('[data-fit-panel="'+key+'"]'):$(id);const extra=pick('summary','fitExtraSummary'),charts=pick('charts','fitDetailCharts'),laps=pick('laps','fitLapTable'),zones=pick('zones','fitZones'),lapMeta=pick('lap-meta','fitLapMeta');if(extra)extra.innerHTML=`<div class="fit-mini-stats"><div class="fit-mini-stat"><span>Moving time</span><strong>${fitDurationLabel(stats.movingSec)}</strong><small>Elapsed ${fitDurationLabel(stats.elapsedSec)}${stats.idleSec!=null?` · Idle ${fitDurationLabel(stats.idleSec)}`:''}</small></div><div class="fit-mini-stat"><span>Avg pace</span><strong>${stats.avgPaceSec?secToPace(stats.avgPaceSec):'—'}/km</strong><small>Distance ${stats.distanceKm!=null?fitRound(stats.distanceKm,3):'—'} km</small></div><div class="fit-mini-stat"><span>Heart rate</span><strong>${stats.avgHr?Math.round(stats.avgHr):'—'} bpm</strong><small>Max ${stats.maxHr?Math.round(stats.maxHr):'—'} bpm</small></div><div class="fit-mini-stat"><span>Cadence</span><strong>${stats.avgCad?Math.round(stats.avgCad):'—'} spm</strong><small>Max ${stats.maxCad?Math.round(stats.maxCad):'—'} spm</small></div><div class="fit-mini-stat"><span>Power</span><strong>${stats.avgPower?Math.round(stats.avgPower):'—'} W</strong><small>Max ${stats.maxPower?Math.round(stats.maxPower):'—'} W</small></div><div class="fit-mini-stat"><span>Stride length</span><strong>${stats.avgStride?fitRound(stats.avgStride,2):'—'} m</strong><small>Ascent ${stats.totalAscent?Math.round(stats.totalAscent):'—'} m · Descent ${stats.totalDescent?Math.round(stats.totalDescent):'—'} m</small></div></div><div class="fit-insight-warning">Các chỉ số như cadence, power, stride length, HR zones và biểu đồ bên dưới chỉ hiện khi file FIT thực sự có dữ liệu tương ứng.</div>`;
  if(charts)fitRenderChartHost(charts,dash);
  if(laps){lapMeta.textContent=`${dash.laps.length} lap${dash.laps.length!==1?'s':''}`;laps.innerHTML=dash.laps.length?`<div class="fit-lap-note">Mỗi lap được Garmin ghi nhận theo đồng hồ. Có thể dùng để ghép 1:1 với section nếu số lượng trùng nhau.</div><div class="fit-table-wrap"><table><thead><tr><th>#</th><th>Time</th><th>Distance</th><th>Avg Pace</th><th>Avg HR</th><th>Cadence</th><th>Power</th><th>Ascent</th></tr></thead><tbody>${dash.laps.map(l=>`<tr><td>${l.index}</td><td>${escapeHtml(l.time)}</td><td>${l.dist!=null?escapeHtml(String(l.dist)):'—'}</td><td>${l.pace?escapeHtml(l.pace)+'/km':'—'}</td><td>${l.hr??'—'}</td><td>${l.cad??'—'}</td><td>${l.power??'—'}</td><td>${l.asc??'—'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="fit-chart-empty">Không có dữ liệu lap trong file FIT.</div>'}
- if(zones){zones.innerHTML=dash.zones.length?`<div class="fit-zone-list">${dash.zones.map(z=>`<div class="fit-zone-row"><div class="label"><strong>${escapeHtml(z.name)}</strong> · ${escapeHtml(z.range)}</div><div class="fit-zone-bar"><div class="fit-zone-fill ${z.cls}" style="width:${Math.max(0,Math.min(100,z.pct)).toFixed(1)}%"></div></div><div class="pct">${fitClock(z.sec)} · ${Math.round(z.pct)}%</div></div>`).join('')}</div><div class="fit-muted" style="margin-top:8px">HR zones ước tính theo tỷ lệ % của nhịp tim tối đa trong chính file FIT này.</div>`:'<div class="fit-chart-empty">Không có đủ dữ liệu nhịp tim để tính time in zones.</div>'}
+ if(zones){zones.innerHTML=dash.zones.length?`<div class="fit-zone-list">${dash.zones.map(z=>`<div class="fit-zone-row"><div class="label"><strong>${escapeHtml(z.name)}</strong> · ${escapeHtml(z.range)}</div><div class="fit-zone-bar"><div class="fit-zone-fill ${z.cls}" style="width:${Math.max(0,Math.min(100,z.pct)).toFixed(1)}%"></div></div><div class="pct">${fitClock(z.sec)} · ${Math.round(z.pct)}%</div></div>`).join('')}</div><div class="fit-muted" style="margin-top:8px">${dash.zones[0]?.source==='profile'?'Vùng tim theo Hồ sơ VĐV (% LTHR).':'HR zones ước tính theo tỷ lệ % của nhịp tim tối đa trong chính file FIT này — nhập Hồ sơ VĐV để dùng vùng của bạn.'}</div>`:'<div class="fit-chart-empty">Không có đủ dữ liệu nhịp tim để tính time in zones.</div>'}
 }
 function fitCompactInsights(f){const dash=fitBuildDashboard(f);const chartKeys=['pace','hr','cadence','stride','power','elevation'];const charts={};for(const k of chartKeys){const ch=dash.charts[k];if(ch&&ch.points&&ch.points.length>1)charts[k]={title:ch.title,avg:ch.avg,avgLabel:ch.avgLabel,points:fitDownsample(ch.points,120),color:ch.color,unit:'',invert:!!ch.invert}}return {stats:dash.stats,laps:dash.laps,zones:dash.zones,charts}}
 /* Rehydrate dashboard already stored in actual.fitImport.insights.
    v1.8.5 and v1.8.5 saved the series and laps, but did not render them on revisit. */
-function fitNormalizeSavedInsights(ins){
+/* v2.1: nếu đã nhập hồ sơ VĐV (HR max / LTHR) → vùng tim theo hồ sơ; nếu chưa → % HR max trong file như cũ. */
+function fitProfileZonesActive(){const p=db.profile||{};return !!(+p.lthr||+p.hrMax)}
+function fitZoneCuts(fileHrMax){
+ if(fitProfileZonesActive()){const t=T17Athlete.hrZoneTable(db.profile);return{cuts:[0,t[0].to+1,t[1].to+1,t[2].to+1,t[3].to+1,Infinity],names:t.map(z=>z.name),source:'profile'}}
+ return{cuts:[0,.6,.7,.8,.9,1.01].map(x=>fileHrMax*x),names:[1,2,3,4,5].map(i=>'Zone '+i),source:'file'};
+}
+/** Tính lại vùng tim từ chuỗi [giây, hr] đã lưu (sectionSource.hr) khi có hồ sơ VĐV. */
+function fitZonesFromStream(stream,movingSec){
+ if(!fitProfileZonesActive()||!Array.isArray(stream)||stream.length<10)return null;
+ const zc=fitZoneCuts(0),b=[0,0,0,0,0];
+ for(let i=1;i<stream.length;i++){const dt=stream[i][0]-stream[i-1][0];if(!(dt>0)||dt>60)continue;const hr=(stream[i][1]+stream[i-1][1])/2;let z=0;while(z<5&&hr>=zc.cuts[z+1])z++;b[Math.min(4,z)]+=dt}
+ const total=movingSec||b.reduce((a,c)=>a+c,0);
+ return b.map((sec,i)=>({name:zc.names[i],range:i<4?`${Math.round(zc.cuts[i])}–${Math.round(zc.cuts[i+1]-1)} bpm`:`≥ ${Math.round(zc.cuts[i])} bpm`,sec,pct:total?sec/total*100:0,cls:'z'+(i+1),source:'profile'}));
+}
+function fitNormalizeSavedInsights(ins,stream){
  const stats=ins.stats||{},raw=ins.charts||{},charts={};
  const fallback={pace:stats.avgPaceSec,hr:stats.avgHr,cadence:stats.avgCad,stride:stats.avgStride,power:stats.avgPower,elevation:null};
  for(const [key,ch] of Object.entries(raw)){
    const values=Array.isArray(ch.points)?ch.points:[];
    charts[key]={...ch,avg:fitNum(ch.avg)??fitNum(fallback[key])??fitAvg(values.map(v=>v.v))};
  }
- return {stats,charts,laps:Array.isArray(ins.laps)?ins.laps:[],zones:Array.isArray(ins.zones)?ins.zones:[]};
+ return {stats,charts,laps:Array.isArray(ins.laps)?ins.laps:[],zones:fitZonesFromStream(stream,stats.movingSec)||(Array.isArray(ins.zones)?ins.zones:[])};
 }
 function fitShowSavedDashboard(item){
  const info=item?.actual?.fitImport,exists=!!info,ins=info?.insights,details=$('fitSavedDetails'),banner=$('fitSavedBanner'),warn=$('fitSavedLegacyWarning'),content=$('fitSavedRichGrid');
@@ -89,7 +103,7 @@ function fitShowSavedDashboard(item){
  const sectionPlans=actualSectionPlan(item),sectionFilled=(item.actual?.segments||[]).filter(x=>+x.actualMinutes>0||+x.actualKm>0).length;
  $('fitSavedBannerMeta').textContent=(txt||'Đã nhập kết quả FIT')+(sectionPlans.length&&!sectionFilled?' · Chưa ghép section: nhấn ↻ Ghép section từ FIT để bổ sung.':'');$('fitSavedMeta').textContent='Nguồn Garmin FIT · '+(txt||'Không rõ tên tệp')+' · Màn hình này đọc dữ liệu đã lưu trong RunPlan, không yêu cầu import lại.';
  if(!ins){warn.hidden=false;warn.textContent='Hoạt động đã được nhập từ FIT bằng phiên bản cũ nhưng chưa lưu biểu đồ nâng cao. Kết quả tổng vẫn còn; muốn có đầy đủ biểu đồ cho buổi này cần bổ sung lại từ tệp FIT gốc.';content.hidden=true;return}
- warn.hidden=true;content.hidden=false;const data=fitNormalizeSavedInsights(ins);fitRenderRichPreview({_dashboard:data},details);
+ warn.hidden=true;content.hidden=false;const data=fitNormalizeSavedInsights(ins,info.sectionSource?.hr);fitRenderRichPreview({_dashboard:data},details);
 }
 $('fitSavedOpenNow').addEventListener('click',()=>{const details=$('fitSavedDetails');if(!details||details.hidden)return;details.open=true;details.scrollIntoView({behavior:'smooth',block:'start'});});
 $('fitSavedRemap').addEventListener('click',()=>$('fitImportInActual').click());
@@ -211,7 +225,7 @@ function fitCommitResult(){if(!fitPending)return;const {fit:f,filename,innerName
  item.actual={...old,status:'done',km,minutes:mins,fatigue:old.fatigue??'',calories:f.calories??'',avgHr:f.avgHr??'',maxHr:f.maxHr??'',note:old.note||'',segments,fitImport,savedAt:new Date().toISOString()};
  if(!saveDb())return;
  const dst=locateDate(date);if(dst)currentWeek=dst.wi;
- fitCloseModal();if(modal.classList.contains('show'))closeModal();render();if(logViewActive)renderLog();$('calendarWrap').scrollTop=0;toast(`Đã nhập FIT: ${km||'—'} km · ${fitClock(f.durationSec)}${segments.some(x=>x.actualMinutes!==''||x.actualKm!=='')?' · có dữ liệu section':''}`);
+ fitCloseModal();if(modal.classList.contains('show'))closeModal();render();refreshViews();$('calendarWrap').scrollTop=0;toast(`Đã nhập FIT: ${km||'—'} km · ${fitClock(f.durationSec)}${segments.some(x=>x.actualMinutes!==''||x.actualKm!=='')?' · có dữ liệu section':''}`);
 }
 /* Attach a saved standalone FIT activity to the chosen structured plan, without FIT re-upload. */
 window.RunPlanFITLinkStandalone=function(sourceRef,targetId,targetDate){
@@ -239,7 +253,7 @@ window.RunPlanFITLinkStandalone=function(sourceRef,targetId,targetDate){
  sourceDay.workouts.splice(srcIndex,1);
  if(!saveDb()){sourceDay.workouts.splice(srcIndex,0,activity);target.actual=previous;return false;}
  const loc=locateDate(targetDate);if(loc)currentWeek=loc.wi;
- render();if(logViewActive)renderLog();
+ render();refreshViews();
  $('calendarWrap').scrollTop=0;
  toast(segments.filter(s=>s.actualMinutes!==''||s.actualKm!=='').length?`Đã ghép FIT vào “${target.workoutName}” và cập nhật section`:(srcInfo?'Đã ghép kết quả FIT tổng vào bài kế hoạch':'Đã ghép kết quả nhập tay vào bài kế hoạch'));
  return true;
@@ -353,7 +367,7 @@ async function fitImportBatch(entries,bad=[]){
   rows.push({name:'Lỗi lưu dữ liệu',kind:'error',message:err.message||String(err)});
  }
  fitBatchBusy=false;fitBatchProgress.style.width='100%';fitBatchClose.disabled=false;fitBatchStatsRender(rows);fitBatchTitle.textContent=`Đã xử lý ${entries.length+bad.length} tệp FIT`;
- if(fitBatchFirstDay){const loc=locateDate(fitBatchFirstDay);if(loc)currentWeek=loc.wi;render();if(logViewActive)renderLog();$('calendarWrap').scrollTop=0}
+ if(fitBatchFirstDay){const loc=locateDate(fitBatchFirstDay);if(loc)currentWeek=loc.wi;render();refreshViews();$('calendarWrap').scrollTop=0}
 }
 function fitBatchCloseModal(){if(fitBatchBusy)return;fitBatchModal.classList.remove('show');fitBatchFirstDay=null}
 fitBatchClose.addEventListener('click',fitBatchCloseModal);

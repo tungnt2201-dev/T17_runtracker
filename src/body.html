@@ -1,6 +1,6 @@
 <header class="app-top">
-  <div class="logo"><span class="logo-mark">T</span><span>T17 RUNTRACKER <small id="appVersionLabel">v2.0.0</small></span></div>
-  <nav class="top-tabs"><div class="top-tab active" id="tabCalendar">Calendar</div><div class="top-tab disabled" id="tabAnalytics" title="Dự kiến giai đoạn P1">Analytics · sắp có</div><div class="top-tab" id="tabLog">Training Log</div></nav>
+  <div class="logo"><span class="logo-mark">T</span><span>T17 RUNTRACKER <small id="appVersionLabel">v2.1.0</small></span></div>
+  <nav class="top-tabs"><div class="top-tab active" id="tabCalendar">Calendar</div><div class="top-tab" id="tabAnalytics">Analytics</div><div class="top-tab" id="tabLog">Training Log</div></nav>
   <div class="top-right"><span class="live-dot"></span><span id="storageModeLabel">Dữ liệu lưu cục bộ</span></div>
 </header>
 <section class="controlbar">
@@ -40,6 +40,7 @@
     <button class="rail-btn" id="railNewWorkout" type="button">＋<span>Tạo bài tập</span></button>
     <button class="rail-btn" id="railLibrary" type="button">📚<span>Thư viện bài tập</span></button>
     <button class="rail-btn" id="railData" type="button">⇅<span>Import / Export / Dữ liệu</span></button>
+    <button class="rail-btn" id="railProfile" type="button">♥<span>Hồ sơ VĐV · vùng tập</span></button>
     <div class="rail-bottom"><button class="rail-btn" id="railClear" type="button">⌫<span>Xóa dữ liệu</span></button></div>
   </aside>
   <main class="calendar-wrap" id="calendarWrap">
@@ -63,6 +64,17 @@
     <div class="data-note">Nhập FIT sẽ tạo thẻ hoạt động riêng đúng ngày chạy (hoặc tự ghép khi nhập nhiều FIT). Có thể mở kết quả → Tách kết quả khỏi bài tập để trả kết quả về thẻ tím, sau đó kéo thẻ này vào đúng bài kế hoạch; nếu có nhiều bài kế hoạch, ứng dụng sẽ hỏi chọn bài. Trên điện thoại dùng nút “Ghép kết quả vào bài kế hoạch”. Mỗi ngày có thể có nhiều bài tập. Kéo thả 1 bài sang ngày khác để đổi ngày; giữ Ctrl khi kéo (hoặc bấm nút ⧉) để copy sang ngày khác thay vì chuyển hẳn. Import Excel / Nhập JSON chỉ gộp thêm vào lịch, không xóa bài cũ, tự bỏ qua bài trùng. Dùng <b>Xuất bài tập (JSON)</b> để gửi lịch tập cho người khác — họ chỉ cần <b>Nhập bài tập (JSON)</b> để tập theo và tự nhập kết quả. Kéo xuống để xem thêm các tuần kế tiếp.</div>
   </aside>
 </div>
+<section class="an-view" id="analyticsView" style="display:none">
+  <div class="an-toolbar">
+    <div><div class="eyebrow">Phân tích tải tập</div><h1>Analytics</h1></div>
+    <div class="an-range" id="anRange" role="group" aria-label="Khoảng thời gian">
+      <button type="button" data-weeks="8">8 tuần</button><button type="button" data-weeks="12" class="active">12 tuần</button><button type="button" data-weeks="26">6 tháng</button><button type="button" data-weeks="52">12 tháng</button><button type="button" data-weeks="0">Tất cả</button>
+    </div>
+    <div class="toolbar-spacer"></div>
+    <button type="button" class="toolbar-btn" id="anProfileBtn">♥ Hồ sơ VĐV · vùng tập</button>
+  </div>
+  <div class="an-body" id="anBody"></div>
+</section>
 <section class="log-view" id="logView" style="display:none">
   <div class="log-toolbar">
     <div class="log-field"><label>Từ ngày</label><input type="date" id="logFrom" /></div>
@@ -196,7 +208,7 @@
       <div id="builderContent"></div>
       <div class="builder-section"><div class="builder-section-head"><strong>Mô tả sẽ lưu vào kế hoạch</strong><small>Tự sinh từ cấu trúc phía trên</small></div><div style="padding:9px"><div id="builderPreview" class="builder-preview">Chưa có cấu trúc bài tập.</div><div class="pace-legend"><span class="mini-bar walkbar"></span>Đi bộ / nghỉ <span class="mini-bar easybar"></span>Chạy dễ <span class="mini-bar fastbar"></span>Pace nhanh</div></div></div>
       <div class="builder-help">Cách hiểu pace: nhập dạng <b>mm:ss</b>, ví dụ 05:20–05:40/km. Pace nhỏ hơn nghĩa là chạy nhanh hơn. Nếu một đoạn dùng quãng đường, app dùng pace trung bình của khoảng mục tiêu để ước tính thời gian; nếu dùng thời gian, app dùng pace để ước tính quãng đường. <b>Đoạn theo cự ly:</b> nhập được 0,08 km (80 m), 0,05 km (50 m) bằng <b>dấu phẩy hoặc dấu chấm</b>; kết quả không bị làm tròn về 0,1 km.</div>
-      <div class="sheetactions"><button type="button" id="deletePlan" class="danger">Xóa bài tập này</button><button type="button" id="saveAsTemplateBtn">💾 Lưu làm mẫu</button><button type="button" id="cancelBuilder">Đóng</button><button type="submit" class="primary">Lưu bài tập</button></div>
+      <div class="sheetactions"><button type="button" id="deletePlan" class="danger">Xóa bài tập này</button><button type="button" id="builderGarminBtn" title="Xuất bài đang soạn thành file .fit cho đồng hồ Garmin">⌚ Xuất cho Garmin</button><button type="button" id="saveAsTemplateBtn">💾 Lưu làm mẫu</button><button type="button" id="cancelBuilder">Đóng</button><button type="submit" class="primary">Lưu bài tập</button></div>
     </form></div>
   </div>
 </div>
@@ -215,6 +227,25 @@
       <div id="libraryList" class="lib-grid"></div>
       <div class="sheetactions"><button type="button" id="libraryCreateBtn">＋ Tạo bài mới</button><button type="button" id="closeLibrary">Đóng</button></div>
     </div>
+  </div>
+</div>
+
+<div class="modal" id="profileModal">
+  <div class="sheet profile-sheet">
+    <div class="sheet-head"><h2>Hồ sơ vận động viên</h2><div class="meta">Dùng để tính vùng nhịp tim / pace và điểm tải (TSS) của từng buổi</div></div>
+    <form class="sheet-body" id="profileForm">
+      <div class="profile-grid">
+        <div class="field"><label>Giới tính (hệ số TRIMP)</label><select id="pfSex"><option value="male">Nam</option><option value="female">Nữ</option></select></div>
+        <div class="field"><label>Nhịp tim nghỉ (bpm)</label><input id="pfHrRest" type="number" min="30" max="110" inputmode="numeric" placeholder="vd. 52" /></div>
+        <div class="field"><label>Nhịp tim tối đa (bpm)</label><input id="pfHrMax" type="number" min="120" max="230" inputmode="numeric" placeholder="vd. 188" /><button type="button" class="pf-suggest" id="pfSuggestMax" hidden></button></div>
+        <div class="field"><label>Nhịp tim ngưỡng LTHR (bpm)</label><input id="pfLthr" type="number" min="100" max="220" inputmode="numeric" placeholder="vd. 168" /><small class="time-input-hint">Nhịp tim trung bình 20 phút cuối của bài chạy hết sức 30 phút.</small></div>
+        <div class="field"><label>Pace ngưỡng (mm:ss /km)</label><input id="pfPace" type="text" placeholder="vd. 5:10" autocomplete="off" /><small class="time-input-hint">Pace có thể giữ khoảng 1 giờ (≈ pace giải 10K–HM).</small></div>
+        <div class="field"><label>Cân nặng (kg, tuỳ chọn)</label><input id="pfWeight" type="number" min="30" max="200" step="0.1" inputmode="decimal" /></div>
+      </div>
+      <div class="pf-note" id="pfNote"></div>
+      <div class="pf-zones"><div><h3>Vùng nhịp tim</h3><div id="pfHrZones"></div></div><div><h3>Vùng pace</h3><div id="pfPaceZones"></div></div></div>
+      <div class="sheetactions"><button type="button" id="pfCancel">Đóng</button><button type="submit" class="primary">Lưu hồ sơ</button></div>
+    </form>
   </div>
 </div>
 
