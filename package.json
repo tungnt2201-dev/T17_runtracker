@@ -1,0 +1,22 @@
+{
+  "name": "t17-runtracker",
+  "version": "2.0.0",
+  "private": true,
+  "description": "T17 RunTracker — lập kế hoạch & theo dõi chạy bộ, đọc Garmin FIT offline. Bản Windows portable (Neutralino) + bản HTML một file.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "npm run build && node --test tests/*.test.js",
+    "check": "node scripts/check-syntax.mjs",
+    "dev": "npm run build && neu run",
+    "exe": "npm run build && neu update && neu build --release --embed-resources && node scripts/package-win.mjs"
+  },
+  "devDependencies": {
+    "@neutralinojs/lib": "6.10.0",
+    "@neutralinojs/neu": "^11.8.0",
+    "jsdom": "^25.0.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

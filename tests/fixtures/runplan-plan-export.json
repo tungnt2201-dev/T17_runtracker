@@ -1,0 +1,5 @@
+{"format": "runplan-plan", "version": 1, "exportedAt": "2026-10-01T00:00:00.000Z", "days": [
+  {"date": "2026-11-02", "dow": "Hai", "workouts": [{"workoutName": "Easy 40 phút", "workoutType": "Easy", "planKm": 6.15, "planMinutes": 40, "description": "Easy", "planNote": "", "workoutStructure": null}]},
+  {"date": "2026-11-04", "dow": "Tư", "workouts": [{"workoutName": "Interval 6x800m", "workoutType": "Interval", "planKm": 9.1, "planMinutes": 55, "description": "6x800", "planNote": "", "workoutStructure": null}, {"workoutName": "", "planKm": "", "planMinutes": "", "description": ""}]},
+  {"dow": "Năm", "workouts": [{"workoutName": "Không ngày"}]}
+]}

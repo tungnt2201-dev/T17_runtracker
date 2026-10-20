@@ -1,0 +1,24 @@
+{
+  "weeks": [
+    {
+      "label": "1",
+      "days": [
+        {"dow": "Hai", "date": "15/01/2025", "workoutName": "Easy 5km", "planKm": "5", "planMinutes": 35, "description": "Chạy nhẹ", "planNote": "", "actual": {"status": "done", "km": "5,2", "minutes": "36:30", "fatigue": "4", "avgHr": 142, "note": "Ổn"}},
+        {"dow": "Ba", "date": "16/01/2025", "workoutName": "", "planKm": "", "planMinutes": "", "description": "", "planNote": "", "actual": null},
+        {"dow": "Tư", "date": "17/01/2025", "workoutName": "Interval", "planKm": 8, "planMinutes": 50, "description": "Warm-up: Warm-up: 10 phút\nChạy 3 phút lặp 5 lần", "planNote": "Giữ form", "actual": {"km": 7.9, "minutes": 51}},
+        {"dow": "Năm", "date": "18/01/2025", "workoutName": "Nghỉ"},
+        {"dow": "Sáu", "date": "19/01/2025"},
+        {"dow": "Bảy", "date": "20/01/2025", "workoutName": "Long run", "planKm": 15, "planMinutes": 100, "actual": {"status": "missed"}},
+        {"dow": "CN", "date": "21/01/2025"}
+      ]
+    },
+    {
+      "label": "2",
+      "days": [
+        {"dow": "Hai", "date": "2025-01-22", "workoutName": "Recovery", "planKm": 4, "planMinutes": 30},
+        {"dow": "Ba", "date": "", "workoutName": "Bài không có ngày", "planKm": 6}
+      ]
+    }
+  ],
+  "templates": [{"name": "Mẫu cũ", "planKm": "6,5", "planMinutes": 40, "description": "Easy"}]
+}

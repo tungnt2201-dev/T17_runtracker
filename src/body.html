@@ -1,0 +1,221 @@
+<header class="app-top">
+  <div class="logo"><span class="logo-mark">T</span><span>T17 RUNTRACKER <small id="appVersionLabel">v2.0.0</small></span></div>
+  <nav class="top-tabs"><div class="top-tab active" id="tabCalendar">Calendar</div><div class="top-tab disabled" id="tabAnalytics" title="Dự kiến giai đoạn P1">Analytics · sắp có</div><div class="top-tab" id="tabLog">Training Log</div></nav>
+  <div class="top-right"><span class="live-dot"></span><span id="storageModeLabel">Dữ liệu lưu cục bộ</span></div>
+</header>
+<section class="controlbar">
+  <div class="period-title"><div class="eyebrow">Lịch chạy nhiều tuần</div><h1 id="weekTitle">Chưa có kế hoạch</h1></div>
+  <div class="period-nav"><button id="prevWeek" class="nav-btn" type="button">‹</button><button id="todayBtn" class="toolbar-btn" type="button">Hôm nay</button><button id="nextWeek" class="nav-btn" type="button">›</button></div>
+  <div id="weekRange" style="font-size:10px;color:#7b8594;margin-left:4px">Tạo bài tập hoặc Import Excel để bắt đầu</div>
+  <div class="toolbar-spacer"></div>
+  <button id="newWorkoutBtn" class="toolbar-btn primary" type="button">＋ Tạo bài tập</button>
+  <button id="libraryBtn" class="toolbar-btn" type="button">📚 Thư viện</button>
+  <button id="fitImportTopBtn" class="toolbar-btn" type="button" title="Chọn 1 hoặc nhiều file FIT; nhiều file sẽ tự ghép vào bài chưa có kết quả">⇧ Import FIT (nhiều)</button>
+  <details class="menu-wrap" id="dataMenu">
+    <summary class="toolbar-btn">Dữ liệu ▾</summary>
+    <div class="menu-panel">
+      <div class="menu-group-label">Garmin (không cần tài khoản API)</div>
+      <button id="fitImportBtn" type="button">⇧ Import 1 / nhiều Garmin FIT / ZIP</button>
+      <div class="menu-group-label">Excel (1 bài / ngày)</div>
+      <button id="importBtn" type="button">⇧ Import Excel</button>
+      <button id="exportBtn" type="button">⇩ Export Excel</button>
+      <div class="menu-group-label">Chia sẻ bài tập (JSON, nhiều bài / ngày)</div>
+      <button id="exportPlanBtn" type="button">⇩ Xuất bài tập (JSON)</button>
+      <button id="importPlanBtn" type="button">⇧ Nhập bài tập / Training Log (JSON)</button>
+      <div class="menu-group-label">Toàn bộ dữ liệu trên máy này</div>
+      <button id="backupBtn" type="button">Sao lưu toàn bộ (JSON)</button>
+      <button id="restoreBtn" type="button">Khôi phục toàn bộ (ghi đè) — nhận cả file RunPlan cũ</button>
+      <button id="openDataFolderBtn" type="button" hidden>📂 Mở thư mục dữ liệu</button>
+      <button id="clearBtn" class="danger" type="button">Xóa toàn bộ dữ liệu</button>
+    </div>
+  </details>
+  <input class="file-picker-input" id="fitImportFile" type="file" multiple accept=".fit,.FIT,.zip,.ZIP,application/octet-stream,application/zip" />
+  <input class="file-picker-input" id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+  <input class="file-picker-input" id="importPlanFile" type="file" accept=".json,application/json" />
+  <input class="file-picker-input" id="restoreFile" type="file" accept=".json,application/json" />
+</section>
+<div class="shell">
+  <aside class="rail">
+    <button class="rail-btn active" type="button">▦<span>Lịch tuần</span></button>
+    <button class="rail-btn" id="railNewWorkout" type="button">＋<span>Tạo bài tập</span></button>
+    <button class="rail-btn" id="railLibrary" type="button">📚<span>Thư viện bài tập</span></button>
+    <button class="rail-btn" id="railData" type="button">⇅<span>Import / Export / Dữ liệu</span></button>
+    <div class="rail-bottom"><button class="rail-btn" id="railClear" type="button">⌫<span>Xóa dữ liệu</span></button></div>
+  </aside>
+  <main class="calendar-wrap" id="calendarWrap">
+    <div class="week-calendar">
+      <div class="day-heads" id="dayHeads"></div>
+      <div class="day-columns" id="days"></div>
+    </div>
+  </main>
+  <aside class="summary">
+    <div id="supportBox" class="support"></div>
+    <div class="summary-card">
+      <div class="summary-title">Hoàn thành tuần</div>
+      <div class="completion-wrap">
+        <div class="completion-ring" id="completionRing"><div style="position:relative;z-index:2;text-align:center"><b id="completionPct">0%</b><span>sessions</span></div></div>
+        <div class="completion-copy"><strong id="completionText">0 / 0</strong><small>buổi đã hoàn thành<br>trên tổng số buổi kế hoạch</small></div>
+      </div>
+    </div>
+    <div class="summary-card"><div class="summary-title">Tổng quan tuần</div><div class="sum-grid" id="metrics"></div></div>
+    <div class="summary-card"><div class="summary-title">Mức độ hoàn thành</div><div class="legend"><div class="legend-row"><span class="legend-dot done"></span>Đạt: lệch ≤ ±10%</div><div class="legend-row"><span class="legend-dot variance30"></span>Lệch nhẹ: >10% đến 30%</div><div class="legend-row"><span class="legend-dot variance50"></span>Lệch vừa: >30% đến 50%</div><div class="legend-row"><span class="legend-dot variance80"></span>Lệch lớn: >50% đến 80%</div><div class="legend-row"><span class="legend-dot varianceOver"></span>Lệch rất lớn: >80%</div><div class="legend-row"><span class="legend-dot skipped"></span>Không tập / bỏ buổi</div><div class="legend-row"><span class="legend-dot planned"></span>Chưa đến / đang kế hoạch</div><div class="legend-row"><span class="legend-dot overdue"></span>Quá hạn, chưa nhập kết quả</div></div></div>
+    <div class="summary-card"><div class="summary-title">Dữ liệu</div><div class="mini-actions"><button id="restoreSide" type="button">Khôi phục</button><button id="backupSide" type="button">Sao lưu</button><button id="clearSide" class="wide" type="button">Xóa toàn bộ dữ liệu</button></div></div>
+    <div class="data-note">Nhập FIT sẽ tạo thẻ hoạt động riêng đúng ngày chạy (hoặc tự ghép khi nhập nhiều FIT). Có thể mở kết quả → Tách kết quả khỏi bài tập để trả kết quả về thẻ tím, sau đó kéo thẻ này vào đúng bài kế hoạch; nếu có nhiều bài kế hoạch, ứng dụng sẽ hỏi chọn bài. Trên điện thoại dùng nút “Ghép kết quả vào bài kế hoạch”. Mỗi ngày có thể có nhiều bài tập. Kéo thả 1 bài sang ngày khác để đổi ngày; giữ Ctrl khi kéo (hoặc bấm nút ⧉) để copy sang ngày khác thay vì chuyển hẳn. Import Excel / Nhập JSON chỉ gộp thêm vào lịch, không xóa bài cũ, tự bỏ qua bài trùng. Dùng <b>Xuất bài tập (JSON)</b> để gửi lịch tập cho người khác — họ chỉ cần <b>Nhập bài tập (JSON)</b> để tập theo và tự nhập kết quả. Kéo xuống để xem thêm các tuần kế tiếp.</div>
+  </aside>
+</div>
+<section class="log-view" id="logView" style="display:none">
+  <div class="log-toolbar">
+    <div class="log-field"><label>Từ ngày</label><input type="date" id="logFrom" /></div>
+    <div class="log-field"><label>Đến ngày</label><input type="date" id="logTo" /></div>
+    <div class="log-field"><label>Loại bài</label><select id="logType"><option value="">Tất cả</option><option>Easy</option><option>Recovery</option><option>Long run</option><option>Tempo</option><option>Threshold</option><option>Interval</option><option>VO2max</option><option>Custom</option></select></div>
+    <div class="log-field"><label>Trạng thái</label><select id="logStatus"><option value="">Tất cả</option><option value="done">Đạt ±10%</option><option value="variance30">Lệch 10–30%</option><option value="variance50">Lệch 30–50%</option><option value="variance80">Lệch 50–80%</option><option value="varianceOver">Lệch &gt;80%</option><option value="skipped">Không tập / bỏ buổi</option><option value="overdue">Quá hạn chưa nhập</option><option value="planned">Kế hoạch (chưa tới)</option></select></div>
+    <div class="log-field log-search"><label>Tìm kiếm</label><input type="text" id="logSearch" placeholder="Tên bài, ghi chú..." /></div>
+    <div class="log-field log-reset"><label>&nbsp;</label><button type="button" id="logResetBtn">Xóa lọc</button></div>
+    <div class="toolbar-spacer"></div>
+    <button type="button" id="logExportExcel" class="toolbar-btn">⇩ Xuất Excel</button>
+    <button type="button" id="logExportJson" class="toolbar-btn">⇩ Xuất JSON</button>
+  </div>
+  <div class="log-summary" id="logSummary">0 mục</div>
+  <div class="log-table-wrap">
+    <div class="log-row log-row-head"><div>Ngày</div><div>Bài tập</div><div>Loại</div><div>Trạng thái</div><div>Kế hoạch</div><div>Thực tế</div><div>Pace TT</div><div></div></div>
+    <div id="logRows"></div>
+    <div class="log-empty" id="logEmpty" style="display:none">Không có mục nào khớp bộ lọc.</div>
+  </div>
+</section>
+<div class="modal" id="modal">
+  <div class="sheet actual-sheet">
+    <div class="sheet-head"><h2>Nhập kết quả chạy</h2><div class="meta" id="modalMeta"></div></div>
+    <div class="sheet-body"><form id="actualForm">
+    <div class="fit-saved-banner" id="fitSavedBanner" hidden>
+      <div class="fit-saved-banner-copy"><strong>📊 Đã có dữ liệu Garmin FIT</strong><small id="fitSavedBannerMeta">Dữ liệu phân tích được lưu cùng kết quả chạy, có thể xem lại bất cứ lúc nào.</small></div>
+      <button type="button" class="fit-saved-show-btn" id="fitSavedRemap">↻ Ghép section từ FIT</button>
+      <button type="button" class="fit-saved-show-btn" id="fitSavedOpenNow">Xem toàn bộ biểu đồ · Laps · Zones ↓</button>
+    </div>
+    <div class="grid">
+      <div class="field"><label>Trạng thái</label><select id="workoutStatus"><option value="done">Hoàn thành</option><option value="missed">Bỏ buổi / không hoàn thành</option></select></div>
+      <div class="field"><label>Pace thực tế</label><input id="paceOut" readonly /></div>
+      <div class="field"><label>Km thực tế</label><input id="actualKm" inputmode="decimal" type="number" min="0" step="0.01" /></div>
+      <div class="field"><label>Thời gian thực tế</label><input id="actualMinutes" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="66:30 · 1:06:30 · 66'30&quot; · 1h06'30&quot;" /><small class="time-input-hint">Ô này là <b>text</b>, không còn giới hạn kiểu số. Nhập mm:ss, h:mm:ss hoặc 66'30&quot; / 1h06'30&quot;. Nếu bàn phím điện thoại khó gõ ký hiệu, dùng các nút ngay dưới.</small><div class="time-quickbar" id="timeQuickBar"><span class="quick-label">Chèn:</span><button class="time-quick-btn" type="button" data-time-token=":" title="Chèn dấu hai chấm">:</button><button class="time-quick-btn" type="button" data-time-token="'" title="Chèn dấu phút">'</button><button class="time-quick-btn" type="button" data-time-token="&quot;" title="Chèn dấu giây">&quot;</button><button class="time-quick-btn" type="button" data-time-token="h" title="Chèn giờ">h</button><button class="time-example-btn" type="button" data-time-example="66:30">66:30</button><button class="time-example-btn" type="button" data-time-example="1:06:30">1:06:30</button></div></div>
+      <div class="field"><label>Mức mệt mỏi (RPE 1–10)</label><select id="fatigue"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></div>
+      <div class="field"><label>Calo (kcal)</label><input id="calories" inputmode="numeric" type="number" min="0" step="1" /></div>
+      <div class="field"><label>Nhịp tim TB (bpm)</label><input id="avgHr" inputmode="numeric" type="number" min="0" step="1" /></div>
+      <div class="field span2"><label>Ghi chú khác</label><textarea id="actualNote" placeholder="Cảm giác chân, thời tiết, đau mỏi, thay đổi bài tập..."></textarea></div>
+      <div class="actual-section-panel" id="actualSectionPanel">
+        <div class="actual-section-head"><strong>Chi tiết kết quả theo từng section</strong><small>Lặp lại đúng cấu trúc bài kế hoạch</small><span class="push"></span><span class="actual-section-count" id="actualSectionCount">0 section</span></div>
+        <div class="actual-section-help">Chỉ cần nhập <b>1 thông tin</b> ở một section. App sẽ lấy phần còn thiếu từ <b>kế hoạch của chính section đó</b> rồi tính đủ 3 giá trị <b>thời gian · km · pace</b>. Ví dụ bài 200 m: nhập 2:00 → tự điền 0,20 km và tính pace; nhập pace 5:30 → tự điền 0,20 km và tính thời gian. Khi đã có dữ liệu section, <b>Km/Thời gian tổng phía trên bị khóa và được tính lại hoàn toàn từ các section</b>.</div>
+        <div class="actual-section-wrap"><div id="actualSectionsBody"></div></div>
+        <div class="section-summary-bar" id="actualSectionSummary"><span>Chưa có dữ liệu section.</span></div>
+      </div>
+      <div class="section-compare-panel" id="actualSectionComparePanel">
+        <div class="section-compare-head"><strong>So sánh kế hoạch ↔ thực tế theo section</strong><small>Overlay workout profile</small><span class="push"></span><div class="section-compare-legend"><span><i class="compare-legend-swatch plan"></i>KH · vạch đỏ đứt</span><span><i class="compare-legend-swatch actual"></i>TT · lớp trong suốt</span><span><i class="compare-legend-swatch good"></i>Lệch ≤10%</span></div></div>
+        <div class="section-compare-help"><b>Hai lớp chồng trực tiếp lên nhau.</b> Chiều cao biểu diễn tốc độ (cao hơn = nhanh hơn). <b>Chiều rộng section thay đổi theo khối lượng</b>: section theo phút dùng thời gian; section theo cự ly được quy đổi theo cự ly + pace mục tiêu để nằm trên cùng một trục trực quan. Bên trong từng section, chiều rộng lớp TT co/giãn theo tỷ lệ khối lượng TT/KH. Màu lớp TT lấy <b>mức lệch lớn hơn giữa pace và khối lượng</b>.</div>
+        <div class="section-compare-scroll"><div id="actualSectionCompareChart" class="section-compare-chart"><div class="section-compare-empty">Nhập kết quả từng section để xem biểu đồ so sánh.</div></div></div>
+        <div class="compare-summary" id="actualSectionCompareSummary"><span>Chưa có dữ liệu để so sánh.</span></div>
+      </div>
+      <details class="fit-saved-details" id="fitSavedDetails" hidden>
+        <summary>📊 Phân tích Garmin FIT · Tổng quan, biểu đồ, Laps và Zones</summary>
+        <div class="fit-saved-content">
+          <div class="fit-saved-meta" id="fitSavedMeta"></div>
+          <div id="fitSavedLegacyWarning" class="fit-old-warning" hidden></div>
+          <div class="fit-rich-grid" id="fitSavedRichGrid">
+            <section class="fit-rich-card wide"><div class="fit-rich-head"><h3>Tổng quan nâng cao</h3><div class="meta">Dữ liệu FIT đã lưu</div></div><div class="fit-rich-body" data-fit-panel="summary"></div></section>
+            <section class="fit-rich-card wide"><div class="fit-rich-head"><h3>Biểu đồ theo thời gian</h3><div class="meta">Dựa trên bản ghi FIT</div></div><div class="fit-rich-body"><div class="fit-charts-grid" data-fit-panel="charts"></div></div></section>
+            <section class="fit-rich-card"><div class="fit-rich-head"><h3>Bảng Laps</h3><div class="meta" data-fit-panel="lap-meta"></div></div><div class="fit-rich-body" data-fit-panel="laps"></div></section>
+            <section class="fit-rich-card"><div class="fit-rich-head"><h3>Time in Heart Rate Zones</h3><div class="meta">Ước tính, không phải zones cài trong Garmin</div></div><div class="fit-rich-body" data-fit-panel="zones"></div></section>
+          </div>
+        </div>
+      </details>
+    </div><div class="sheetactions"><button type="button" id="fitImportInActual" title="Lấy dữ liệu Garmin FIT cho bài này">⇧ Lấy từ FIT</button><button type="button" id="detachActual" class="fit-detach-action" hidden title="Tách kết quả thành thẻ tím riêng và giữ bài tập ở trạng thái chưa có kết quả">⇱ Tách kết quả khỏi bài tập</button><button type="button" id="deleteActual" class="danger">Xóa kết quả</button><button type="button" id="cancelModal">Đóng</button><button type="submit" class="primary">Lưu kết quả</button></div></form></div>
+  </div>
+</div>
+
+
+<!-- RunPlan v1.8.5 Garmin FIT preview: nothing is saved until user confirms. -->
+<div class="modal" id="fitImportModal">
+  <div class="sheet fit-import-sheet">
+    <div class="sheet-head"><h2>Nhập kết quả Garmin FIT</h2><div class="meta" id="fitImportTitle">Đang đọc tệp…</div></div>
+    <div class="sheet-body">
+      <div class="fit-import-guide"><strong>Xem trước trước khi lưu:</strong> RunPlan đọc tệp FIT ngay trên thiết bị, không gửi dữ liệu lên máy chủ. Mặc định file được tạo thành thẻ hoạt động FIT trong đúng ngày chạy. Sau đó kéo thẻ này vào thẻ bài kế hoạch, hoặc chọn bài kế hoạch ngay tại đây nếu muốn ghép trực tiếp.</div>
+      <div class="fit-source-line" id="fitImportMeta"></div>
+      <div class="fit-preview-stats" id="fitPreviewSummary"></div>
+      <div class="fit-import-grid">
+        <div><label for="fitImportDate">Ngày chạy (có thể sửa)</label><input type="date" id="fitImportDate" required /></div>
+        <div><label for="fitTargetWorkout">Ghép kết quả vào bài tập</label><select id="fitTargetWorkout"></select></div>
+        <div class="wide"><label for="fitSectionMode">Dữ liệu theo section</label><select id="fitSectionMode"><option value="none">Chỉ nhập tổng kết quả FIT</option></select></div>
+      </div>
+      <div class="fit-warning" id="fitImportWarning" style="display:none"></div>
+      <div class="fit-mode-explainer" id="fitSectionEstimateHelp" hidden></div>
+      <div class="fit-preview-sections" id="fitSectionsPreview"><div class="fit-preview-empty">Chưa có dữ liệu section.</div></div>
+      <div class="fit-rich-grid">
+        <section class="fit-rich-card wide"><div class="fit-rich-head"><h3>Tổng quan nâng cao</h3><div class="meta">Garmin-inspired dashboard · dữ liệu đọc từ FIT</div></div><div class="fit-rich-body" id="fitExtraSummary"></div></section>
+        <section class="fit-rich-card wide"><div class="fit-rich-head"><h3>Biểu đồ theo thời gian</h3><div class="meta">Những biểu đồ có dữ liệu mới được hiện</div></div><div class="fit-rich-body"><div id="fitDetailCharts" class="fit-charts-grid"></div></div></section>
+        <section class="fit-rich-card"><div class="fit-rich-head"><h3>Laps</h3><div class="meta" id="fitLapMeta"></div></div><div class="fit-rich-body" id="fitLapTable"></div></section>
+        <section class="fit-rich-card"><div class="fit-rich-head"><h3>Time in Heart Rate Zones</h3><div class="meta">Ước tính theo nhịp tim tối đa trong file FIT</div></div><div class="fit-rich-body" id="fitZones"></div></section>
+      </div>
+      <label class="fit-safety"><input type="checkbox" id="fitAllowOverwrite" /><span><strong>Cho phép ghi đè kết quả hiện có.</strong> Chỉ cần tích khi muốn thay thế kết quả của bài đã có dữ liệu. Trường hợp chưa có kết quả, RunPlan sẽ lưu mới bình thường.</span></label>
+      <div class="fit-overwrite-state" id="fitOverwriteState"></div>
+      <div class="sheetactions"><button type="button" id="fitCancelBtn">Hủy, không lưu</button><button type="button" id="fitApplyBtn" class="primary">Áp dụng dữ liệu FIT</button></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- v1.8.8: automatic import report when selecting multiple FIT files -->
+<div class="modal" id="fitBatchModal">
+  <div class="sheet fit-batch-sheet">
+    <div class="sheet-head"><h2>Import nhiều Garmin FIT</h2><div class="meta" id="fitBatchTitle">Đang chuẩn bị…</div></div>
+    <div class="sheet-body">
+      <div class="fit-batch-guide">Mỗi FIT được nhận diện theo <b>ngày chạy trong file</b>. RunPlan tự ghép vào bài kế hoạch <b>chưa có kết quả</b> khi tìm được bài phù hợp, đồng thời ghép section theo phút/km. Nếu ngày đã kín, thiếu kế hoạch hoặc chưa thể xác định chính xác bài đích, hoạt động vẫn được lưu thành <b>thẻ FIT riêng</b> để ghép sau. Không tự ghi đè kết quả đã có.</div>
+      <div class="fit-batch-progress"><div class="fit-batch-progress-fill" id="fitBatchProgress"></div></div>
+      <div class="fit-batch-stats" id="fitBatchStats"></div>
+      <div class="fit-batch-table-wrap"><table class="fit-batch-table"><thead><tr><th>Tệp FIT</th><th>Ngày chạy</th><th>Thành tích</th><th>Kết quả xử lý</th></tr></thead><tbody id="fitBatchRows"></tbody></table></div>
+      <div class="fit-batch-note">Tệp không hợp lệ hoặc trùng sẽ bỏ qua và báo rõ lý do. Với những bài có cấu trúc, ranh giới section được nội suy tuần tự theo kế hoạch, cần kiểm tra lại nếu buổi chạy thực tế có đổi bài.</div>
+      <div class="sheetactions"><button type="button" id="fitBatchCloseBtn" class="primary" disabled>Đóng và xem lịch</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="builderModal">
+  <div class="sheet builder-sheet">
+    <div class="sheet-head">
+      <div class="builder-headline"><div><h2 id="builderTitle">Tạo bài tập chạy</h2><div class="meta" id="builderMeta">Xây bài theo từng phần, pace và nhịp tim mục tiêu</div></div><div class="hint">Warm-up → các block lặp → Cool-down. Mỗi đoạn có thể dùng thời gian hoặc quãng đường, pace mục tiêu và/hoặc nhịp tim mục tiêu.</div></div>
+    </div>
+    <div class="builder-body"><form id="builderForm">
+      <div class="builder-top-grid">
+        <div class="field"><label>Ngày tập</label><input id="builderDate" type="date" required /></div>
+        <div class="field"><label>Tên bài tập</label><input id="builderName" placeholder="Ví dụ: Interval 6x800m / Easy aerobic" required /></div>
+        <div class="field"><label>Loại bài</label><select id="builderType"><option>Easy</option><option>Recovery</option><option>Long run</option><option>Tempo</option><option>Threshold</option><option>Interval</option><option>VO2max</option><option>Custom</option></select></div>
+        <div class="field wide"><label>Ghi chú kế hoạch</label><input id="builderNote" placeholder="Ví dụ: Giữ form chạy, không cố nếu nhịp tim vượt mục tiêu..." /></div>
+      </div>
+      <div class="builder-summary">
+        <div class="bstat"><span>Tổng thời gian ước tính</span><b id="builderTotalMin">0 phút</b></div>
+        <div class="bstat"><span>Tổng quãng đường ước tính</span><b id="builderTotalKm">0 km</b></div>
+        <div class="bstat"><span>Pace mục tiêu toàn bài</span><b id="builderPaceRange">—</b></div>
+        <div class="bstat"><span>Nhịp tim mục tiêu</span><b id="builderHrRange">—</b></div>
+      </div>
+      <div id="builderContent"></div>
+      <div class="builder-section"><div class="builder-section-head"><strong>Mô tả sẽ lưu vào kế hoạch</strong><small>Tự sinh từ cấu trúc phía trên</small></div><div style="padding:9px"><div id="builderPreview" class="builder-preview">Chưa có cấu trúc bài tập.</div><div class="pace-legend"><span class="mini-bar walkbar"></span>Đi bộ / nghỉ <span class="mini-bar easybar"></span>Chạy dễ <span class="mini-bar fastbar"></span>Pace nhanh</div></div></div>
+      <div class="builder-help">Cách hiểu pace: nhập dạng <b>mm:ss</b>, ví dụ 05:20–05:40/km. Pace nhỏ hơn nghĩa là chạy nhanh hơn. Nếu một đoạn dùng quãng đường, app dùng pace trung bình của khoảng mục tiêu để ước tính thời gian; nếu dùng thời gian, app dùng pace để ước tính quãng đường. <b>Đoạn theo cự ly:</b> nhập được 0,08 km (80 m), 0,05 km (50 m) bằng <b>dấu phẩy hoặc dấu chấm</b>; kết quả không bị làm tròn về 0,1 km.</div>
+      <div class="sheetactions"><button type="button" id="deletePlan" class="danger">Xóa bài tập này</button><button type="button" id="saveAsTemplateBtn">💾 Lưu làm mẫu</button><button type="button" id="cancelBuilder">Đóng</button><button type="submit" class="primary">Lưu bài tập</button></div>
+    </form></div>
+  </div>
+</div>
+
+<div class="modal" id="libraryModal">
+  <div class="sheet library-sheet">
+    <div class="sheet-head"><h2>Thư viện bài tập mẫu</h2><div class="meta">Tìm nhanh, xem cấu trúc bài, chọn ngày và thêm thẳng vào lịch hoặc chỉnh trước khi dùng</div></div>
+    <div class="sheet-body">
+      <div class="library-toolbar">
+        <div class="field"><label>Tìm mẫu</label><input id="librarySearch" placeholder="Tên bài, loại bài, nội dung..." /></div>
+        <div class="field"><label>Loại bài</label><select id="libraryType"><option value="">Tất cả</option><option>Easy</option><option>Recovery</option><option>Long run</option><option>Tempo</option><option>Threshold</option><option>Interval</option><option>VO2max</option><option>Custom</option></select></div>
+        <div class="field"><label>Ngày thêm vào lịch</label><input id="libraryDate" type="date" /></div>
+        <div class="library-count" id="libraryCount">0 mẫu</div>
+      </div>
+      <div class="library-tip">Mỗi mẫu hiển thị luôn workout profile và cấu trúc chính. “Thêm vào lịch” giữ nguyên mẫu; “Chỉnh trước khi dùng” mở Workout Builder để bạn thay pace, số lần lặp hoặc ghi chú trước khi lưu.</div>
+      <div id="libraryList" class="lib-grid"></div>
+      <div class="sheetactions"><button type="button" id="libraryCreateBtn">＋ Tạo bài mới</button><button type="button" id="closeLibrary">Đóng</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>

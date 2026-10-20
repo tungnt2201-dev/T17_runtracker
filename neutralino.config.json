@@ -1,0 +1,64 @@
+{
+  "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
+  "applicationId": "vn.t17.runtracker",
+  "version": "2.0.0",
+  "applicationName": "T17 RunTracker",
+  "author": "Tung",
+  "description": "T17 RunTracker - kế hoạch và theo dõi chạy bộ",
+  "copyright": "T17 RunTracker",
+  "applicationIcon": "assets/appIcon.png",
+  "defaultMode": "window",
+  "port": 0,
+  "documentRoot": "/resources/",
+  "url": "/",
+  "enableServer": true,
+  "enableNativeAPI": true,
+  "tokenSecurity": "one-time",
+  "logging": {
+    "enabled": false,
+    "writeToLogFile": false
+  },
+  "nativeAllowList": [
+    "app.*",
+    "os.getPath",
+    "os.showSaveDialog",
+    "os.showOpenDialog",
+    "os.open",
+    "os.execCommand",
+    "filesystem.*",
+    "window.*",
+    "events.*"
+  ],
+  "globalVariables": {},
+  "modes": {
+    "window": {
+      "title": "T17 RunTracker",
+      "width": 1440,
+      "height": 900,
+      "minWidth": 1100,
+      "minHeight": 640,
+      "center": true,
+      "fullScreen": false,
+      "alwaysOnTop": false,
+      "icon": "/resources/icons/appIcon.png",
+      "enableInspector": false,
+      "borderless": false,
+      "maximize": false,
+      "hidden": false,
+      "resizable": true,
+      "exitProcessOnClose": false,
+      "useSavedState": true
+    },
+    "browser": {
+      "nativeBlockList": []
+    }
+  },
+  "cli": {
+    "binaryName": "T17_runtracker",
+    "resourcesPath": "/resources/",
+    "extensionsPath": "/extensions/",
+    "clientLibrary": "/resources/js/neutralino.js",
+    "binaryVersion": "6.10.0",
+    "clientVersion": "6.10.0"
+  }
+}

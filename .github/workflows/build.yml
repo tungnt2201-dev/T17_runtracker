@@ -1,0 +1,54 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Cài đặt
+        run: npm ci
+
+      - name: Kiểm tra cú pháp
+        run: npm run check
+
+      - name: Test (bao gồm đọc dữ liệu JSON đời cũ)
+        run: npm test
+
+      - name: Tải Neutralino binaries
+        run: npx neu update
+
+      - name: Đóng gói exe một file (Windows portable)
+        run: |
+          npx neu build --release --embed-resources
+          node scripts/package-win.mjs
+          ls -la release
+
+      - name: Tải lên artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: T17_runtracker-${{ github.sha }}
+          path: release/*
+          if-no-files-found: error
+
+      - name: Tạo GitHub Release (khi đẩy tag v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true

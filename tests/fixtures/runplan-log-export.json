@@ -1,0 +1,5 @@
+{"format": "runplan-log", "version": 1, "exportedAt": "2026-10-20T00:00:00.000Z", "entries": [
+  {"date": "2026-10-12", "dow": "Hai", "workoutName": "Tempo 20 phút", "workoutType": "Tempo", "planKm": 7.2, "planMinutes": 45, "description": "Warm-up: Chạy 15 phút", "planNote": "", "actual": {"status": "done", "km": 7.3, "minutes": 44.5}},
+  {"date": "2026-10-19", "dow": "Hai", "workoutName": "Easy 40 phút", "workoutType": "Easy", "planKm": 6.15, "planMinutes": 40, "description": "Easy", "planNote": "", "actual": {"status": "done", "km": 6.3, "minutes": 41}},
+  {"date": "2026-10-20", "dow": "Ba", "workoutName": "Recovery", "planKm": 4, "planMinutes": 30, "description": "", "planNote": "", "actual": null}
+]}

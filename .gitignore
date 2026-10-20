@@ -1,0 +1,17 @@
+node_modules/
+dist/
+release/
+bin/
+.tmp/
+.storage/
+neutralinojs.log
+
+# sinh ra bởi scripts/build.mjs
+resources/index.html
+resources/js/
+resources/icons/
+
+# dữ liệu cá nhân khi chạy thử `neu run`
+data/
+*.fit
+*.FIT
