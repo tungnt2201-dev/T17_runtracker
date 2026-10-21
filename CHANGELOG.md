@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.1 — 2026-10-21
+
+- **Hướng dẫn sử dụng** dạng Word (`docs/Huong_dan_su_dung_T17_RunTracker.docx`, 34 trang, 30 hình), có trong gói zip phát hành.
+- Sửa: trên cột ngày hẹp, hàng nút công cụ (✎ ⧉ ⌚ ⌫ ⋮) đè lên tên bài — nay tự xuống dòng.
+
 ## 2.1.0 — 2026-10-20 (P1)
 
 Gói phát hành từ bản này: **`yymmdd_T17_runtracker_vX.Y.Z.zip`** (exe + bản web + hướng dẫn). Giải nén đè lên thư mục cũ, dữ liệu trong `data\` được giữ nguyên.

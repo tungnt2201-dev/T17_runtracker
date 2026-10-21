@@ -3,7 +3,8 @@
 //     ├─ T17_runtracker.exe        (tên cố định → giải nén đè bản cũ, thư mục data\ giữ nguyên)
 //     ├─ T17_runtracker_web.html   (bản chạy bằng trình duyệt)
 //     ├─ HUONG_DAN.txt
-//     └─ CHANGELOG.md
+//     ├─ CHANGELOG.md
+//     └─ Huong_dan_su_dung_T17_RunTracker.docx
 // yymmdd = ngày build theo giờ Việt Nam. Ghi đè bằng biến môi trường BUILD_DATE=yymmdd nếu cần.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -65,6 +66,7 @@ if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith
     { name: 'T17_runtracker_web.html', data: fs.readFileSync('dist/web/T17_runtracker.html') },
     { name: 'HUONG_DAN.txt', data: Buffer.from('\ufeff' + GUIDE(pkg.version), 'utf8') },
     { name: 'CHANGELOG.md', data: fs.readFileSync('CHANGELOG.md') },
+    ...(fs.existsSync('docs/Huong_dan_su_dung_T17_RunTracker.docx') ? [{ name: 'Huong_dan_su_dung_T17_RunTracker.docx', data: fs.readFileSync('docs/Huong_dan_su_dung_T17_RunTracker.docx') }] : []),
   ]);
   const out = path.join('release', base + '.zip');
   fs.writeFileSync(out, zip);

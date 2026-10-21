@@ -189,3 +189,8 @@ button{font:inherit}button,.btn{border:0;cursor:pointer}.file-picker-input{posit
 .an-alert{padding:9px 12px;border-radius:8px;background:#fff8e5;border:1px solid #f0dc9c;color:#7a5c0c;font-size:11px}.an-alert.bad{background:#fff0f0;border-color:#f2caca;color:#9b2c2c}
 .an-alert button{margin-left:8px;height:24px;border:1px solid #e0c56f;background:#fff;border-radius:5px;font-size:10px;font-weight:800;color:#7a5c0c;padding:0 8px}
 @media(max-width:1200px){.an-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.an-two{grid-template-columns:1fr}}
+
+/* v2.1.1: cột ngày hẹp → hàng nút công cụ tự xuống dòng, không đè lên tên bài */
+.workout-top{flex-wrap:wrap;row-gap:2px}
+.workout-top .workout-title{flex:1 1 80px;overflow-wrap:anywhere}
+.workout-top .workout-tools{margin-left:auto;flex-wrap:wrap;justify-content:flex-end}

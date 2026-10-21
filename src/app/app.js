@@ -1,6 +1,6 @@
 'use strict';
 /* T17 RunTracker — app chính (tách từ RunPlan Tracker v1.8.9). */
-const APP_VERSION='2.1.0';
+const APP_VERSION='2.1.1';
 const {parseWorkbookRows}=T17ExcelPlan;
 const {DAYS,cleanDescription,genId,hasWorkoutContent,norm,ymd,excelYmd,pace,parseDurationInput,formatDurationClock,samePlanRecord,numVN,paceToSec,secToPace,clamp,stepEstimate,flattenStructuredSegments,segmentHeight,parseYmdLocal,addDaysYmd,mondayYmd,isoWeekNumber,blankDay,deepClone,stepTargetsText,stepText,smartNum,descriptionOf,totalsOf}=T17Core;
 const $=id=>document.getElementById(id);

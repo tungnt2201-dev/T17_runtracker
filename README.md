@@ -9,7 +9,7 @@ Chạy được theo hai cách:
 | **Web (một file HTML)** | `T17_runtracker_web.html` | localStorage của trình duyệt (dùng chung khoá với RunPlan cũ) |
 
 Mỗi phiên bản phát hành là một file nén **`yymmdd_T17_runtracker_vX.Y.Z.zip`** (ví dụ `261020_T17_runtracker_v2.1.0.zip`)
-chứa cả hai bản trên, `HUONG_DAN.txt` và `CHANGELOG.md`.
+chứa cả hai bản trên, `HUONG_DAN.txt`, `CHANGELOG.md` và **Hướng dẫn sử dụng** (Word, có ảnh minh hoạ từng bước — cũng có tại [`docs/Huong_dan_su_dung_T17_RunTracker.docx`](docs/Huong_dan_su_dung_T17_RunTracker.docx)).
 
 Không cần tài khoản, không gửi dữ liệu đi đâu. File Garmin FIT được đọc ngay trên máy.
 
