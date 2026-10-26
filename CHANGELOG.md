@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.2.0 — 2026-10-26
+
+### Mới: nhiều người dùng
+- Nút người dùng ở góc phải thanh trên: danh sách, **chuyển người dùng** một cú bấm, **thêm người dùng**, mở hồ sơ, xoá người dùng (gõ tên để xác nhận).
+- Mỗi người dùng có kho dữ liệu **riêng hoàn toàn**: lịch tập, kết quả, FIT, mẫu bài và hồ sơ. Sao lưu / khôi phục / xoá dữ liệu chỉ tác động tới người đang chọn.
+- **Hồ sơ cá nhân đầy đủ, nhập bổ sung dần** (mọi ô tuỳ chọn): họ tên, biệt danh, ngày sinh (tự tính tuổi), giới tính, chiều cao, cân nặng (tự tính BMI), email, điện thoại, nơi ở, CLB, liên hệ khẩn cấp, mục tiêu, ghi chú — cùng với thông số tập luyện sẵn có. Thanh tiến độ cho biết đã nhập bao nhiêu mục; gợi ý HR tối đa theo tuổi.
+- Bản .exe: người dùng cũ giữ nguyên file `data\t17-runtracker.json`; người mới nằm ở `data\users\<mã>.json`, danh sách ở `data\users.json`. Mỗi người có bản sao lưu tự động hằng ngày riêng. Xoá người dùng chỉ chuyển file vào `data\deleted\`. Nếu `users.json` hỏng, app tự dò lại từ thư mục `users\`.
+- Bản web: người dùng cũ giữ khoá localStorage cũ; người mới dùng khoá `runplan-tracker-v1:<mã>`.
+- App mở lại đúng người dùng đã dùng lần trước.
+
+### Sửa lỗi
+- Ghi file: gọi flush khi không có gì chờ ghi có thể làm kẹt các lần lưu sau trong cùng phiên.
+
+### Tương thích dữ liệu
+- Không đổi schema file dữ liệu; thêm các trường cá nhân vào `profile`. Nâng cấp từ 2.0 / 2.1 không cần làm gì — dữ liệu cũ tự thành người dùng đầu tiên (“Tôi”). File sao lưu của mỗi người dùng vẫn đọc được bằng bản cũ.
+
 ## 2.1.1 — 2026-10-21
 
 - **Hướng dẫn sử dụng** dạng Word (`docs/Huong_dan_su_dung_T17_RunTracker.docx`, 34 trang, 30 hình), có trong gói zip phát hành.

@@ -506,9 +506,9 @@ async function exportExcel(){const EXPORT_TITLE='Xuất Excel';
  if(!T17Platform.isDesktop)toast('Đã tạo file Excel (đủ mọi bài trong ngày)');
 }
 exportBtn.onclick=exportExcel;
-function clearData(){if(confirm('Xóa toàn bộ kế hoạch và kết quả đang lưu trên trình duyệt này? (Mẫu bài tập trong thư viện sẽ được giữ lại.)')){db={weeks:[],templates:db.templates||[],templatesSeeded:true};saveDb();render();toast('Đã xóa dữ liệu')}}clearBtn.onclick=clearData;$('clearSide').onclick=clearData;railClear.onclick=clearData;
+function clearData(){if(confirm('Xóa toàn bộ kế hoạch và kết quả của người dùng “'+T17Platform.activeUser().name+'”? (Người dùng khác không bị ảnh hưởng.) (Mẫu bài tập trong thư viện sẽ được giữ lại.)')){db={weeks:[],templates:db.templates||[],templatesSeeded:true};saveDb();render();toast('Đã xóa dữ liệu')}}clearBtn.onclick=clearData;$('clearSide').onclick=clearData;railClear.onclick=clearData;
 function saveBlob(blob,name){return T17Platform.saveFile(blob,name).then(p=>{if(p&&T17Platform.isDesktop)toast('Đã lưu: '+p);return p}).catch(e=>{alert('Không lưu được file: '+(e.message||e));return''})}
-function backup(){saveBlob(new Blob([JSON.stringify(T17Legacy.toBackup(db,APP_VERSION),null,2)],{type:'application/json'}),`T17_RunTracker_backup_${ymd(new Date())}.json`)}backupBtn.onclick=backup;$('backupSide').onclick=backup;
+function backup(){saveBlob(new Blob([JSON.stringify(T17Legacy.toBackup(db,APP_VERSION),null,2)],{type:'application/json'}),`T17_RunTracker_backup_${T17Platform.activeUserId()==='main'?'':T17Users.slug(T17Platform.activeUser().name)+'_'}${ymd(new Date())}.json`)}backupBtn.onclick=backup;$('backupSide').onclick=backup;
 function triggerRestore(){try{restoreFile.value='';restoreFile.click()}catch(e){alert('Không mở được trình chọn file.')}}restoreBtn.onclick=triggerRestore;$('restoreSide').onclick=triggerRestore;
 /** Khôi phục toàn bộ: nhận mọi định dạng sao lưu (RunPlan v1.x, T17 v2, localStorage dump, mảng tuần). */
 function restoreFromData(data,sourceName=''){
@@ -516,7 +516,7 @@ function restoreFromData(data,sourceName=''){
  if(kind==='plan'||kind==='log')return mergeExportData(data,kind);
  if(!['backup','backup-wrapped','weeks'].includes(kind))throw new Error('File JSON không đúng định dạng sao lưu RunPlan / T17 RunTracker.');
  const {db:next,report}=loadDbFrom(data);
- if(!confirm(`Khôi phục toàn bộ dữ liệu từ ${sourceName||'file'}?\n\nFile chứa: ${T17Legacy.describeReport(report)}.\n\nDữ liệu hiện tại trên máy này sẽ bị GHI ĐÈ. Nên bấm "Sao lưu toàn bộ" trước nếu chưa chắc.`))return false;
+ if(!confirm(`Khôi phục toàn bộ dữ liệu từ ${sourceName||'file'}?\n\nFile chứa: ${T17Legacy.describeReport(report)}.\n\nDữ liệu hiện tại của người dùng “${T17Platform.activeUser().name}” sẽ bị GHI ĐÈ (người dùng khác không bị ảnh hưởng). Nên bấm "Sao lưu toàn bộ" trước nếu chưa chắc.`))return false;
  db=next;saveDb();currentWeek=findCurrentWeek();render();refreshViews();toast('Đã khôi phục: '+T17Legacy.describeReport(report));return true;
 }
 /** Gộp thêm file "Xuất bài tập" (plan) hoặc "Training Log" (log, có kèm kết quả). Không xoá dữ liệu cũ. */
@@ -722,7 +722,7 @@ async function boot(){
  // Lần đầu (hoặc dữ liệu được nâng cấp từ định dạng cũ) → ghi lại theo schema mới.
  if(raw&&(!raw.schemaVersion||raw.schemaVersion<T17Legacy.SCHEMA_VERSION||report.legacyDaysConverted||report.weeksRealigned||report.idsFixed))saveDb();
  else if(!raw)saveDb();
- T17Analytics.init();T17Profile.init();
+ T17Analytics.init();T17Profile.init();T17UserUI.init();T17UserUI.syncName();
  currentWeek=findCurrentWeek();render();initEnvironment();
  booted=true;if(warnings.length)showSupport('warn',warnings.join(' '));
  if(loadError)showSupport('bad','Không mở được kho dữ liệu: '+loadError+'. Dữ liệu tạm thời chỉ nằm trong phiên này — hãy Sao lưu JSON.');

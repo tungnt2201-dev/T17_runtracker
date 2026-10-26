@@ -17,6 +17,7 @@ const VERSION = pkg.version;
 const MODULES = [
   'src/core/utils.js',
   'src/core/legacy.js',
+  'src/core/users.js',
   'src/core/excel-plan.js',
   'src/core/athlete.js',
   'src/core/load.js',
@@ -29,6 +30,7 @@ const MODULES = [
   'src/app/fit-ui.js',
   'src/app/analytics.js',
   'src/app/profile.js',
+  'src/app/users-ui.js',
 ];
 
 function inlineScript(file) {

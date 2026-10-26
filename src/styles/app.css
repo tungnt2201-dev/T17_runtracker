@@ -194,3 +194,24 @@ button{font:inherit}button,.btn{border:0;cursor:pointer}.file-picker-input{posit
 .workout-top{flex-wrap:wrap;row-gap:2px}
 .workout-top .workout-title{flex:1 1 80px;overflow-wrap:anywhere}
 .workout-top .workout-tools{margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+
+/* ===== v2.2: nhiều người dùng ===== */
+.top-right{display:flex;align-items:center;gap:8px}
+.avatar{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#2f6fda;color:#fff;font-size:10px;font-weight:800;flex:0 0 auto;letter-spacing:0}
+.avatar.big{width:48px;height:48px;font-size:17px}
+.user-wrap{position:relative;margin-left:8px}
+.user-chip{display:flex;align-items:center;gap:7px;height:32px;padding:0 9px 0 4px;border-radius:999px;border:1px solid #d9e1ec;background:#fff;color:#1d2838;font-size:12px;font-weight:800}
+.user-chip:hover{background:#edf4ff;border-color:#b9cff0}.user-chip .caret{font-size:10px;color:#7d8796}
+.user-chip-name{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-menu{position:absolute;right:0;top:38px;min-width:240px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px #1b2a4433;padding:6px;z-index:120}
+.user-menu[hidden]{display:none}
+.user-menu-label{font-size:9.5px;font-weight:800;color:#8a94a3;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px 4px}
+.user-menu button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:7px 8px;border:0;border-radius:7px;background:transparent;font-size:12px;color:#1d2838}
+.user-menu button:hover{background:#edf4ff}.user-menu button.danger{color:#c0392b}
+.user-item.active{background:#f2f7ff}.user-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}.user-item-check{color:#2f6fda;font-weight:800}
+.user-menu-sep{height:1px;background:var(--line);margin:5px 2px}
+.pf-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}.pf-head-info{flex:1;min-width:0}.pf-head-info b{display:block;font-size:14px;color:#1d2838}.pf-head-info small{display:block;font-size:10.5px;color:#7d8796}
+.pf-progress{height:5px;border-radius:3px;background:#e6edf7;margin:6px 0 3px;overflow:hidden}.pf-progress i{display:block;height:100%;width:0;background:#2f6fda;transition:width .2s}
+.pf-h{font-size:12px;margin:14px 0 8px;color:#34475f;border-bottom:1px solid var(--line);padding-bottom:4px}
+.profile-grid .field.wide{grid-column:1/-1}.profile-grid textarea{width:100%;border:1px solid #ced5de;border-radius:6px;padding:7px 8px;font:inherit;font-size:12px;resize:vertical}
+.profile-sheet .sheet-body{max-height:calc(100vh - 150px);overflow:auto}

@@ -15,6 +15,9 @@
 - ✅ Xuất bài tập có cấu trúc thành **Workout FIT** để copy vào `GARMIN\NewFiles` trên đồng hồ.
 - ✅ Thay `prompt()` bằng hộp thoại trong app (còn lại: `confirm()` cho thao tác xoá/ghi đè — dùng hộp thoại hệ thống).
 
+## v2.2.0 — Nhiều người dùng ✅
+- Mỗi người dùng một kho dữ liệu riêng, hồ sơ cá nhân đầy đủ nhập dần, nút chuyển người dùng.
+
 ## P2 — Thành tích & thiết bị
 - Tự phát hiện best efforts / PR (1 km, 5 km, 10 km, HM, FM) từ bản ghi FIT.
 - Theo dõi số km của từng đôi giày.

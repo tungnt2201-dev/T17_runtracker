@@ -21,7 +21,10 @@ Toàn bộ logic nằm ở `src/core/legacy.js` và được kiểm thử bằng
   "templates": [ { "id": "tpl…", "name": "…" } ],
   "templatesSeeded": true,
   "profile": { "sex": "male", "hrRest": 50, "hrMax": 190, "lthr": 170,   // v2.1 — hồ sơ VĐV (tuỳ chọn)
-               "thresholdPace": "5:15", "weightKg": "", "updatedAt": "…" },
+               "thresholdPace": "5:15", "weightKg": "", "updatedAt": "…",
+               // v2.2 — thông tin cá nhân (tất cả tuỳ chọn, chuỗi): fullName, nickname, birthDate "YYYY-MM-DD",
+               // heightCm, email, phone, city, club, goal, emergencyName, emergencyPhone, notes
+             },
   "orphans": [ ]                   // bài trong file cũ không có ngày hợp lệ: giữ lại, không xoá
 }
 ```
@@ -58,3 +61,20 @@ Chuẩn hoá có tính **idempotent**: chạy nhiều lần cho cùng một kế
 
 Xuất Excel giờ ghi **đủ mọi bài trong ngày**: bài thứ 2 trở đi nằm trong khối `Tuần N - bài k`.
 Import Excel (cả RunPlan cũ lẫn T17) đọc lại được các khối này.
+
+## Nhiều người dùng (v2.2)
+
+Mỗi người dùng có **một file dữ liệu riêng** đúng định dạng ở trên. Danh sách người dùng nằm ở file chỉ mục:
+
+```jsonc
+// data/users.json  (web: localStorage "t17-users-v1")
+{ "app": "T17 RunTracker", "usersVersion": 1, "activeUserId": "main",
+  "users": [ { "id": "main", "name": "Tôi", "createdAt": "…" }, { "id": "umvokt5ubf98", "name": "Lan", "createdAt": "…" } ] }
+```
+
+| Người dùng | File (exe) | Khoá (web) | Sao lưu tự động |
+|---|---|---|---|
+| `main` (dữ liệu đời cũ) | `data/t17-runtracker.json` | `runplan-tracker-v1` | `data/backups/t17-runtracker-YYYY-MM-DD.json` |
+| khác | `data/users/<id>.json` | `runplan-tracker-v1:<id>` | `data/backups/<id>-YYYY-MM-DD.json` |
+
+Xoá người dùng (exe) chuyển file vào `data/deleted/<id>-<thời gian>.json`. Sao lưu / khôi phục / Excel / JSON chia sẻ luôn thao tác trên người dùng đang chọn.

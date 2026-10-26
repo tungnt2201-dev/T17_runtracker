@@ -1,7 +1,19 @@
 <header class="app-top">
   <div class="logo"><span class="logo-mark">T</span><span>T17 RUNTRACKER <small id="appVersionLabel">v2.1.0</small></span></div>
   <nav class="top-tabs"><div class="top-tab active" id="tabCalendar">Calendar</div><div class="top-tab" id="tabAnalytics">Analytics</div><div class="top-tab" id="tabLog">Training Log</div></nav>
-  <div class="top-right"><span class="live-dot"></span><span id="storageModeLabel">Dữ liệu lưu cục bộ</span></div>
+  <div class="top-right"><span class="live-dot"></span><span id="storageModeLabel">Dữ liệu lưu cục bộ</span>
+    <div class="user-wrap" id="userWrap">
+      <button type="button" class="user-chip" id="userChip" aria-haspopup="true" aria-expanded="false" title="Chuyển người dùng"><span class="avatar" id="userAvatar">?</span><span class="user-chip-name" id="userChipName">Người dùng</span><span class="caret">▾</span></button>
+      <div class="user-menu" id="userMenu" hidden>
+        <div class="user-menu-label">Chuyển người dùng</div>
+        <div id="userList"></div>
+        <div class="user-menu-sep"></div>
+        <button type="button" id="userAddBtn">＋ Thêm người dùng</button>
+        <button type="button" id="userProfileBtn">♥ Hồ sơ của người dùng này</button>
+        <button type="button" id="userDeleteBtn" class="danger">⌫ Xoá người dùng này…</button>
+      </div>
+    </div>
+  </div>
 </header>
 <section class="controlbar">
   <div class="period-title"><div class="eyebrow">Lịch chạy nhiều tuần</div><h1 id="weekTitle">Chưa có kế hoạch</h1></div>
@@ -22,7 +34,7 @@
       <div class="menu-group-label">Chia sẻ bài tập (JSON, nhiều bài / ngày)</div>
       <button id="exportPlanBtn" type="button">⇩ Xuất bài tập (JSON)</button>
       <button id="importPlanBtn" type="button">⇧ Nhập bài tập / Training Log (JSON)</button>
-      <div class="menu-group-label">Toàn bộ dữ liệu trên máy này</div>
+      <div class="menu-group-label">Toàn bộ dữ liệu của người dùng đang chọn</div>
       <button id="backupBtn" type="button">Sao lưu toàn bộ (JSON)</button>
       <button id="restoreBtn" type="button">Khôi phục toàn bộ (ghi đè) — nhận cả file RunPlan cũ</button>
       <button id="openDataFolderBtn" type="button" hidden>📂 Mở thư mục dữ liệu</button>
@@ -40,7 +52,7 @@
     <button class="rail-btn" id="railNewWorkout" type="button">＋<span>Tạo bài tập</span></button>
     <button class="rail-btn" id="railLibrary" type="button">📚<span>Thư viện bài tập</span></button>
     <button class="rail-btn" id="railData" type="button">⇅<span>Import / Export / Dữ liệu</span></button>
-    <button class="rail-btn" id="railProfile" type="button">♥<span>Hồ sơ VĐV · vùng tập</span></button>
+    <button class="rail-btn" id="railProfile" type="button">♥<span>Hồ sơ người dùng · vùng tập</span></button>
     <div class="rail-bottom"><button class="rail-btn" id="railClear" type="button">⌫<span>Xóa dữ liệu</span></button></div>
   </aside>
   <main class="calendar-wrap" id="calendarWrap">
@@ -71,7 +83,7 @@
       <button type="button" data-weeks="8">8 tuần</button><button type="button" data-weeks="12" class="active">12 tuần</button><button type="button" data-weeks="26">6 tháng</button><button type="button" data-weeks="52">12 tháng</button><button type="button" data-weeks="0">Tất cả</button>
     </div>
     <div class="toolbar-spacer"></div>
-    <button type="button" class="toolbar-btn" id="anProfileBtn">♥ Hồ sơ VĐV · vùng tập</button>
+    <button type="button" class="toolbar-btn" id="anProfileBtn">♥ Hồ sơ · vùng tập</button>
   </div>
   <div class="an-body" id="anBody"></div>
 </section>
@@ -232,15 +244,32 @@
 
 <div class="modal" id="profileModal">
   <div class="sheet profile-sheet">
-    <div class="sheet-head"><h2>Hồ sơ vận động viên</h2><div class="meta">Dùng để tính vùng nhịp tim / pace và điểm tải (TSS) của từng buổi</div></div>
+    <div class="sheet-head"><h2 id="pfTitle">Hồ sơ người dùng</h2><div class="meta">Tất cả các ô đều tuỳ chọn — nhập dần khi cần. Dữ liệu chỉ nằm trên máy này, riêng cho từng người dùng.</div></div>
     <form class="sheet-body" id="profileForm">
+      <div class="pf-head"><span class="avatar big" id="pfAvatar">?</span><div class="pf-head-info"><b id="pfHeadName">—</b><small id="pfHeadSub"></small><div class="pf-progress"><i id="pfProgressBar"></i></div><small id="pfProgressTxt"></small></div></div>
+      <h3 class="pf-h">Thông tin cá nhân</h3>
       <div class="profile-grid">
+        <div class="field"><label>Họ và tên</label><input id="pfFullName" type="text" maxlength="80" autocomplete="off" /></div>
+        <div class="field"><label>Tên gọi / biệt danh</label><input id="pfNickname" type="text" maxlength="30" autocomplete="off" placeholder="hiện trên nút chuyển người dùng" /></div>
+        <div class="field"><label>Ngày sinh</label><input id="pfBirth" type="date" /><small class="time-input-hint" id="pfAge"></small></div>
         <div class="field"><label>Giới tính (hệ số TRIMP)</label><select id="pfSex"><option value="male">Nam</option><option value="female">Nữ</option></select></div>
+        <div class="field"><label>Chiều cao (cm)</label><input id="pfHeight" type="number" min="100" max="250" step="0.5" inputmode="decimal" /></div>
+        <div class="field"><label>Cân nặng (kg)</label><input id="pfWeight" type="number" min="30" max="200" step="0.1" inputmode="decimal" /><small class="time-input-hint" id="pfBmi"></small></div>
+        <div class="field"><label>Email</label><input id="pfEmail" type="email" maxlength="120" autocomplete="off" /></div>
+        <div class="field"><label>Điện thoại</label><input id="pfPhone" type="text" maxlength="30" autocomplete="off" /></div>
+        <div class="field"><label>Nơi ở (tỉnh / thành)</label><input id="pfCity" type="text" maxlength="80" autocomplete="off" /></div>
+        <div class="field"><label>CLB / nhóm chạy</label><input id="pfClub" type="text" maxlength="80" autocomplete="off" /></div>
+        <div class="field"><label>Liên hệ khẩn cấp (tên)</label><input id="pfEmName" type="text" maxlength="80" autocomplete="off" /></div>
+        <div class="field"><label>Liên hệ khẩn cấp (điện thoại)</label><input id="pfEmPhone" type="text" maxlength="30" autocomplete="off" /></div>
+        <div class="field wide"><label>Mục tiêu</label><input id="pfGoal" type="text" maxlength="300" autocomplete="off" placeholder="vd. Sub-4:00 marathon, 10/2027" /></div>
+        <div class="field wide"><label>Ghi chú (chấn thương cũ, giày, lưu ý khác…)</label><textarea id="pfNotes" rows="3" maxlength="1000"></textarea></div>
+      </div>
+      <h3 class="pf-h">Thông số tập luyện</h3>
+      <div class="profile-grid">
         <div class="field"><label>Nhịp tim nghỉ (bpm)</label><input id="pfHrRest" type="number" min="30" max="110" inputmode="numeric" placeholder="vd. 52" /></div>
-        <div class="field"><label>Nhịp tim tối đa (bpm)</label><input id="pfHrMax" type="number" min="120" max="230" inputmode="numeric" placeholder="vd. 188" /><button type="button" class="pf-suggest" id="pfSuggestMax" hidden></button></div>
+        <div class="field"><label>Nhịp tim tối đa (bpm)</label><input id="pfHrMax" type="number" min="120" max="230" inputmode="numeric" placeholder="vd. 188" /><button type="button" class="pf-suggest" id="pfSuggestMax" hidden></button><button type="button" class="pf-suggest" id="pfSuggestAge" hidden></button></div>
         <div class="field"><label>Nhịp tim ngưỡng LTHR (bpm)</label><input id="pfLthr" type="number" min="100" max="220" inputmode="numeric" placeholder="vd. 168" /><small class="time-input-hint">Nhịp tim trung bình 20 phút cuối của bài chạy hết sức 30 phút.</small></div>
         <div class="field"><label>Pace ngưỡng (mm:ss /km)</label><input id="pfPace" type="text" placeholder="vd. 5:10" autocomplete="off" /><small class="time-input-hint">Pace có thể giữ khoảng 1 giờ (≈ pace giải 10K–HM).</small></div>
-        <div class="field"><label>Cân nặng (kg, tuỳ chọn)</label><input id="pfWeight" type="number" min="30" max="200" step="0.1" inputmode="decimal" /></div>
       </div>
       <div class="pf-note" id="pfNote"></div>
       <div class="pf-zones"><div><h3>Vùng nhịp tim</h3><div id="pfHrZones"></div></div><div><h3>Vùng pace</h3><div id="pfPaceZones"></div></div></div>

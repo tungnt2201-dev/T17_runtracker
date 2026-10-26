@@ -11,13 +11,14 @@ Chạy được theo hai cách:
 Mỗi phiên bản phát hành là một file nén **`yymmdd_T17_runtracker_vX.Y.Z.zip`** (ví dụ `261020_T17_runtracker_v2.1.0.zip`)
 chứa cả hai bản trên, `HUONG_DAN.txt`, `CHANGELOG.md` và **Hướng dẫn sử dụng** (Word, có ảnh minh hoạ từng bước — cũng có tại [`docs/Huong_dan_su_dung_T17_RunTracker.docx`](docs/Huong_dan_su_dung_T17_RunTracker.docx)).
 
+**Nhiều người dùng** (từ v2.2): mỗi người có lịch tập, kết quả và hồ sơ cá nhân riêng; chuyển qua lại bằng nút ở góc phải thanh trên.
 Không cần tài khoản, không gửi dữ liệu đi đâu. File Garmin FIT được đọc ngay trên máy.
 
 ## Tải về & chạy
 
 1. Vào **Releases** của repo, tải file `yymmdd_T17_runtracker_vX.Y.Z.zip` mới nhất.
 2. Giải nén vào một thư mục riêng, ví dụ `D:\T17\`, rồi chạy `T17_runtracker.exe`.
-3. Lần đầu chạy, app tạo `D:\T17\data\t17-runtracker.json`. Muốn chuyển máy: **copy cả thư mục**.
+3. Lần đầu chạy, app tạo `D:\T17\data\t17-runtracker.json` (người dùng đầu tiên; người dùng thêm sau nằm ở `data\users\`). Muốn chuyển máy: **copy cả thư mục**.
 4. Nâng cấp: giải nén bản mới **đè lên** thư mục cũ — thư mục `data\` không bị động tới.
 
 Yêu cầu: Windows 10/11 có **Microsoft Edge WebView2 Runtime** (Windows 11 có sẵn; Windows 10 cập nhật đầy đủ thường cũng có).
@@ -48,7 +49,7 @@ Bản sao lưu của T17 vẫn giữ mảng `weeks` ở cấp cao nhất nên **
 
 ```bash
 npm install
-npm test              # build + 36 test (FIT decoder, dữ liệu cũ, Excel, chạy thử app trong jsdom)
+npm test              # build + 42 test (FIT decoder, dữ liệu cũ, Excel, chạy thử app trong jsdom)
 npm run build         # dist/web/T17_runtracker.html + resources/ cho Neutralino
 npm run dev           # chạy cửa sổ desktop (neu run) để thử
 npm run exe           # tải Neutralino 6.10 + đóng gói release/yymmdd_T17_runtracker_vX.Y.Z.zip
@@ -58,12 +59,12 @@ Cấu trúc:
 
 ```
 src/
-  core/        utils.js (thời gian, pace, cấu trúc bài) · legacy.js (đọc mọi định dạng JSON cũ) · excel-plan.js
+  core/        utils.js (thời gian, pace, cấu trúc bài) · legacy.js (đọc mọi định dạng JSON cũ) · users.js (nhiều người dùng, hồ sơ cá nhân) · excel-plan.js
                athlete.js (hồ sơ VĐV, vùng HR/pace) · load.js (điểm tải, CTL/ATL/TSB) · fit-workout.js (xuất Workout FIT)
   lib/         xlsx.js (đọc/ghi .xlsx không cần thư viện) · fit-decoder.js (Garmin FIT)
   platform/    platform.js (lưu file cạnh exe / localStorage, Save As, sao lưu tự động)
   app/         app.js (lịch, builder, thư viện, nhập kết quả, log) · fit-ui.js (nhập FIT)
-               analytics.js (tab Analytics) · profile.js (hồ sơ VĐV) · dialogs.js (hộp thoại trong app)
+               analytics.js (tab Analytics) · profile.js (hồ sơ) · users-ui.js (chuyển người dùng) · dialogs.js (hộp thoại trong app)
   styles/      app.css
   body.html, index.template.html
 scripts/       build.mjs · check-syntax.mjs · package-win.mjs

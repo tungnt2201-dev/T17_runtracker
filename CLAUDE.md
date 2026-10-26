@@ -8,3 +8,4 @@
 - Giữ exe nhỏ: không dùng Electron hay thư viện UI nặng.
 - Kiểm tra trước khi đẩy: `npm run check && npm test`.
 - Phát hành: tăng `version` trong `package.json` + ghi CHANGELOG; Actions tự tạo Release `yymmdd_T17_runtracker_vX.Y.Z.zip`.
+- **Nhiều người dùng**: `db` luôn là dữ liệu của MỘT người dùng; mọi đường lưu/nạp đi qua `T17Platform` (theo `activeUserId`). Không tự ghép đường dẫn file dữ liệu; dùng `T17Users.fileNameFor/lsKeyFor`. Người dùng `main` giữ file/khoá đời cũ.
