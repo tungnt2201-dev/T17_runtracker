@@ -1,0 +1,294 @@
+{
+  "app": "T17_runtracker",
+  "schemaVersion": 2,
+  "weeks": [
+    {
+      "label": "44",
+      "days": [
+        {
+          "dow": "Thứ 2",
+          "date": "2026-10-26",
+          "workouts": [
+            {
+              "id": "lan-1",
+              "workoutName": "Easy 5K",
+              "workoutType": "Easy",
+              "planKm": 5,
+              "planMinutes": 35,
+              "description": "",
+              "planNote": "",
+              "workoutStructure": null,
+              "actual": {
+                "status": "done",
+                "km": 5.1,
+                "minutes": 34.5,
+                "fatigue": 4,
+                "calories": 310,
+                "avgHr": 150,
+                "note": "nhẹ nhàng",
+                "segments": []
+              }
+            }
+          ]
+        },
+        {
+          "dow": "Thứ 4",
+          "date": "2026-10-28",
+          "workouts": [
+            {
+              "id": "lan-2",
+              "workoutName": "Tempo 20p",
+              "workoutType": "Tempo",
+              "planKm": "",
+              "planMinutes": 40,
+              "description": "Warm-up 10p, tempo 20p, cool-down 10p",
+              "planNote": "",
+              "workoutStructure": null,
+              "actual": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "id": "tplmw8y78lkroym4",
+      "name": "Easy 40 phút",
+      "workoutType": "Easy",
+      "workoutStructure": {
+        "version": 1,
+        "warmup": null,
+        "groups": [
+          {
+            "label": "Easy pace",
+            "repeats": 1,
+            "steps": [
+              {
+                "label": "Easy run",
+                "activity": "run",
+                "mode": "time",
+                "value": 40,
+                "paceFrom": "6:15",
+                "paceTo": "6:45",
+                "hrFrom": "",
+                "hrTo": ""
+              }
+            ]
+          }
+        ],
+        "cooldown": null
+      },
+      "planKm": 6.154,
+      "planMinutes": 40,
+      "description": "Lặp 1 lần – Easy pace:\n• Easy run: Chạy 40 phút · Pace 6:15–6:45/km",
+      "planNote": "",
+      "savedAt": "2026-11-09T07:36:58.953Z"
+    },
+    {
+      "id": "tplmw8y78ll7xczm",
+      "name": "Long run 90 phút",
+      "workoutType": "Long run",
+      "workoutStructure": {
+        "version": 1,
+        "warmup": {
+          "label": "Warm-up",
+          "activity": "run",
+          "mode": "time",
+          "value": 10,
+          "paceFrom": "7:00",
+          "paceTo": "7:30",
+          "hrFrom": "",
+          "hrTo": ""
+        },
+        "groups": [
+          {
+            "label": "Steady",
+            "repeats": 1,
+            "steps": [
+              {
+                "label": "Long steady",
+                "activity": "run",
+                "mode": "time",
+                "value": 70,
+                "paceFrom": "6:25",
+                "paceTo": "6:55",
+                "hrFrom": "",
+                "hrTo": ""
+              }
+            ]
+          }
+        ],
+        "cooldown": {
+          "label": "Cool-down",
+          "activity": "run",
+          "mode": "time",
+          "value": 10,
+          "paceFrom": "7:00",
+          "paceTo": "7:30",
+          "hrFrom": "",
+          "hrTo": ""
+        }
+      },
+      "planKm": 13.259,
+      "planMinutes": 90,
+      "description": "Warm-up: Chạy 10 phút · Pace 7:00–7:30/km\nLặp 1 lần – Steady:\n• Long steady: Chạy 70 phút · Pace 6:25–6:55/km\nCool-down: Chạy 10 phút · Pace 7:00–7:30/km",
+      "planNote": "",
+      "savedAt": "2026-11-09T07:36:58.953Z"
+    },
+    {
+      "id": "tplmw8y78lldrgc5",
+      "name": "Tempo 20 phút",
+      "workoutType": "Tempo",
+      "workoutStructure": {
+        "version": 1,
+        "warmup": {
+          "label": "Warm-up",
+          "activity": "run",
+          "mode": "time",
+          "value": 15,
+          "paceFrom": "7:00",
+          "paceTo": "7:30",
+          "hrFrom": "",
+          "hrTo": ""
+        },
+        "groups": [
+          {
+            "label": "Tempo",
+            "repeats": 1,
+            "steps": [
+              {
+                "label": "Tempo",
+                "activity": "run",
+                "mode": "time",
+                "value": 20,
+                "paceFrom": "5:45",
+                "paceTo": "6:05",
+                "hrFrom": "",
+                "hrTo": ""
+              }
+            ]
+          }
+        ],
+        "cooldown": {
+          "label": "Cool-down",
+          "activity": "run",
+          "mode": "time",
+          "value": 10,
+          "paceFrom": "7:00",
+          "paceTo": "7:30",
+          "hrFrom": "",
+          "hrTo": ""
+        }
+      },
+      "planKm": 6.829,
+      "planMinutes": 45,
+      "description": "Warm-up: Chạy 15 phút · Pace 7:00–7:30/km\nLặp 1 lần – Tempo:\n• Tempo: Chạy 20 phút · Pace 5:45–6:05/km\nCool-down: Chạy 10 phút · Pace 7:00–7:30/km",
+      "planNote": "",
+      "savedAt": "2026-11-09T07:36:58.953Z"
+    },
+    {
+      "id": "tplmw8y78ll3lebz",
+      "name": "Interval 6x800m",
+      "workoutType": "Interval",
+      "workoutStructure": {
+        "version": 1,
+        "warmup": {
+          "label": "Warm-up",
+          "activity": "run",
+          "mode": "time",
+          "value": 15,
+          "paceFrom": "7:00",
+          "paceTo": "7:30",
+          "hrFrom": "",
+          "hrTo": ""
+        },
+        "groups": [
+          {
+            "label": "6x800m",
+            "repeats": 6,
+            "steps": [
+              {
+                "label": "Fast 800m",
+                "activity": "run",
+                "mode": "distance",
+                "value": 0.8,
+                "paceFrom": "5:20",
+                "paceTo": "5:45",
+                "hrFrom": "",
+                "hrTo": ""
+              },
+              {
+                "label": "Recovery",
+                "activity": "walk",
+                "mode": "time",
+                "value": 2,
+                "paceFrom": "11:30",
+                "paceTo": "13:00",
+                "hrFrom": "",
+                "hrTo": ""
+              }
+            ]
+          }
+        ],
+        "cooldown": {
+          "label": "Cool-down",
+          "activity": "run",
+          "mode": "time",
+          "value": 10,
+          "paceFrom": "7:00",
+          "paceTo": "7:30",
+          "hrFrom": "",
+          "hrTo": ""
+        }
+      },
+      "planKm": 9.228,
+      "planMinutes": 63.6,
+      "description": "Warm-up: Chạy 15 phút · Pace 7:00–7:30/km\nLặp 6 lần – 6x800m:\n• Fast 800m: Chạy 0.8 km · Pace 5:20–5:45/km\n• Recovery: Đi bộ 2 phút · Pace 11:30–13:00/km\nCool-down: Chạy 10 phút · Pace 7:00–7:30/km",
+      "planNote": "",
+      "savedAt": "2026-11-09T07:36:58.953Z"
+    },
+    {
+      "id": "tplmw8y78llal0ql",
+      "name": "Recovery 25 phút",
+      "workoutType": "Recovery",
+      "workoutStructure": {
+        "version": 1,
+        "warmup": null,
+        "groups": [
+          {
+            "label": "Recovery",
+            "repeats": 1,
+            "steps": [
+              {
+                "label": "Recovery jog",
+                "activity": "run",
+                "mode": "time",
+                "value": 25,
+                "paceFrom": "7:00",
+                "paceTo": "7:30",
+                "hrFrom": "",
+                "hrTo": ""
+              }
+            ]
+          }
+        ],
+        "cooldown": null
+      },
+      "planKm": 3.448,
+      "planMinutes": 25,
+      "description": "Lặp 1 lần – Recovery:\n• Recovery jog: Chạy 25 phút · Pace 7:00–7:30/km",
+      "planNote": "",
+      "savedAt": "2026-11-09T07:36:58.953Z"
+    }
+  ],
+  "templatesSeeded": true,
+  "profile": {
+    "fullName": "Trần Thị Lan",
+    "sex": "female",
+    "birthDate": "1992-03-04",
+    "heightCm": "160",
+    "weightKg": 52,
+    "hrMax": 184
+  }
+}

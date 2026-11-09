@@ -8,6 +8,7 @@
  *   - log     : { format:'runplan-log', entries:[{date, ..., actual}] } (Training Log → "Xuất JSON")
  *   - weeks   : [ {label, days:[...]} ]                               (mảng tuần trần)
  *   - chuỗi JSON lồng (localStorage dump bị stringify 2 lần), có BOM, ...
+ *   Phần mở rộng fitness (v2.3): workout.fitness, actual.fitness, db.fitnessLibrary, db.features — xem core/fitness.js.
  *
  * Pure: không đụng DOM/localStorage. Dùng được trong app (globalThis.T17Legacy) và Node test.
  */
@@ -15,9 +16,13 @@
 'use strict';
 const C = root.T17Core || (typeof require === 'function' ? require('./utils.js') : null);
 const { DAYS, cleanDescription, genId, hasWorkoutContent, isYmd, excelYmd, parseDurationInput, mondayYmd, addDaysYmd, isoWeekNumber, blankDay, samePlanRecord, deepClone } = C;
+const F = root.T17Fitness || (typeof require === 'function' ? require('./fitness.js') : null);
 
 const APP_ID = 'T17_runtracker';
+// Giữ 2: bản v2.2.0 trở về trước tự ghi đè schemaVersion về 2 khi lưu, nên số này không còn là tín hiệu tin cậy.
+// Phần mở rộng (cộng thêm, tuỳ chọn) được đánh dấu bằng `features` — bản cũ giữ nguyên field này. Xem docs/DATA_FORMAT.md.
 const SCHEMA_VERSION = 2;
+const FEATURES = { fitness: 1 };
 const LEGACY_STORAGE_KEY = 'runplan-tracker-v1';
 const DAY_LEVEL_FIELDS = ['workoutName', 'workoutType', 'planKm', 'planMinutes', 'description', 'planNote', 'workoutStructure', 'actual'];
 
@@ -68,6 +73,7 @@ function normalizeActual(a) {
   for (const k of ['fatigue', 'calories', 'avgHr', 'maxHr']) if (k in a) out[k] = toNum(a[k]);
   out.note = a.note == null ? '' : String(a.note);
   out.segments = Array.isArray(a.segments) ? a.segments.filter(s => s && typeof s === 'object') : [];
+  if ('fitness' in a) { const f = F.normalizeFitnessBlock(a.fitness, { withDone: true }); if (f) out.fitness = f; else delete out.fitness; }
   return out;
 }
 
@@ -85,10 +91,12 @@ function normalizeWorkout(w, seenIds, report) {
   out.workoutStructure = w.workoutStructure && typeof w.workoutStructure === 'object' ? w.workoutStructure : null;
   if (typeof w.workoutStructure === 'string') { try { out.workoutStructure = JSON.parse(w.workoutStructure); } catch (e) { out.workoutStructure = null; } }
   out.actual = normalizeActual(w.actual);
+  if ('fitness' in w) { const f = F.normalizeFitnessBlock(w.fitness); if (f) out.fitness = f; else delete out.fitness; }
   if (w.fitStandalone) out.fitStandalone = true; else delete out.fitStandalone;
   if (out.fitStandalone && !out.actual) delete out.fitStandalone; // thẻ FIT không có kết quả là vô nghĩa
-  if (!hasWorkoutContent(out) && !out.actual) return null;
+  if (!hasWorkoutContent(out) && !out.actual && !F.hasFitnessContent(out)) return null;
   if (out.actual) report.actuals++;
+  if (F.isFitnessWorkout(out)) report.fitnessSessions++;
   if (out.actual?.fitImport) report.fitActivities++;
   report.workouts++;
   return out;
@@ -105,7 +113,7 @@ function dayWorkouts(d, report) {
   return [];
 }
 
-function emptyReport(kind) { return { sourceKind: kind, weeks: 0, workouts: 0, actuals: 0, fitActivities: 0, legacyDaysConverted: 0, idsFixed: 0, datesFixed: 0, weeksRealigned: 0, orphans: 0, templates: 0 }; }
+function emptyReport(kind) { return { sourceKind: kind, weeks: 0, workouts: 0, actuals: 0, fitActivities: 0, fitnessSessions: 0, legacyDaysConverted: 0, idsFixed: 0, datesFixed: 0, weeksRealigned: 0, orphans: 0, templates: 0 }; }
 
 /* ---------- full database ---------- */
 /** Chuẩn hoá một DB (backup hoặc dữ liệu localStorage) về schema v2.
@@ -172,9 +180,29 @@ function normalizeDb(input, opts = {}) {
 
   const db = { ...rest, app: APP_ID, schemaVersion: SCHEMA_VERSION, weeks, templates, templatesSeeded: !!x.templatesSeeded };
   if (orphans.length) db.orphans = orphans;
+  if ('fitnessLibrary' in rest) db.fitnessLibrary = F.normalizeLibrary(rest.fitnessLibrary);
+  const features = featuresOf(db);
+  if (features) db.features = features; else if (db.features && !Object.keys(db.features).length) delete db.features;
   delete db.exportedAt;
   return { db, report };
 }
+
+/** `features` = các phần mở rộng có trong dữ liệu (giữ cả khoá lạ của phiên bản sau). null nếu chỉ có chạy bộ. */
+function featuresOf(db) {
+  const out = db.features && typeof db.features === 'object' && !Array.isArray(db.features) ? { ...db.features } : {};
+  const hasFitness = 'fitnessLibrary' in db || (db.weeks || []).some(w => (w.days || []).some(d => (d.workouts || []).some(F.isFitnessWorkout)));
+  if (hasFitness) out.fitness = Math.max(+out.fitness || 0, FEATURES.fitness);
+  return Object.keys(out).length ? out : null;
+}
+
+/** Bản ghi kế hoạch để chia sẻ / nhập lại (Xuất bài tập JSON, thêm bài từ mẫu, Excel…).
+ *  Trường chạy bộ giữ nguyên như trước; `fitness` chỉ có khi bài là fitness. */
+function planRecord(item) {
+  const o = { workoutName: item.workoutName || '', workoutType: item.workoutType || '', planKm: item.planKm ?? '', planMinutes: item.planMinutes ?? '', description: item.description || '', planNote: item.planNote || '', workoutStructure: item.workoutStructure ? deepClone(item.workoutStructure) : null };
+  if (item.fitness && typeof item.fitness === 'object') o.fitness = deepClone(item.fitness);
+  return o;
+}
+const fitnessPlanKey = w => w && w.fitness ? F.contentHash({ exercises: w.fitness.exercises || [] }) : '';
 
 /* ---------- merging plan / log exports into an existing DB ---------- */
 function locateDateIn(db, date) {
@@ -190,7 +218,13 @@ function ensureDateIn(db, date) {
   }
   return locateDateIn(db, date);
 }
-function sameActual(a, b) { if (!a || !b) return false; return String(a.km ?? '') === String(b.km ?? '') && String(a.minutes ?? '') === String(b.minutes ?? '') && (a.status || 'done') === (b.status || 'done') && (a.fitImport?.id || '') === (b.fitImport?.id || ''); }
+function sameActual(a, b) {
+  if (!a || !b) return false;
+  if (!(String(a.km ?? '') === String(b.km ?? '') && String(a.minutes ?? '') === String(b.minutes ?? '') && (a.status || 'done') === (b.status || 'done') && (a.fitImport?.id || '') === (b.fitImport?.id || ''))) return false;
+  // Hai buổi fitness cùng thời lượng (km rỗng) KHÔNG được coi là trùng nếu nội dung khác nhau.
+  if (a.fitness || b.fitness) return !!(a.fitness && b.fitness) && F.contentHash(a.fitness) === F.contentHash(b.fitness);
+  return true;
+}
 
 /** Chuyển plan/log export → danh sách {date, workouts}. */
 function exportToDays(x) {
@@ -213,9 +247,9 @@ function mergeDays(db, days, opts = {}) {
       const src = normalizeWorkout({ ...deepClone(src0 || {}), id: undefined }, seen, dummy);
       if (!src) { res.invalid++; continue; }
       if (!withActual) { src.actual = null; delete src.fitStandalone; }
-      if (!hasWorkoutContent(src) && !src.actual) { res.invalid++; continue; }
+      if (!hasWorkoutContent(src) && !src.actual && !F.hasFitnessContent(src)) { res.invalid++; continue; }
       const dst = ensureDateIn(db, date).d; dst.workouts = dst.workouts || [];
-      const same = dst.workouts.find(it => samePlanRecord(it, src));
+      const same = dst.workouts.find(it => samePlanRecord(it, src) && fitnessPlanKey(it) === fitnessPlanKey(src));
       if (same) {
         if (withActual && src.actual && !same.actual) { same.actual = src.actual; res.actualsAttached++; }
         else res.duplicates++;
@@ -230,19 +264,22 @@ function mergeDays(db, days, opts = {}) {
 
 /** Bản sao lưu: vẫn có mảng weeks ở cấp cao nhất nên RunPlan v1.8.x cũ cũng khôi phục được. */
 function toBackup(db, appVersion) {
-  return { ...db, app: APP_ID, schemaVersion: SCHEMA_VERSION, appVersion: appVersion || '', exportedAt: new Date().toISOString() };
+  const out = { ...db, app: APP_ID, schemaVersion: SCHEMA_VERSION, appVersion: appVersion || '', exportedAt: new Date().toISOString() };
+  const features = featuresOf(db); if (features) out.features = features;
+  return out;
 }
 
 function describeReport(r) {
   const parts = [`${r.weeks} tuần`, `${r.workouts} bài`, `${r.actuals} kết quả`];
   if (r.fitActivities) parts.push(`${r.fitActivities} hoạt động FIT`);
+  if (r.fitnessSessions) parts.push(`${r.fitnessSessions} buổi fitness`);
   if (r.legacyDaysConverted) parts.push(`${r.legacyDaysConverted} ngày định dạng cũ đã chuyển đổi`);
   if (r.weeksRealigned) parts.push(`${r.weeksRealigned} tuần được căn lại về thứ Hai`);
   if (r.orphans) parts.push(`${r.orphans} bài thiếu ngày được giữ riêng`);
   return parts.join(' · ');
 }
 
-const api = { APP_ID, SCHEMA_VERSION, LEGACY_STORAGE_KEY, parseJsonText, detectKind, normalizeDb, normalizeWorkout, normalizeActual, exportToDays, mergeDays, locateDateIn, ensureDateIn, toBackup, describeReport, toNum, toMinutes };
+const api = { APP_ID, SCHEMA_VERSION, FEATURES, featuresOf, planRecord, LEGACY_STORAGE_KEY, parseJsonText, detectKind, normalizeDb, normalizeWorkout, normalizeActual, exportToDays, mergeDays, locateDateIn, ensureDateIn, toBackup, describeReport, toNum, toMinutes };
 root.T17Legacy = api;
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -16,6 +16,7 @@ const VERSION = pkg.version;
 // Thứ tự nạp: core (thuần) → thư viện I/O → platform → app → FIT UI
 const MODULES = [
   'src/core/utils.js',
+  'src/core/fitness.js',
   'src/core/legacy.js',
   'src/core/users.js',
   'src/core/excel-plan.js',

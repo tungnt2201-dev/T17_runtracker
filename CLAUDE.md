@@ -3,7 +3,11 @@
 - Giao diện và thông báo bằng **tiếng Việt**.
 - Mọi file trong `src/` là classic script (IIFE, gắn vào `globalThis`); `scripts/build.mjs` nhúng chúng theo thứ tự `MODULES`. Thêm module mới thì thêm vào cả `MODULES` lẫn `scripts/check-syntax.mjs`.
 - Logic thuần (không DOM) đặt trong `src/core/` và phải có test trong `tests/` (`node:test`, không thêm framework).
-- **Không phá tương thích dữ liệu**: mọi thay đổi schema đi qua `src/core/legacy.js` (`normalizeDb`), tăng `SCHEMA_VERSION`, thêm fixture cũ vào `tests/fixtures/`. File sao lưu luôn giữ mảng `weeks` ở cấp cao nhất.
+- **Không phá tương thích dữ liệu**: mọi thay đổi schema đi qua `src/core/legacy.js` (`normalizeDb`), thêm fixture cũ vào `tests/fixtures/`. File sao lưu luôn giữ mảng `weeks` ở cấp cao nhất.
+  - Thay đổi **cộng thêm, tuỳ chọn** → KHÔNG tăng `SCHEMA_VERSION` (bản cũ tự ghi đè về 2); đánh dấu bằng `db.features` (`featuresOf`). Chỉ tăng khi thay đổi không cộng thêm.
+  - File chỉ có chạy bộ không được thêm field mới; bản ghi chạy bộ khi xuất giữ đúng bộ trường cũ (`planRecord`).
+  - `tests/compat.test.js` so với lõi nguyên văn `tests/compat/v2.2.0/` (không sửa thư mục đó) — phải luôn xanh.
+- Fitness: logic trong `src/core/fitness.js`; bài fitness có `description` = `summaryText` để bản cũ đọc được; ảnh/hướng dẫn chỉ nằm trong `fitnessLibrary`. Copy/thêm từ mẫu phải cấp `sessionId` mới.
 - Lưu dữ liệu chỉ qua `saveDb()` → `T17Platform.save()`; tham chiếu bài theo `id` (`resolveRef`), không tin chỉ số `wi/di/ii`.
 - Giữ exe nhỏ: không dùng Electron hay thư viện UI nặng.
 - Kiểm tra trước khi đẩy: `npm run check && npm test`.

@@ -18,6 +18,10 @@
 ## v2.2.0 — Nhiều người dùng ✅
 - Mỗi người dùng một kho dữ liệu riêng, hồ sơ cá nhân đầy đủ nhập dần, nút chuyển người dùng.
 
+## v2.3–v2.5 — Fitness, chỉ số cơ thể, calo (đang làm theo 8 lượt)
+- ✅ Lượt 1: lớp dữ liệu fitness, đọc file app mobile, test tương thích hai chiều với v2.2.0.
+- Lượt 2–3: thư viện + giao bài + nhập tự động nhận diện (v2.3.0). Lượt 4–5: chỉ số cơ thể + biểu đồ (v2.4.0). Lượt 6: calo trong ngày (v2.5.0). Lượt 7–8: rà soát + hướng dẫn.
+
 ## P2 — Thành tích & thiết bị
 - Tự phát hiện best efforts / PR (1 km, 5 km, 10 km, HM, FM) từ bản ghi FIT.
 - Theo dõi số km của từng đôi giày.

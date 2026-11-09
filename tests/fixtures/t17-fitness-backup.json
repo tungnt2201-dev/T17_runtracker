@@ -1,0 +1,1214 @@
+{
+  "templatesSeeded": true,
+  "futureField": {
+    "keep": "me"
+  },
+  "app": "T17_runtracker",
+  "schemaVersion": 2,
+  "profile": {
+    "fullName": "Nguyễn Văn Tùng",
+    "nickname": "Tùng",
+    "birthDate": "1988-05-20",
+    "sex": "male",
+    "heightCm": "172",
+    "weightKg": 68,
+    "hrRest": 50,
+    "hrMax": 186,
+    "lthr": 168,
+    "thresholdPace": "5:05",
+    "city": "Hà Nội",
+    "club": "T17",
+    "goal": "Sub-3:45 FM",
+    "updatedAt": "2026-10-26T02:00:00.000Z"
+  },
+  "fitnessLibrary": [
+    {
+      "id": "good-morning",
+      "builtin": true,
+      "name": "Good Morning with Barbell",
+      "category": "Posterior chain",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Đặt barbell chắc trên phần cơ thang/upper back, đứng vững và gối hơi chùng. Đẩy hông ra sau như hip hinge, giữ cột sống trung tính rồi siết mông để trở về tư thế đứng.",
+      "caution": "Giữ thanh tạ ổn định trên lưng trên; không đặt tạ lên cổ, không cúi bằng lưng và không cố hạ quá sâu khi lưng bắt đầu cong.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "1-12",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "1-10",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "reverse-lunge",
+      "builtin": true,
+      "name": "Reverse Lunge with Dumbbells",
+      "category": "Knee / Hip",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Cầm tạ hai bên, bước một chân ra sau và hạ người có kiểm soát. Gối chân trước đi theo hướng bàn chân. Đạp chân trước xuống sàn để trở lại.",
+      "caution": "Tránh bước quá hẹp, gối đổ vào trong hoặc dùng chân sau đẩy mạnh để đứng lên.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "one-leg-deadlift",
+      "builtin": true,
+      "name": "One-Leg Deadlift with Dumbbells",
+      "category": "Hamstring / Balance",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Đứng trên một chân, gối hơi chùng, đẩy hông ra sau và nghiêng thân về trước. Giữ hai bên hông tương đối cân, chân còn lại duỗi ra sau.",
+      "caution": "Không xoay mở hông, không kéo tạ bằng lưng và không hy sinh thăng bằng để cố xuống sâu.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "glute-bridge",
+      "builtin": true,
+      "name": "Hip Thrust with Barbell",
+      "category": "Glute",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Tựa phần lưng trên vào ghế chắc chắn, bàn chân đặt vững, barbell nằm ngang vùng hông có đệm. Đẩy hông lên đến khi thân và đùi gần thành một đường thẳng, siết mông rồi hạ có kiểm soát.",
+      "caution": "Giữ ghế ổn định, cằm hơi thu, không ưỡn thắt lưng ở đỉnh và luôn kiểm soát thanh tạ trên hông.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "single-leg-squat",
+      "builtin": true,
+      "name": "Single Leg Squat / Single Leg Press",
+      "category": "Knee / Quad",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Chọn biến thể phù hợp. Hạ người hoặc đạp máy có kiểm soát, gối đi cùng hướng mũi chân và duy trì lực đều qua bàn chân.",
+      "caution": "Không để gối sụp vào trong. Giảm độ sâu hoặc tải nếu mất kiểm soát; với leg press không khóa cứng gối.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "single-calf-raise",
+      "builtin": true,
+      "name": "Single Calf Raise with Dumbbells",
+      "category": "Calf",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Đứng một chân, nâng gót hết biên độ có kiểm soát, dừng ngắn ở đỉnh rồi hạ chậm. Có thể vịn nhẹ để giữ thăng bằng.",
+      "caution": "Không bật nảy, không lăn cổ chân ra ngoài/trong và không rút ngắn biên độ chỉ để tăng tạ.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "backward-walk",
+      "builtin": true,
+      "name": "Đi lùi",
+      "category": "Knee basic",
+      "plan": "10 phút",
+      "cue": "Đi lùi trên bề mặt phẳng và thông thoáng, bước ngắn, thân người thẳng, tiếp đất nhẹ và giữ nhịp đều.",
+      "caution": "Ưu tiên nơi an toàn, không có vật cản. Giảm tốc hoặc dừng nếu đau nhói ở gối, cổ chân hay bàn chân.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "",
+          "time": "10 phút",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "banded-knee-extension",
+      "builtin": true,
+      "name": "Banded Knee Extension",
+      "category": "Knee basic",
+      "plan": "2 phút",
+      "cue": "Cố định dây kháng lực phía sau gối. Từ tư thế gối hơi chùng, duỗi gối có kiểm soát đến gần thẳng rồi quay lại, giữ bàn chân ổn định.",
+      "caution": "Không giật dây hoặc khóa gối mạnh ở cuối biên độ; dùng lực vừa đủ để chuyển động trơn tru.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "",
+          "time": "2 phút",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "tib-raise",
+      "builtin": true,
+      "name": "Tib Raise",
+      "category": "Shin / Ankle",
+      "plan": "1 x 20",
+      "cue": "Giữ gót chân trên sàn, nâng mũi bàn chân lên bằng cơ mặt trước cẳng chân rồi hạ chậm xuống.",
+      "caution": "Không nhấc gót, không giật nhanh; giữ biên độ trong khả năng kiểm soát.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "20",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "fhl-calf-raise",
+      "builtin": true,
+      "name": "FHL Calf Raise",
+      "category": "Calf / Foot",
+      "plan": "1 x 20",
+      "cue": "Ở tư thế calf raise có điểm tựa, hơi nghiêng người theo biến thể đã chọn. Nâng gót chậm, đẩy qua vùng ngón cái và hạ có kiểm soát.",
+      "caution": "Không để cổ chân đổ mạnh vào trong/ngoài; giảm biên độ nếu xuất hiện khó chịu ở gân Achilles hoặc bàn chân.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "20",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "step-ups",
+      "builtin": true,
+      "name": "Step Ups",
+      "category": "Knee / Quad",
+      "plan": "3 x 10 mỗi chân",
+      "cue": "Đứng trên bục chắc chắn. Giữ một chân làm chân trụ, hạ chân còn lại xuống có kiểm soát rồi dùng chân trụ đưa cơ thể trở lại.",
+      "caution": "Giữ gối chân trụ theo hướng ngón chân, không để hông rơi sang một bên. Chọn độ cao bục phù hợp.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "3",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "standing-hip-flexion",
+      "builtin": true,
+      "name": "Standing Hip Flexion",
+      "category": "Hip flexor",
+      "plan": "2 x 25 mỗi chân",
+      "cue": "Đứng thẳng, giữ thân ổn định và nâng gối lên bằng cơ gấp hông. Hạ xuống chậm, tránh ngả người ra sau.",
+      "caution": "Không dùng quán tính hoặc ưỡn lưng để nâng gối; có thể vịn nhẹ nếu cần thăng bằng.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "25",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "25",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "isometric-glute-bridge",
+      "builtin": true,
+      "name": "Isometric Glute Bridge",
+      "category": "Glute / Isometric",
+      "plan": "1 x 45 giây",
+      "cue": "Vào tư thế cầu mông theo biến thể một chân, nâng hông và giữ vị trí ổn định trong thời gian mục tiêu.",
+      "caution": "Giữ xương chậu cân, không ưỡn thắt lưng. Nếu một chân quá khó, giảm thời gian hoặc dùng hai chân.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "",
+          "time": "45 giây",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "elephant-walk",
+      "builtin": true,
+      "name": "Elephant Walk",
+      "category": "Hamstring mobility",
+      "plan": "2 x 30 lần",
+      "cue": "Cúi người, tay chạm sàn hoặc điểm tựa phù hợp. Luân phiên co một gối và duỗi chân còn lại để tạo cảm giác kéo giãn gân kheo.",
+      "caution": "Không ép đầu gối khóa cứng hoặc cố chạm sàn bằng mọi giá; giữ nhịp nhẹ và kiểm soát.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "30",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "",
+          "reps": "30",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "calf-stretch",
+      "builtin": true,
+      "name": "Calf Stretch",
+      "category": "Calf mobility",
+      "plan": "60 giây",
+      "cue": "Đặt chân trên bục nghiêng hoặc vị trí kéo giãn phù hợp, giữ gót ổn định và duy trì cảm giác căng vừa phải ở bắp chân.",
+      "caution": "Không nhún bật và không kéo đến mức đau nhói; giữ hơi thở tự nhiên.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "",
+          "time": "60 giây",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "custom-banded-walk",
+      "builtin": false,
+      "name": "Banded Lateral Walk",
+      "category": "Glute med",
+      "plan": "2 x 15 bước mỗi bên",
+      "cue": "Dây quanh gối, đi ngang.",
+      "caution": "Giữ gối hướng mũi chân.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi bên",
+          "reps": "15",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    }
+  ],
+  "weeks": [
+    {
+      "label": "42",
+      "days": [
+        {
+          "dow": "Hai",
+          "date": "2026-10-12",
+          "workouts": [
+            {
+              "id": "wA",
+              "workoutName": "Tempo 20 phút",
+              "workoutType": "Tempo",
+              "planKm": 7.2,
+              "planMinutes": 45,
+              "description": "Warm-up: Chạy 15 phút",
+              "planNote": "",
+              "workoutStructure": {
+                "version": 1,
+                "warmup": {
+                  "label": "Warm-up",
+                  "activity": "run",
+                  "mode": "time",
+                  "value": 15,
+                  "paceFrom": "7:00",
+                  "paceTo": "7:30",
+                  "hrFrom": "",
+                  "hrTo": ""
+                },
+                "groups": [
+                  {
+                    "label": "Tempo",
+                    "repeats": 1,
+                    "steps": [
+                      {
+                        "label": "Tempo",
+                        "activity": "run",
+                        "mode": "time",
+                        "value": 20,
+                        "paceFrom": "5:45",
+                        "paceTo": "6:05",
+                        "hrFrom": "",
+                        "hrTo": ""
+                      }
+                    ]
+                  }
+                ],
+                "cooldown": null
+              },
+              "actual": {
+                "status": "done",
+                "km": 7.3,
+                "minutes": 44.5,
+                "fatigue": 6,
+                "calories": 480,
+                "avgHr": 158,
+                "note": "",
+                "segments": [
+                  {
+                    "key": "warmup",
+                    "label": "Warm-up",
+                    "actualMinutes": 15,
+                    "actualKm": 2.1,
+                    "actualPace": "7:08"
+                  }
+                ],
+                "savedAt": "2026-10-12T12:00:00.000Z"
+              }
+            },
+            {
+              "id": "wmw8y77zcioanp",
+              "workoutName": "Core 15 phút",
+              "workoutType": "Custom",
+              "planKm": "",
+              "planMinutes": 15,
+              "description": "",
+              "planNote": "",
+              "workoutStructure": null,
+              "actual": null
+            },
+            {
+              "id": "wDup",
+              "workoutName": "Bài trùng ngày ở tuần khác",
+              "planKm": 3,
+              "planMinutes": 20,
+              "workoutType": "",
+              "description": "",
+              "planNote": "",
+              "workoutStructure": null,
+              "actual": null
+            },
+            {
+              "id": "wfit-done-1",
+              "workoutName": "Run Basic 1",
+              "workoutType": "Fitness",
+              "planKm": "",
+              "planMinutes": 48,
+              "description": "Fitness · 7 bài (6 xong) · 13 set · 2366 kg tổng\n• ✓ Good Morning with Barbell — 2 set × 10–12 · 20–30 kg\n• ✓ Reverse Lunge with Dumbbells — 2 set × 10–12 (mỗi chân) · 8–12 kg\n• ✓ One-Leg Deadlift with Dumbbells — 2 set × 8–10 (mỗi chân) · 10–14 kg\n• ✓ Hip Thrust with Barbell — 2 set × 10–12 · 40–60 kg\n• ✗ Single Leg Squat / Single Leg Press — 1 set × 10 (mỗi chân)\n• ✓ Single Calf Raise with Dumbbells — 2 set × 12–15 (mỗi chân) · 10–14 kg\n• ✓ Banded Lateral Walk — 2 set × 15 (mỗi bên)",
+              "planNote": "Set 1 nhẹ, set 2 nặng hơn",
+              "workoutStructure": null,
+              "fitness": {
+                "schema": 1,
+                "sessionId": "fs-golden-done",
+                "templateId": "run-basic-1",
+                "workoutNote": "Set 1 nhẹ, set 2 nặng hơn",
+                "exercises": [
+                  {
+                    "instanceId": "ex-fixture-1",
+                    "libraryId": "good-morning",
+                    "name": "Good Morning with Barbell",
+                    "category": "Posterior chain",
+                    "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "",
+                        "reps": "12",
+                        "time": "",
+                        "weight": "20",
+                        "note": ""
+                      },
+                      {
+                        "set": "2",
+                        "group": "",
+                        "reps": "10",
+                        "time": "",
+                        "weight": "30",
+                        "note": "nặng"
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-fixture-2",
+                    "libraryId": "reverse-lunge",
+                    "name": "Reverse Lunge with Dumbbells",
+                    "category": "Knee / Hip",
+                    "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "mỗi chân",
+                        "reps": "12",
+                        "time": "",
+                        "weight": "8",
+                        "note": ""
+                      },
+                      {
+                        "set": "2",
+                        "group": "mỗi chân",
+                        "reps": "10",
+                        "time": "",
+                        "weight": "12",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-fixture-3",
+                    "libraryId": "one-leg-deadlift",
+                    "name": "One-Leg Deadlift with Dumbbells",
+                    "category": "Hamstring / Balance",
+                    "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "mỗi chân",
+                        "reps": "10",
+                        "time": "",
+                        "weight": "10",
+                        "note": ""
+                      },
+                      {
+                        "set": "2",
+                        "group": "mỗi chân",
+                        "reps": "8",
+                        "time": "",
+                        "weight": "14",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-fixture-4",
+                    "libraryId": "glute-bridge",
+                    "name": "Hip Thrust with Barbell",
+                    "category": "Glute",
+                    "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "",
+                        "reps": "12",
+                        "time": "",
+                        "weight": "40",
+                        "note": ""
+                      },
+                      {
+                        "set": "2",
+                        "group": "",
+                        "reps": "10",
+                        "time": "",
+                        "weight": "60",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-fixture-5",
+                    "libraryId": "single-leg-squat",
+                    "name": "Single Leg Squat / Single Leg Press",
+                    "category": "Knee / Quad",
+                    "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "mỗi chân",
+                        "reps": "10",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-fixture-6",
+                    "libraryId": "single-calf-raise",
+                    "name": "Single Calf Raise with Dumbbells",
+                    "category": "Calf",
+                    "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "mỗi chân",
+                        "reps": "15",
+                        "time": "",
+                        "weight": "10",
+                        "note": ""
+                      },
+                      {
+                        "set": "2",
+                        "group": "mỗi chân",
+                        "reps": "12",
+                        "time": "",
+                        "weight": "14",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-fixture-7",
+                    "libraryId": "custom-banded-walk",
+                    "name": "Banded Lateral Walk",
+                    "category": "Glute med",
+                    "plan": "2 x 15 bước mỗi bên",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "mỗi bên",
+                        "reps": "15",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      },
+                      {
+                        "set": "2",
+                        "group": "mỗi bên",
+                        "reps": "15",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              "actual": {
+                "status": "done",
+                "km": "",
+                "minutes": 48,
+                "fatigue": 7,
+                "calories": 260,
+                "note": "Ổn, gối trái hơi mỏi ở lunge",
+                "segments": [],
+                "source": "fitness-mobile",
+                "fitness": {
+                  "schema": 1,
+                  "sessionId": "fs-golden-done",
+                  "contentHash": "f651cea0",
+                  "exercises": [
+                    {
+                      "instanceId": "ex-fixture-1",
+                      "libraryId": "good-morning",
+                      "name": "Good Morning with Barbell",
+                      "category": "Posterior chain",
+                      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                      "done": true,
+                      "rows": [
+                        {
+                          "set": "1",
+                          "group": "",
+                          "reps": "12",
+                          "time": "",
+                          "weight": "20",
+                          "note": ""
+                        },
+                        {
+                          "set": "2",
+                          "group": "",
+                          "reps": "10",
+                          "time": "",
+                          "weight": "30",
+                          "note": "nặng"
+                        }
+                      ]
+                    },
+                    {
+                      "instanceId": "ex-fixture-2",
+                      "libraryId": "reverse-lunge",
+                      "name": "Reverse Lunge with Dumbbells",
+                      "category": "Knee / Hip",
+                      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                      "done": true,
+                      "rows": [
+                        {
+                          "set": "1",
+                          "group": "mỗi chân",
+                          "reps": "12",
+                          "time": "",
+                          "weight": "8",
+                          "note": ""
+                        },
+                        {
+                          "set": "2",
+                          "group": "mỗi chân",
+                          "reps": "10",
+                          "time": "",
+                          "weight": "12",
+                          "note": ""
+                        }
+                      ]
+                    },
+                    {
+                      "instanceId": "ex-fixture-3",
+                      "libraryId": "one-leg-deadlift",
+                      "name": "One-Leg Deadlift with Dumbbells",
+                      "category": "Hamstring / Balance",
+                      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                      "done": true,
+                      "rows": [
+                        {
+                          "set": "1",
+                          "group": "mỗi chân",
+                          "reps": "10",
+                          "time": "",
+                          "weight": "10",
+                          "note": ""
+                        },
+                        {
+                          "set": "2",
+                          "group": "mỗi chân",
+                          "reps": "8",
+                          "time": "",
+                          "weight": "14",
+                          "note": ""
+                        }
+                      ]
+                    },
+                    {
+                      "instanceId": "ex-fixture-4",
+                      "libraryId": "glute-bridge",
+                      "name": "Hip Thrust with Barbell",
+                      "category": "Glute",
+                      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                      "done": true,
+                      "rows": [
+                        {
+                          "set": "1",
+                          "group": "",
+                          "reps": "12",
+                          "time": "",
+                          "weight": "40",
+                          "note": ""
+                        },
+                        {
+                          "set": "2",
+                          "group": "",
+                          "reps": "10",
+                          "time": "",
+                          "weight": "60",
+                          "note": ""
+                        }
+                      ]
+                    },
+                    {
+                      "instanceId": "ex-fixture-5",
+                      "libraryId": "single-leg-squat",
+                      "name": "Single Leg Squat / Single Leg Press",
+                      "category": "Knee / Quad",
+                      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                      "done": false,
+                      "rows": [
+                        {
+                          "set": "1",
+                          "group": "mỗi chân",
+                          "reps": "10",
+                          "time": "",
+                          "weight": "",
+                          "note": ""
+                        }
+                      ]
+                    },
+                    {
+                      "instanceId": "ex-fixture-6",
+                      "libraryId": "single-calf-raise",
+                      "name": "Single Calf Raise with Dumbbells",
+                      "category": "Calf",
+                      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+                      "done": true,
+                      "rows": [
+                        {
+                          "set": "1",
+                          "group": "mỗi chân",
+                          "reps": "15",
+                          "time": "",
+                          "weight": "10",
+                          "note": ""
+                        },
+                        {
+                          "set": "2",
+                          "group": "mỗi chân",
+                          "reps": "12",
+                          "time": "",
+                          "weight": "14",
+                          "note": ""
+                        }
+                      ]
+                    },
+                    {
+                      "instanceId": "ex-fixture-7",
+                      "libraryId": "custom-banded-walk",
+                      "name": "Banded Lateral Walk",
+                      "category": "Glute med",
+                      "plan": "2 x 15 bước mỗi bên",
+                      "done": true,
+                      "rows": [
+                        {
+                          "set": "1",
+                          "group": "mỗi bên",
+                          "reps": "15",
+                          "time": "",
+                          "weight": "",
+                          "note": ""
+                        },
+                        {
+                          "set": "2",
+                          "group": "mỗi bên",
+                          "reps": "15",
+                          "time": "",
+                          "weight": "",
+                          "note": ""
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "dow": "Ba",
+          "date": "2026-10-13",
+          "workouts": [
+            {
+              "id": "fit1",
+              "fitStandalone": true,
+              "workoutName": "Garmin FIT · 2026-10-13",
+              "workoutType": "Custom",
+              "planKm": "",
+              "planMinutes": "",
+              "description": "Hoạt động thực tế",
+              "planNote": "",
+              "workoutStructure": null,
+              "actual": {
+                "status": "done",
+                "km": 10.02,
+                "minutes": 58.25,
+                "calories": 650,
+                "avgHr": 150,
+                "segments": [],
+                "fitImport": {
+                  "id": "abc-123",
+                  "source": "Garmin FIT",
+                  "filename": "x.fit",
+                  "insights": {
+                    "stats": {
+                      "movingSec": 3495
+                    },
+                    "charts": {},
+                    "laps": [],
+                    "zones": []
+                  }
+                },
+                "note": ""
+              }
+            }
+          ]
+        },
+        {
+          "dow": "Tư",
+          "date": "2026-10-14",
+          "workouts": [
+            {
+              "id": "wfit-plan-1",
+              "workoutName": "Bổ trợ khớp gối 1",
+              "workoutType": "Fitness",
+              "planKm": "",
+              "planMinutes": "",
+              "description": "Fitness · 10 bài · 14 set\n• Đi lùi — 1 set × 10 phút\n• Banded Knee Extension — 1 set × 2 phút\n• Tib Raise — 1 set × 20\n• FHL Calf Raise — 1 set × 20\n• Tib Raise — 1 set × 20\n• Step Ups — 3 set × 10 (mỗi chân)\n• Standing Hip Flexion — 2 set × 25 (mỗi chân)\n• Isometric Glute Bridge — 1 set × 45 giây\n• Elephant Walk — 2 set × 30\n• Calf Stretch — 1 set × 60 giây",
+              "planNote": "Thực hiện chậm và ưu tiên biên độ không đau. Đây là buổi bổ trợ, không phải bài kiểm tra sức mạnh tối đa. Với động tác theo thời gian, dùng ô “Thời gian / quãng đường”; với động tác theo rep, dùng ô “Số rep”.",
+              "workoutStructure": null,
+              "fitness": {
+                "schema": 1,
+                "sessionId": "fs-golden-plan",
+                "templateId": "knee-support-1",
+                "workoutNote": "Thực hiện chậm và ưu tiên biên độ không đau. Đây là buổi bổ trợ, không phải bài kiểm tra sức mạnh tối đa. Với động tác theo thời gian, dùng ô “Thời gian / quãng đường”; với động tác theo rep, dùng ô “Số rep”.",
+                "exercises": [
+                  {
+                    "instanceId": "ex-knee-support-1-1",
+                    "libraryId": "backward-walk",
+                    "name": "Đi lùi",
+                    "category": "Knee basic",
+                    "plan": "10 phút",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "",
+                        "reps": "",
+                        "time": "10 phút",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-knee-support-1-2",
+                    "libraryId": "banded-knee-extension",
+                    "name": "Banded Knee Extension",
+                    "category": "Knee basic",
+                    "plan": "2 phút",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "",
+                        "reps": "",
+                        "time": "2 phút",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-knee-support-1-3",
+                    "libraryId": "tib-raise",
+                    "name": "Tib Raise",
+                    "category": "Shin / Ankle",
+                    "plan": "1 x 20",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "",
+                        "reps": "20",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-knee-support-1-4",
+                    "libraryId": "fhl-calf-raise",
+                    "name": "FHL Calf Raise",
+                    "category": "Calf / Foot",
+                    "plan": "1 x 20",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "",
+                        "reps": "20",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-knee-support-1-5",
+                    "libraryId": "tib-raise",
+                    "name": "Tib Raise",
+                    "category": "Shin / Ankle",
+                    "plan": "1 x 20",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "",
+                        "reps": "20",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-knee-support-1-6",
+                    "libraryId": "step-ups",
+                    "name": "Step Ups",
+                    "category": "Knee / Quad",
+                    "plan": "3 x 10 mỗi chân",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "mỗi chân",
+                        "reps": "10",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      },
+                      {
+                        "set": "2",
+                        "group": "mỗi chân",
+                        "reps": "10",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      },
+                      {
+                        "set": "3",
+                        "group": "mỗi chân",
+                        "reps": "10",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-knee-support-1-7",
+                    "libraryId": "standing-hip-flexion",
+                    "name": "Standing Hip Flexion",
+                    "category": "Hip flexor",
+                    "plan": "2 x 25 mỗi chân",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "mỗi chân",
+                        "reps": "25",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      },
+                      {
+                        "set": "2",
+                        "group": "mỗi chân",
+                        "reps": "25",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-knee-support-1-8",
+                    "libraryId": "isometric-glute-bridge",
+                    "name": "Isometric Glute Bridge",
+                    "category": "Glute / Isometric",
+                    "plan": "1 x 45 giây",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "",
+                        "reps": "",
+                        "time": "45 giây",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-knee-support-1-9",
+                    "libraryId": "elephant-walk",
+                    "name": "Elephant Walk",
+                    "category": "Hamstring mobility",
+                    "plan": "2 x 30 lần",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "",
+                        "reps": "30",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      },
+                      {
+                        "set": "2",
+                        "group": "",
+                        "reps": "30",
+                        "time": "",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  },
+                  {
+                    "instanceId": "ex-knee-support-1-10",
+                    "libraryId": "calf-stretch",
+                    "name": "Calf Stretch",
+                    "category": "Calf mobility",
+                    "plan": "60 giây",
+                    "rows": [
+                      {
+                        "set": "1",
+                        "group": "",
+                        "reps": "",
+                        "time": "60 giây",
+                        "weight": "",
+                        "note": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              "actual": null
+            }
+          ]
+        },
+        {
+          "dow": "Năm",
+          "date": "2026-10-15",
+          "workouts": []
+        },
+        {
+          "dow": "Sáu",
+          "date": "2026-10-16",
+          "workouts": []
+        },
+        {
+          "dow": "Bảy",
+          "date": "2026-10-17",
+          "workouts": []
+        },
+        {
+          "dow": "CN",
+          "date": "2026-10-18",
+          "workouts": []
+        }
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "id": "tpl1",
+      "name": "Easy 40 phút",
+      "workoutType": "Easy",
+      "planKm": 6.15,
+      "planMinutes": 40,
+      "description": ""
+    }
+  ],
+  "features": {
+    "fitness": 1
+  },
+  "appVersion": "2.3.0-dev",
+  "exportedAt": "2026-11-09T07:00:00.000Z"
+}

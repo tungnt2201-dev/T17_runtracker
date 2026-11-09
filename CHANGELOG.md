@@ -1,5 +1,15 @@
 # Changelog
 
+## Chưa phát hành — Fitness, lượt 1 (lớp dữ liệu)
+
+Chưa có giao diện fitness; bản này chỉ chuẩn bị dữ liệu và kiểm chứng tương thích.
+
+- `src/core/fitness.js`: thư viện 15 bài + 2 mẫu buổi trích nguyên văn từ app mobile *T17 Run Training*; đọc file JSON v3 và JSON đời cũ (`T17_RUN_BASIC_1_V1`) của app mobile; tóm tắt chữ, tổng khối lượng (set/rep/kg), mã băm nội dung chống trùng.
+- Mô hình dữ liệu: `workoutType: "Fitness"`, `workout.fitness` (kế hoạch), `actual.fitness` (thực tế), `db.fitnessLibrary`, `db.features` — đều cộng thêm, tuỳ chọn. Giữ `schemaVersion: 2` (lý do trong `docs/DATA_FORMAT.md`).
+- Xuất bài tập JSON, Training Log JSON, thêm bài từ mẫu/Excel, copy bài mang theo khối fitness; copy hoặc thêm từ mẫu cấp `sessionId` mới. Bài chạy bộ xuất ra **đúng bộ trường như cũ**.
+- Gộp file: hai buổi fitness cùng ngày, cùng thời lượng nhưng khác nội dung không còn bị coi là trùng.
+- Test tương thích hai chiều với lõi nguyên văn của v2.2.0 (`tests/compat/`), fixture từ app mobile (JSON v3, JSON đời cũ, Excel) và bộ dữ liệu 2 người dùng do chính v2.2.0 ghi ra.
+
 ## 2.2.0 — 2026-10-26
 
 ### Mới: nhiều người dùng

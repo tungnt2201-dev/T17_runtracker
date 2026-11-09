@@ -49,7 +49,7 @@ Bản sao lưu của T17 vẫn giữ mảng `weeks` ở cấp cao nhất nên **
 
 ```bash
 npm install
-npm test              # build + 42 test (FIT decoder, dữ liệu cũ, Excel, chạy thử app trong jsdom)
+npm test              # build + 64 test (FIT decoder, dữ liệu cũ, Excel, chạy thử app trong jsdom)
 npm run build         # dist/web/T17_runtracker.html + resources/ cho Neutralino
 npm run dev           # chạy cửa sổ desktop (neu run) để thử
 npm run exe           # tải Neutralino 6.10 + đóng gói release/yymmdd_T17_runtracker_vX.Y.Z.zip
@@ -59,7 +59,7 @@ Cấu trúc:
 
 ```
 src/
-  core/        utils.js (thời gian, pace, cấu trúc bài) · legacy.js (đọc mọi định dạng JSON cũ) · users.js (nhiều người dùng, hồ sơ cá nhân) · excel-plan.js
+  core/        utils.js (thời gian, pace, cấu trúc bài) · legacy.js (đọc mọi định dạng JSON cũ) · users.js (nhiều người dùng, hồ sơ cá nhân) · fitness.js (dữ liệu fitness, đọc file app mobile) · excel-plan.js
                athlete.js (hồ sơ VĐV, vùng HR/pace) · load.js (điểm tải, CTL/ATL/TSB) · fit-workout.js (xuất Workout FIT)
   lib/         xlsx.js (đọc/ghi .xlsx không cần thư viện) · fit-decoder.js (Garmin FIT)
   platform/    platform.js (lưu file cạnh exe / localStorage, Save As, sao lưu tự động)
@@ -68,8 +68,8 @@ src/
   styles/      app.css
   body.html, index.template.html
 scripts/       build.mjs · check-syntax.mjs · package-win.mjs
-tests/         *.test.js + fixtures/ (file JSON mẫu của các đời RunPlan)
-legacy/        runplan_tracker_v1_8_9.html (bản gốc để đối chiếu)
+tests/         *.test.js + fixtures/ (file mẫu các đời RunPlan/T17, app mobile) + compat/ (lõi v2.2.0 để test tương thích)
+legacy/        runplan_tracker_v1_8_9.html · T17_Run_Training_Mobile.html (bản gốc để đối chiếu)
 docs/          DATA_FORMAT.md · ROADMAP.md
 ```
 

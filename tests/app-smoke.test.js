@@ -150,3 +150,44 @@ test('đa người dùng (desktop): file riêng users/<id>.json, backup riêng, 
   await app.w.T17UserUI.switchTo('main'); await app.w.T17Platform.removeUser(u.id);
   assert.ok(!files.has(bp)); assert.ok([...files.keys()].some(k => k.includes('data/deleted/' + u.id)));
 });
+
+test('v2.3 lượt 1 (web): mở file sao lưu có fitness → không lỗi, lưu lại giữ nguyên khối fitness; copy/thêm bài cấp sessionId mới', async () => {
+  const GOLD = fs.readFileSync(path.join(__dirname, 'fixtures', 't17-fitness-backup.json'), 'utf8');
+  const { w, doc, errors } = open('dist/web/T17_runtracker.html', w => w.localStorage.setItem('runplan-tracker-v1', GOLD));
+  await wait(300);
+  assert.deepEqual(errors, []);
+  w.eval('saveDb()');
+  const saved = JSON.parse(w.localStorage.getItem('runplan-tracker-v1'));
+  const fit = saved.weeks.flatMap(x => x.days).flatMap(d => d.workouts).filter(x => x.fitness);
+  assert.equal(fit.length, 2); assert.deepEqual(saved.features, { fitness: 1 }); assert.equal(saved.fitnessLibrary.length, 16);
+  assert.ok(fit.find(x => x.actual).actual.fitness.exercises.length === 7);
+  // copy sang ngày khác → buổi mới, sessionId mới, không mang kết quả
+  const r = w.eval(`(()=>{const it=db.weeks.flatMap(x=>x.days).flatMap(d=>d.workouts).find(x=>x.fitness&&x.actual);copyWorkoutToDate(it,'2026-12-01');const c=db.weeks.flatMap(x=>x.days).find(d=>d.date==='2026-12-01').workouts.at(-1);return {old:it.fitness.sessionId,neu:c.fitness.sessionId,actual:c.actual,ex:c.fitness.exercises.length,rec:planExportRecord(it).fitness.sessionId}})()`);
+  assert.notEqual(r.neu, r.old); assert.equal(r.actual, null); assert.equal(r.ex, 7); assert.equal(r.rec, r.old);
+  // chạy bộ: planExportRecord giữ đúng bộ trường cũ, không thêm field
+  const keys = w.eval(`Object.keys(planExportRecord(db.weeks.flatMap(x=>x.days).flatMap(d=>d.workouts).find(x=>!x.fitness)))`);
+  assert.deepEqual([...keys], ['workoutName', 'workoutType', 'planKm', 'planMinutes', 'description', 'planNote', 'workoutStructure']);
+  assert.match(doc.getElementById('days').textContent + JSON.stringify(saved), /Run Basic 1/);
+});
+
+test('v2.3 lượt 1 (desktop): bộ dữ liệu 2 người dùng do v2.2.0 ghi → mở được cả hai, dữ liệu chạy bộ không đổi', async () => {
+  const files = new Map(); files.dirs = new Set(); const handlers = {};
+  const FXD = path.join(__dirname, 'fixtures', 't17-v22-multiuser');
+  const put = (rel) => files.set('C:/Apps/T17/data/' + rel, fs.readFileSync(path.join(FXD, rel), 'utf8'));
+  const idx = JSON.parse(fs.readFileSync(path.join(FXD, 'users.json'), 'utf8')); const lanId = idx.users[1].id;
+  ['users.json', 't17-runtracker.json', `users/${lanId}.json`].forEach(put);
+  const L = require('../src/core/legacy.js');
+  const count = db => db.weeks.flatMap(x => x.days).flatMap(d => d.workouts).map(x => [x.id, x.workoutName, x.planKm, x.actual?.km ?? null]);
+  const before = { main: count(L.normalizeDb(JSON.parse(files.get('C:/Apps/T17/data/t17-runtracker.json'))).db), lan: count(L.normalizeDb(JSON.parse(files.get(`C:/Apps/T17/data/users/${lanId}.json`))).db) };
+  const app = open('resources/index.html', w => { w.NL_PORT = 1; w.NL_PATH = 'C:/Apps/T17'; w.NL_OS = 'Windows'; w.Neutralino = fakeNeutralino(files, handlers); });
+  await wait(800);
+  assert.deepEqual(app.errors, []);
+  assert.equal(app.w.eval('T17Platform.activeUserId()'), lanId, 'mở lại đúng người dùng cuối cùng của v2.2.0');
+  assert.deepEqual(count(JSON.parse(app.w.eval('JSON.stringify(db)'))), before.lan);
+  await app.w.T17UserUI.switchTo('main'); await wait(400);
+  assert.deepEqual(count(JSON.parse(app.w.eval('JSON.stringify(db)'))), before.main);
+  await handlers.windowClose();
+  const after = JSON.parse(files.get('C:/Apps/T17/data/t17-runtracker.json'));
+  assert.deepEqual(count(L.normalizeDb(after).db), before.main);
+  assert.ok(!('features' in after) && !('fitnessLibrary' in after), 'không thêm field fitness vào dữ liệu chỉ có chạy bộ');
+});

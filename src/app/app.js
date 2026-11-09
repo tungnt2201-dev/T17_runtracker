@@ -32,7 +32,7 @@ function actualDurationLabel(minutes){const x=formatDurationClock(minutes);retur
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function readFileArrayBuffer(file){return new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=()=>reject(fr.error||new Error('Không đọc được file.'));fr.readAsArrayBuffer(file)})}
 function readFileText(file){return new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=()=>reject(fr.error||new Error('Không đọc được file.'));fr.readAsText(file,'utf-8')})}
-function addWorkoutFromRecord(dst,src){dst.workouts=dst.workouts||[];dst.workouts.push({id:genId(),workoutName:src.workoutName||'',workoutType:src.workoutType||'',planKm:src.planKm??'',planMinutes:src.planMinutes??'',description:src.description||'',planNote:src.planNote||'',workoutStructure:src.workoutStructure?deepClone(src.workoutStructure):null,actual:null})}
+function addWorkoutFromRecord(dst,src){dst.workouts=dst.workouts||[];const rec={id:genId(),...T17Legacy.planRecord(src),actual:null};if(rec.fitness)rec.fitness.sessionId=T17Fitness.newSessionId();dst.workouts.push(rec)}
 async function importExcel(file){
  if(!file)return;if(!/\.xlsx$/i.test(file.name))throw new Error('Bản này hỗ trợ file .xlsx. Nếu đang dùng .xls, hãy Save As thành .xlsx trước.');if(!window.RunPlanXLSX)throw new Error('Bộ đọc Excel nội bộ chưa tải được.');
  const data=await readFileArrayBuffer(file);const rows=await RunPlanXLSX.readFirstSheet(data);const imported=parseWorkbookRows(rows);
@@ -221,7 +221,8 @@ function copyWorkoutToDate(item,newDate){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(newDate))return null;
  const target=ensureDate(newDate);
  target.d.workouts=target.d.workouts||[];
- target.d.workouts.push({...deepClone(item),id:genId(),actual:null});
+ const copy={...deepClone(item),id:genId(),actual:null};if(copy.fitness)copy.fitness.sessionId=T17Fitness.newSessionId();// bản sao là buổi mới
+ target.d.workouts.push(copy);
  return target.wi;
 }
 function copyWorkoutToDates(item,dates){
@@ -529,7 +530,7 @@ function mergeExportData(data,kind){
 }
 restoreFile.addEventListener('change',async e=>{try{const f=e.target.files&&e.target.files[0];if(!f)return;restoreFromData(T17Legacy.parseJsonText(await readFileText(f)),f.name)}catch(err){alert(err.message||err)}finally{e.target.value=''}});
 
-function planExportRecord(item){return{workoutName:item.workoutName||'',workoutType:item.workoutType||'',planKm:item.planKm??'',planMinutes:item.planMinutes??'',description:item.description||'',planNote:item.planNote||'',workoutStructure:item.workoutStructure?deepClone(item.workoutStructure):null}}
+function planExportRecord(item){return T17Legacy.planRecord(item)}
 async function exportPlanJson(){const EXPORT_TITLE='Xuất bài tập (JSON) để chia sẻ';
  if(!db.weeks.length)return toast('Chưa có dữ liệu');
  const range=await T17UI.uiDateRange({title:EXPORT_TITLE});if(!range)return;const {from,to}=range;
@@ -707,7 +708,7 @@ function exportLogExcel(){
 function exportLogJson(){
  const rows=logView._lastFiltered||[];
  if(!rows.length)return toast('Không có mục nào để xuất');
- const entries=rows.map(({date,dow,item})=>({date,dow,workoutName:item.workoutName||'',workoutType:item.workoutType||'',planKm:item.planKm??'',planMinutes:item.planMinutes??'',description:item.description||'',planNote:item.planNote||'',actual:item.actual||null}));
+ const entries=rows.map(({date,dow,item})=>({date,dow,workoutName:item.workoutName||'',workoutType:item.workoutType||'',planKm:item.planKm??'',planMinutes:item.planMinutes??'',description:item.description||'',planNote:item.planNote||'',...(item.fitness?{fitness:deepClone(item.fitness)}:{}),actual:item.actual||null}));
  const payload={format:'runplan-log',version:1,exportedAt:new Date().toISOString(),entries};
  saveBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`RunPlan_TrainingLog_${logFrom.value||'start'}_${logTo.value||'end'}.json`);
  toast('Đã xuất Training Log ra JSON');

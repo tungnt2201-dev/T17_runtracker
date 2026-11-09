@@ -1,0 +1,393 @@
+{
+  "templatesSeeded": true,
+  "futureField": {
+    "keep": "me"
+  },
+  "app": "T17_runtracker",
+  "schemaVersion": 2,
+  "weeks": [
+    {
+      "label": "42",
+      "days": [
+        {
+          "dow": "Hai",
+          "date": "2026-10-12",
+          "workouts": [
+            {
+              "id": "wA",
+              "workoutName": "Tempo 20 phút",
+              "workoutType": "Tempo",
+              "planKm": 7.2,
+              "planMinutes": 45,
+              "description": "Warm-up: Chạy 15 phút",
+              "planNote": "",
+              "workoutStructure": {
+                "version": 1,
+                "warmup": {
+                  "label": "Warm-up",
+                  "activity": "run",
+                  "mode": "time",
+                  "value": 15,
+                  "paceFrom": "7:00",
+                  "paceTo": "7:30",
+                  "hrFrom": "",
+                  "hrTo": ""
+                },
+                "groups": [
+                  {
+                    "label": "Tempo",
+                    "repeats": 1,
+                    "steps": [
+                      {
+                        "label": "Tempo",
+                        "activity": "run",
+                        "mode": "time",
+                        "value": 20,
+                        "paceFrom": "5:45",
+                        "paceTo": "6:05",
+                        "hrFrom": "",
+                        "hrTo": ""
+                      }
+                    ]
+                  }
+                ],
+                "cooldown": null
+              },
+              "actual": {
+                "status": "done",
+                "km": 7.3,
+                "minutes": 44.5,
+                "fatigue": 6,
+                "calories": 480,
+                "avgHr": 158,
+                "note": "",
+                "segments": [
+                  {
+                    "key": "warmup",
+                    "label": "Warm-up",
+                    "actualMinutes": 15,
+                    "actualKm": 2.1,
+                    "actualPace": "7:08"
+                  }
+                ],
+                "savedAt": "2026-10-12T12:00:00.000Z"
+              }
+            },
+            {
+              "id": "wmw8y77zcioanp",
+              "workoutName": "Core 15 phút",
+              "workoutType": "Custom",
+              "planKm": "",
+              "planMinutes": 15,
+              "description": "",
+              "planNote": "",
+              "workoutStructure": null,
+              "actual": null
+            },
+            {
+              "id": "wDup",
+              "workoutName": "Bài trùng ngày ở tuần khác",
+              "planKm": 3,
+              "planMinutes": 20,
+              "workoutType": "",
+              "description": "",
+              "planNote": "",
+              "workoutStructure": null,
+              "actual": null
+            }
+          ]
+        },
+        {
+          "dow": "Ba",
+          "date": "2026-10-13",
+          "workouts": [
+            {
+              "id": "fit1",
+              "fitStandalone": true,
+              "workoutName": "Garmin FIT · 2026-10-13",
+              "workoutType": "Custom",
+              "planKm": "",
+              "planMinutes": "",
+              "description": "Hoạt động thực tế",
+              "planNote": "",
+              "workoutStructure": null,
+              "actual": {
+                "status": "done",
+                "km": 10.02,
+                "minutes": 58.25,
+                "calories": 650,
+                "avgHr": 150,
+                "segments": [],
+                "fitImport": {
+                  "id": "abc-123",
+                  "source": "Garmin FIT",
+                  "filename": "x.fit",
+                  "insights": {
+                    "stats": {
+                      "movingSec": 3495
+                    },
+                    "charts": {},
+                    "laps": [],
+                    "zones": []
+                  }
+                },
+                "note": ""
+              }
+            }
+          ]
+        },
+        {
+          "dow": "Tư",
+          "date": "2026-10-14",
+          "workouts": []
+        },
+        {
+          "dow": "Năm",
+          "date": "2026-10-15",
+          "workouts": []
+        },
+        {
+          "dow": "Sáu",
+          "date": "2026-10-16",
+          "workouts": []
+        },
+        {
+          "dow": "Bảy",
+          "date": "2026-10-17",
+          "workouts": []
+        },
+        {
+          "dow": "CN",
+          "date": "2026-10-18",
+          "workouts": []
+        }
+      ]
+    },
+    {
+      "label": "43",
+      "days": [
+        {
+          "dow": "Hai",
+          "date": "2026-10-19",
+          "workouts": []
+        },
+        {
+          "dow": "Ba",
+          "date": "2026-10-20",
+          "workouts": []
+        },
+        {
+          "dow": "Tư",
+          "date": "2026-10-21",
+          "workouts": []
+        },
+        {
+          "dow": "Năm",
+          "date": "2026-10-22",
+          "workouts": []
+        },
+        {
+          "dow": "Sáu",
+          "date": "2026-10-23",
+          "workouts": []
+        },
+        {
+          "dow": "Bảy",
+          "date": "2026-10-24",
+          "workouts": []
+        },
+        {
+          "dow": "CN",
+          "date": "2026-10-25",
+          "workouts": []
+        }
+      ]
+    },
+    {
+      "label": "44",
+      "days": [
+        {
+          "dow": "Hai",
+          "date": "2026-10-26",
+          "workouts": []
+        },
+        {
+          "dow": "Ba",
+          "date": "2026-10-27",
+          "workouts": []
+        },
+        {
+          "dow": "Tư",
+          "date": "2026-10-28",
+          "workouts": []
+        },
+        {
+          "dow": "Năm",
+          "date": "2026-10-29",
+          "workouts": []
+        },
+        {
+          "dow": "Sáu",
+          "date": "2026-10-30",
+          "workouts": []
+        },
+        {
+          "dow": "Bảy",
+          "date": "2026-10-31",
+          "workouts": []
+        },
+        {
+          "dow": "CN",
+          "date": "2026-11-01",
+          "workouts": []
+        }
+      ]
+    },
+    {
+      "label": "45",
+      "days": [
+        {
+          "dow": "Hai",
+          "date": "2026-11-02",
+          "workouts": []
+        },
+        {
+          "dow": "Ba",
+          "date": "2026-11-03",
+          "workouts": []
+        },
+        {
+          "dow": "Tư",
+          "date": "2026-11-04",
+          "workouts": []
+        },
+        {
+          "dow": "Năm",
+          "date": "2026-11-05",
+          "workouts": []
+        },
+        {
+          "dow": "Sáu",
+          "date": "2026-11-06",
+          "workouts": []
+        },
+        {
+          "dow": "Bảy",
+          "date": "2026-11-07",
+          "workouts": []
+        },
+        {
+          "dow": "CN",
+          "date": "2026-11-08",
+          "workouts": []
+        }
+      ]
+    },
+    {
+      "label": "46",
+      "days": [
+        {
+          "dow": "Hai",
+          "date": "2026-11-09",
+          "workouts": []
+        },
+        {
+          "dow": "Ba",
+          "date": "2026-11-10",
+          "workouts": []
+        },
+        {
+          "dow": "Tư",
+          "date": "2026-11-11",
+          "workouts": []
+        },
+        {
+          "dow": "Năm",
+          "date": "2026-11-12",
+          "workouts": []
+        },
+        {
+          "dow": "Sáu",
+          "date": "2026-11-13",
+          "workouts": []
+        },
+        {
+          "dow": "Bảy",
+          "date": "2026-11-14",
+          "workouts": []
+        },
+        {
+          "dow": "CN",
+          "date": "2026-11-15",
+          "workouts": []
+        }
+      ]
+    },
+    {
+      "label": "47",
+      "days": [
+        {
+          "dow": "Hai",
+          "date": "2026-11-16",
+          "workouts": []
+        },
+        {
+          "dow": "Ba",
+          "date": "2026-11-17",
+          "workouts": []
+        },
+        {
+          "dow": "Tư",
+          "date": "2026-11-18",
+          "workouts": []
+        },
+        {
+          "dow": "Năm",
+          "date": "2026-11-19",
+          "workouts": []
+        },
+        {
+          "dow": "Sáu",
+          "date": "2026-11-20",
+          "workouts": []
+        },
+        {
+          "dow": "Bảy",
+          "date": "2026-11-21",
+          "workouts": []
+        },
+        {
+          "dow": "CN",
+          "date": "2026-11-22",
+          "workouts": []
+        }
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "id": "tpl1",
+      "name": "Easy 40 phút",
+      "workoutType": "Easy",
+      "planKm": 6.15,
+      "planMinutes": 40,
+      "description": ""
+    }
+  ],
+  "profile": {
+    "fullName": "Nguyễn Văn Tùng",
+    "nickname": "Tùng",
+    "birthDate": "1988-05-20",
+    "sex": "male",
+    "heightCm": "172",
+    "weightKg": 68,
+    "hrRest": 50,
+    "hrMax": 186,
+    "lthr": 168,
+    "thresholdPace": "5:05",
+    "city": "Hà Nội",
+    "club": "T17",
+    "goal": "Sub-3:45 FM",
+    "updatedAt": "2026-10-26T02:00:00.000Z"
+  }
+}

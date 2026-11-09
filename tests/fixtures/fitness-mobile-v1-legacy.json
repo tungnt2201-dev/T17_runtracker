@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-30",
+  "calories": 210,
+  "duration": "45",
+  "rpe": "6",
+  "sessionNote": "Buổi đầu tiên",
+  "exercises": [
+    {
+      "id": "good-morning",
+      "done": true,
+      "rows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "12",
+          "weight": "15",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "",
+          "reps": "10",
+          "weight": "20",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "reverse-lunge",
+      "done": true,
+      "rows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "12",
+          "weight": "6",
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "single-calf-raise",
+      "done": false,
+      "rows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "15",
+          "weight": "",
+          "note": "bỏ vì mỏi"
+        }
+      ]
+    }
+  ]
+}

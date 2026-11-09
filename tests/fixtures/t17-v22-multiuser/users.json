@@ -1,0 +1,17 @@
+{
+  "app": "T17 RunTracker",
+  "usersVersion": 1,
+  "activeUserId": "umw8y78ljgs3",
+  "users": [
+    {
+      "id": "main",
+      "name": "Tôi",
+      "createdAt": "2026-11-09T07:36:58.151Z"
+    },
+    {
+      "id": "umw8y78ljgs3",
+      "name": "Lan",
+      "createdAt": "2026-11-09T07:36:58.951Z"
+    }
+  ]
+}

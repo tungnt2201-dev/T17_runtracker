@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <title>T17 Run Training — Mobile</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;--card:#fff;--text:#111827;--muted:#667085;--line:#dbe2ea;
+      --primary:#2457d6;--primary2:#173f9f;--soft:#eef4ff;--good:#0f7a55;
+      --warn:#8a5700;--danger:#b42318;--shadow:0 8px 28px rgba(16,24,40,.07);--radius:16px;
+    }
+    *{box-sizing:border-box} html{background:var(--bg)}
+    body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);background:var(--bg);min-height:100vh;padding-bottom:94px}
+    button,input,textarea,select{font:inherit} button{cursor:pointer}
+    .app{max-width:860px;margin:0 auto}.hidden{display:none!important}
+    .hero{background:linear-gradient(145deg,#111827,#25304a);color:#fff;padding:calc(16px + env(safe-area-inset-top)) 16px 15px;position:sticky;top:0;z-index:30;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+    .hero-row{display:flex;gap:12px;align-items:center;justify-content:space-between}.hero h1{font-size:20px;margin:0}.hero .sub{font-size:12px;color:#cbd5e1;margin-top:3px}.badge{font-size:11px;font-weight:850;background:#dbe7ff;color:#173f9f;padding:6px 9px;border-radius:999px;white-space:nowrap}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}.tab{border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#dbe6ff;padding:9px;border-radius:10px;font-weight:800}.tab.active{background:#fff;color:#111827}
+    main{padding:11px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:11px;overflow:hidden}.section-pad{padding:13px}
+    .section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.section-title h2{margin:0;font-size:15px}.small{font-size:11px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.field label,.mini label{display:block;color:#475467;font-weight:750}.field label{font-size:11px;margin-bottom:5px}.mini label{font-size:9px;margin:0 0 4px}
+    input,textarea,select{width:100%;border:1px solid #cfd7e3;border-radius:10px;padding:9px 10px;background:#fff;color:var(--text);outline:none}input:focus,textarea:focus,select:focus{border-color:#7aa2ff;box-shadow:0 0 0 3px rgba(36,87,214,.10)}textarea{min-height:74px;resize:vertical}
+    .btn{border:1px solid #cfd7e3;background:#fff;color:#344054;border-radius:10px;padding:9px 10px;font-weight:800;font-size:11px}.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}.btn.soft{background:var(--soft);color:var(--primary2);border-color:#cddcff}.btn.danger{background:#fff5f4;color:var(--danger);border-color:#f0c8c5}.btn.good{background:#effaf5;color:var(--good);border-color:#bde1d2}.btn:disabled{opacity:.45;cursor:not-allowed}
+    .toolbar{display:flex;gap:7px;flex-wrap:wrap}.toolbar>*{flex:1 1 125px}.template-row{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:7px;align-items:end}
+    .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.metric{background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:9px;text-align:center}.metric b{display:block;font-size:16px}.metric span{display:block;margin-top:2px;font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+    .note-box{margin-top:9px;padding:10px;background:#fff9ed;border:1px solid #f1d9ae;border-radius:11px;font-size:11.5px;line-height:1.45;color:#6b4a12}.status{font-size:11px;color:var(--good);font-weight:750;min-height:15px;margin-top:7px}
+    .exercise-head{display:flex;align-items:center;gap:8px;padding:12px;border-bottom:1px solid var(--line)}.exercise-num{width:29px;height:29px;display:grid;place-items:center;border-radius:9px;background:var(--soft);color:var(--primary);font-weight:900;flex:0 0 auto}.exercise-title{min-width:0;flex:1}.exercise-title h3{font-size:14px;margin:0}.exercise-title .plan{font-size:10.5px;color:var(--muted);margin-top:3px}.icon-btn{width:34px;height:34px;border:1px solid #d7dee8;background:#fff;border-radius:9px;font-weight:900;color:#475467;flex:0 0 auto}.icon-btn.danger{color:var(--danger);background:#fff6f5;border-color:#f0c8c5}.done-wrap{display:flex;align-items:center;gap:5px}.done-wrap input{width:17px;height:17px;accent-color:var(--good)}.done-wrap label{font-size:10px;font-weight:800;color:#475467}.completed{border-color:#a7dbc8}.completed .exercise-head{background:#f2fbf7}
+    .exercise-body{padding:10px}.guide{background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:10px;margin-bottom:9px}.guide b{font-size:11px}.guide p{font-size:11.5px;line-height:1.48;color:#475467;margin:4px 0 0}.guide .caution{color:#7a3f00}.log-label{font-size:11px;font-weight:850;color:#344054;margin:8px 0 6px}
+    .log-row{border:1px solid var(--line);border-radius:11px;padding:9px;margin-bottom:7px;background:#fff}.log-row-top{display:grid;grid-template-columns:.6fr .9fr .7fr .85fr .65fr auto;gap:5px;align-items:end}.mini input{padding:8px 6px;font-size:12px}.remove-row{width:31px;height:34px;border:1px solid #f0c8c5;background:#fff4f3;color:var(--danger);border-radius:9px;font-weight:900}.row-note textarea{min-height:48px;padding:8px;font-size:12px;margin-top:6px}.row-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+    .picker{border:1px dashed #b9c8dd;background:#f9fbff;border-radius:13px;padding:10px;margin-bottom:10px}.picker-grid{display:grid;grid-template-columns:1fr;gap:7px;max-height:320px;overflow:auto}.pick-item,.library-item{border:1px solid var(--line);border-radius:11px;padding:10px;background:#fff}.pick-top,.lib-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.pick-name,.lib-name{font-size:13px;font-weight:850}.meta{font-size:10.5px;color:var(--muted);margin-top:3px}.lib-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.pill{display:inline-block;padding:4px 7px;border-radius:999px;background:#f2f4f7;color:#475467;font-size:9px;font-weight:800;margin-right:4px}.pill.builtin{background:#eef4ff;color:#2457d6}
+    .library-form .grid{margin-bottom:8px}.rows-editor{border:1px solid var(--line);border-radius:12px;padding:8px;background:#fafcff}.editor-row{display:grid;grid-template-columns:.55fr .9fr .7fr .85fr .65fr auto;gap:5px;align-items:end;margin-bottom:6px}.editor-row input{padding:8px 6px;font-size:12px}.form-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.search{margin-bottom:9px}
+    .bottom-bar{position:fixed;left:0;right:0;bottom:0;z-index:35;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:8px 9px calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:center}.bottom-inner{width:min(860px,100%);display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.bottom-inner button{min-height:44px;padding:6px;border-radius:10px;border:1px solid #cfd7e3;background:#fff;font-size:10px;font-weight:850;color:#344054}.bottom-inner button.main{background:var(--primary);color:#fff;border-color:var(--primary)}.file-input{display:none}.footer-note{font-size:10.5px;line-height:1.45;color:#667085;padding:1px 3px 14px}
+    .exercise-media{margin:9px 0 8px}.exercise-media img{display:block;width:100%;max-height:560px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:12px}.media-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.media-actions .btn{flex:0 1 auto}.image-empty{margin:8px 0;padding:9px;border:1px dashed #b9c8dd;border-radius:11px;background:#f9fbff}.image-empty .small{display:block;margin-top:5px}.image-upload-box{margin-top:9px;padding:10px;border:1px dashed #b9c8dd;border-radius:12px;background:#f9fbff}.image-preview{margin-top:8px}.image-preview img{display:block;width:100%;max-height:440px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:12px}.image-note{font-size:10px;line-height:1.4;color:var(--muted);margin-top:6px}.lib-thumb{width:74px;height:58px;object-fit:cover;border:1px solid var(--line);border-radius:9px;background:#fff;flex:0 0 auto}.image-pill{background:#effaf5;color:#0f7a55}.busy{opacity:.6;pointer-events:none}
+    @media(max-width:560px){main{padding:9px}.template-row{grid-template-columns:1fr 1fr}.template-row .field:first-child{grid-column:1/-1}.log-row-top,.editor-row{grid-template-columns:.55fr .95fr .7fr .85fr .65fr auto}.exercise-head{padding:10px}.exercise-body{padding:9px}.grid{gap:7px}}
+    @media(max-width:400px){.hero h1{font-size:18px}.log-row-top,.editor-row{grid-template-columns:.5fr .9fr .65fr .8fr .62fr auto;gap:4px}.mini label{font-size:8px}.mini input,.editor-row input{font-size:11px;padding:7px 4px}.remove-row{width:28px}.bottom-inner button{font-size:9px}}
+  
+/* ===== T17 MOBILE OVERRIDES ===== */
+:root{--radius:14px}
+html,body{width:100%;overflow-x:hidden}
+body{padding-bottom:78px}
+.app{max-width:520px;width:100%;margin:0 auto}
+.hero{padding-left:12px;padding-right:12px;padding-bottom:10px}
+.hero-row{gap:8px}.hero h1{font-size:18px}.hero .sub{font-size:11px}
+.badge{font-size:10px;padding:5px 7px}
+.tabs{margin-top:9px}.tab{padding:8px;font-size:12px}
+main{padding:8px}
+.card{margin-bottom:9px;border-radius:14px;box-shadow:0 4px 16px rgba(16,24,40,.055)}
+.section-pad{padding:10px}
+.section-title{align-items:flex-start}.section-title h2{font-size:14px}.section-title .small{font-size:10px;text-align:right}
+.grid{grid-template-columns:1fr 1fr;gap:7px}
+.template-row{grid-template-columns:1fr 1fr;gap:7px}.template-row .field:first-child{grid-column:1/-1}
+.field label{font-size:10px}.field input,.field textarea,.field select{font-size:14px;padding:10px}
+.summary{gap:5px}.metric{padding:7px 4px}.metric b{font-size:15px}.metric span{font-size:8px}
+.note-box{font-size:11px;padding:9px}
+.exercise-head{padding:9px 8px;gap:6px;position:sticky;top:101px;z-index:8;background:#fff}
+.completed .exercise-head{background:#f2fbf7}
+.exercise-num{width:27px;height:27px;border-radius:8px;font-size:12px}
+.exercise-title h3{font-size:13px;line-height:1.2}.exercise-title .plan{font-size:9.5px;line-height:1.25}
+.done-wrap{gap:3px}.done-wrap label{font-size:9px}.done-wrap input{width:16px;height:16px}
+.icon-btn{width:31px;height:31px;border-radius:8px;font-size:13px}
+.exercise-body{padding:8px}
+.guide{padding:9px;margin-bottom:8px}.guide b{font-size:10px}.guide p{font-size:11.5px;line-height:1.5}
+.exercise-media img{width:100%;height:auto;max-height:none;object-fit:contain}
+.image-preview img{width:100%;height:auto;max-height:none}
+.media-actions{display:grid;grid-template-columns:1fr 1fr}.media-actions .btn{width:100%}
+.log-label{font-size:10.5px;margin:8px 0 6px}
+.log-row{padding:8px 8px 7px;position:relative}
+.log-row-top{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding-right:32px}
+.log-row-top .mini:nth-child(1),.log-row-top .mini:nth-child(3),.log-row-top .mini:nth-child(5){grid-column:auto}
+.mini label{font-size:9px;margin-bottom:3px}.mini input{font-size:13px;padding:9px 8px;min-width:0}
+.remove-row{position:absolute;right:7px;top:7px;width:28px;height:28px;border-radius:8px}
+.row-note textarea{min-height:54px;font-size:13px;margin-top:7px}
+.row-actions{display:grid;grid-template-columns:1fr 1fr}.row-actions .btn{width:100%}
+.toolbar>*{flex:1 1 calc(50% - 4px)}
+.picker-grid{max-height:52vh}
+.pick-item,.library-item{padding:9px}
+.lib-top{align-items:center}.lib-thumb{width:68px;height:54px}
+.library-form .grid{grid-template-columns:1fr}
+.rows-editor{padding:7px}.editor-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;position:relative;padding-right:32px;margin-bottom:10px}.editor-row .remove-row{top:0;right:0}.editor-row input{font-size:13px;padding:9px 8px}
+.form-actions{display:grid;grid-template-columns:1fr 1fr}.form-actions .btn{width:100%}
+.bottom-bar{padding:6px 7px calc(6px + env(safe-area-inset-bottom))}
+.bottom-inner{width:100%;grid-template-columns:repeat(4,1fr);gap:4px}
+.bottom-inner button{min-height:43px;padding:5px 2px;font-size:8.8px;line-height:1.15;border-radius:9px}
+.footer-note{font-size:9.5px;padding-bottom:8px}
+@media(max-width:380px){
+  body{padding-bottom:126px}
+  .bottom-inner{grid-template-columns:1fr 1fr;gap:5px}.bottom-inner button{font-size:10px;min-height:40px}
+  .exercise-head{top:97px}.grid{grid-template-columns:1fr}
+  .summary{grid-template-columns:repeat(3,1fr)}
+}
+
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div class="hero-row">
+      <div><h1>T17 Run Training</h1><div class="sub"><span id="heroSub">Run Basic 1</span> · Mobile</div></div>
+      <div class="badge" id="heroBadge">6 bài</div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="today">Buổi tập</button>
+      <button class="tab" data-tab="library">Thư viện</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="todayView">
+      <section class="card section-pad">
+        <div class="section-title"><h2>Giáo án trong ngày</h2><span class="small">Có thể đổi hoặc thêm bài</span></div>
+        <div class="template-row">
+          <div class="field"><label>Chọn giáo án mẫu</label><select id="templateSelect"></select></div>
+          <button class="btn primary" id="loadTemplateBtn">Nạp giáo án</button>
+          <button class="btn soft" id="openPickerBtn">+ Từ thư viện</button>
+        </div>
+        <div id="libraryPicker" class="picker hidden">
+          <div class="section-title"><h2>Thêm bài từ thư viện</h2><button class="btn" id="closePickerBtn">Đóng</button></div>
+          <input id="pickerSearch" class="search" placeholder="Tìm tên bài hoặc nhóm..." />
+          <div id="pickerList" class="picker-grid"></div>
+        </div>
+      </section>
+
+      <section class="card section-pad">
+        <div class="grid">
+          <div class="field"><label>Ngày tập</label><input id="sessionDate" type="date" /></div>
+          <div class="field"><label>Calories (kcal)</label><input id="calories" type="number" min="0" step="1" placeholder="VD: 280" /></div>
+          <div class="field"><label>Thời lượng (phút)</label><input id="duration" type="number" min="0" step="1" /></div>
+          <div class="field"><label>RPE 1–10</label><input id="rpe" type="number" min="1" max="10" step="1" placeholder="VD: 6" /></div>
+        </div>
+        <div class="field" style="margin-top:9px"><label>Ghi chú chung</label><textarea id="sessionNote" placeholder="Cảm giác chân, mức mỏi, điều chỉnh tải..."></textarea></div>
+        <div class="summary">
+          <div class="metric"><b id="sumSets">0</b><span>Dòng set</span></div>
+          <div class="metric"><b id="sumReps">0</b><span>Tổng rep</span></div>
+          <div class="metric"><b id="sumDone">0/0</b><span>Bài hoàn tất</span></div>
+        </div>
+        <div class="note-box" id="workoutNote"></div>
+        <div id="saveStatus" class="status"></div>
+      </section>
+
+      <div id="exerciseList"></div>
+      <div class="footer-note">Dữ liệu được tự lưu trong trình duyệt trên thiết bị. Ảnh được nén trước khi lưu. JSON mang theo ảnh mô tả; Excel chỉ xuất trạng thái/tên ảnh, không nhúng ảnh. Excel dùng SheetJS từ CDN nên cần Internet khi mở app.</div>
+    </div>
+
+    <div id="libraryView" class="hidden">
+      <section class="card section-pad library-form">
+        <div class="section-title"><h2 id="libFormTitle">Thêm bài tập vào thư viện</h2><span class="small">Tạo bài riêng của bạn</span></div>
+        <div class="grid">
+          <div class="field"><label>Tên bài tập *</label><input id="libName" placeholder="VD: Spanish squat" /></div>
+          <div class="field"><label>Nhóm</label><input id="libCategory" placeholder="Knee / Calf / Hip..." /></div>
+        </div>
+        <div class="field"><label>Prescription / mô tả ngắn</label><input id="libPlan" placeholder="VD: 3 x 12 mỗi chân" /></div>
+        <div class="field" style="margin-top:8px"><label>Cách tập</label><textarea id="libCue" placeholder="Mô tả kỹ thuật chính..."></textarea></div>
+        <div class="field" style="margin-top:8px"><label>Chú ý</label><textarea id="libCaution" placeholder="Lỗi thường gặp, dấu hiệu cần dừng..."></textarea></div>
+        <div class="image-upload-box">
+          <div class="section-title" style="margin-bottom:6px"><h2>Ảnh mô tả động tác</h2><span class="small">1 ảnh / bài</span></div>
+          <div class="toolbar"><button class="btn soft" id="libAddImageBtn">+ Add ảnh mô tả</button><button class="btn danger hidden" id="libRemoveImageBtn">Xóa ảnh</button></div>
+          <div id="libImagePreview" class="image-preview hidden"></div>
+          <div class="image-note">Ảnh được tự thu nhỏ và nén trước khi lưu để phù hợp điện thoại. Ảnh sẽ hiện ngay dưới phần “Cách tập”.</div>
+        </div>
+        <div class="log-label">Mẫu log mặc định khi đưa bài vào buổi tập</div>
+        <div class="rows-editor"><div id="defaultRowsEditor"></div><button class="btn soft" id="addDefaultRowBtn">+ Thêm dòng mẫu</button></div>
+        <div class="form-actions"><button class="btn primary" id="saveLibraryExerciseBtn">Lưu vào thư viện</button><button class="btn" id="resetLibraryFormBtn">Làm mới form</button></div>
+      </section>
+
+      <section class="card section-pad">
+        <div class="section-title"><h2>Thư viện bài tập</h2><span class="small" id="libraryCount"></span></div>
+        <input id="librarySearch" class="search" placeholder="Tìm tên bài, nhóm hoặc prescription..." />
+        <div id="libraryList"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="bottom-bar"><div class="bottom-inner">
+  <button class="main" id="saveBtn">Lưu</button>
+  <button id="exportJsonBtn">Xuất JSON</button>
+  <button id="exportExcelBtn">Xuất Excel</button>
+  <button id="importBtn">Nhập file</button>
+</div></div>
+<input class="file-input" id="fileInput" type="file" accept=".json,.xlsx,.xls" />
+<input class="file-input" id="imageFileInput" type="file" accept="image/*" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(() => {
+  const STORAGE_KEY='T17_RUN_TRAINING_V2';
+  const OLD_KEY='T17_RUN_BASIC_1_V1';
+  const uid=(p='id')=>p+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
+  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const numOrText=v=>{const n=Number(v);return String(v??'').trim()!==''&&Number.isFinite(n)?n:v};
+  const localDate=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
+
+  const row=(set='',group='',reps='',time='',weight='',note='')=>({set:String(set),group:String(group),reps:String(reps),time:String(time),weight:String(weight),note:String(note)});
+
+  const BUILTIN_LIBRARY=[
+    {id:'good-morning',builtin:true,name:'Good Morning with Barbell',category:'Posterior chain',plan:'Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn',cue:'Đặt barbell chắc trên phần cơ thang/upper back, đứng vững và gối hơi chùng. Đẩy hông ra sau như hip hinge, giữ cột sống trung tính rồi siết mông để trở về tư thế đứng.',caution:'Giữ thanh tạ ổn định trên lưng trên; không đặt tạ lên cổ, không cúi bằng lưng và không cố hạ quá sâu khi lưng bắt đầu cong.',defaultRows:[row(1,'1-12',12,'','',''),row(2,'1-10',10,'','','')]},
+    {id:'reverse-lunge',builtin:true,name:'Reverse Lunge with Dumbbells',category:'Knee / Hip',plan:'Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn',cue:'Cầm tạ hai bên, bước một chân ra sau và hạ người có kiểm soát. Gối chân trước đi theo hướng bàn chân. Đạp chân trước xuống sàn để trở lại.',caution:'Tránh bước quá hẹp, gối đổ vào trong hoặc dùng chân sau đẩy mạnh để đứng lên.',defaultRows:[row(1,'mỗi chân',12),row(2,'mỗi chân',10)]},
+    {id:'one-leg-deadlift',builtin:true,name:'One-Leg Deadlift with Dumbbells',category:'Hamstring / Balance',plan:'Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn',cue:'Đứng trên một chân, gối hơi chùng, đẩy hông ra sau và nghiêng thân về trước. Giữ hai bên hông tương đối cân, chân còn lại duỗi ra sau.',caution:'Không xoay mở hông, không kéo tạ bằng lưng và không hy sinh thăng bằng để cố xuống sâu.',defaultRows:[row(1,'mỗi chân',12),row(2,'mỗi chân',10)]},
+    {id:'glute-bridge',builtin:true,name:'Hip Thrust with Barbell',category:'Glute',plan:'Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn',cue:'Tựa phần lưng trên vào ghế chắc chắn, bàn chân đặt vững, barbell nằm ngang vùng hông có đệm. Đẩy hông lên đến khi thân và đùi gần thành một đường thẳng, siết mông rồi hạ có kiểm soát.',caution:'Giữ ghế ổn định, cằm hơi thu, không ưỡn thắt lưng ở đỉnh và luôn kiểm soát thanh tạ trên hông.',defaultRows:[row(1,'',12),row(2,'',10)]},
+    {id:'single-leg-squat',builtin:true,name:'Single Leg Squat / Single Leg Press',category:'Knee / Quad',plan:'Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn',cue:'Chọn biến thể phù hợp. Hạ người hoặc đạp máy có kiểm soát, gối đi cùng hướng mũi chân và duy trì lực đều qua bàn chân.',caution:'Không để gối sụp vào trong. Giảm độ sâu hoặc tải nếu mất kiểm soát; với leg press không khóa cứng gối.',defaultRows:[row(1,'mỗi chân',12),row(2,'mỗi chân',10)]},
+    {id:'single-calf-raise',builtin:true,name:'Single Calf Raise with Dumbbells',category:'Calf',plan:'Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn',cue:'Đứng một chân, nâng gót hết biên độ có kiểm soát, dừng ngắn ở đỉnh rồi hạ chậm. Có thể vịn nhẹ để giữ thăng bằng.',caution:'Không bật nảy, không lăn cổ chân ra ngoài/trong và không rút ngắn biên độ chỉ để tăng tạ.',defaultRows:[row(1,'mỗi chân',12),row(2,'mỗi chân',10)]},
+
+    {id:'backward-walk',builtin:true,name:'Đi lùi',category:'Knee basic',plan:'10 phút',cue:'Đi lùi trên bề mặt phẳng và thông thoáng, bước ngắn, thân người thẳng, tiếp đất nhẹ và giữ nhịp đều.',caution:'Ưu tiên nơi an toàn, không có vật cản. Giảm tốc hoặc dừng nếu đau nhói ở gối, cổ chân hay bàn chân.',defaultRows:[row(1,'','', '10 phút')]},
+    {id:'banded-knee-extension',builtin:true,name:'Banded Knee Extension',category:'Knee basic',plan:'2 phút',cue:'Cố định dây kháng lực phía sau gối. Từ tư thế gối hơi chùng, duỗi gối có kiểm soát đến gần thẳng rồi quay lại, giữ bàn chân ổn định.',caution:'Không giật dây hoặc khóa gối mạnh ở cuối biên độ; dùng lực vừa đủ để chuyển động trơn tru.',defaultRows:[row(1,'','', '2 phút')]},
+    {id:'tib-raise',builtin:true,name:'Tib Raise',category:'Shin / Ankle',plan:'1 x 20',cue:'Giữ gót chân trên sàn, nâng mũi bàn chân lên bằng cơ mặt trước cẳng chân rồi hạ chậm xuống.',caution:'Không nhấc gót, không giật nhanh; giữ biên độ trong khả năng kiểm soát.',defaultRows:[row(1,'',20)]},
+    {id:'fhl-calf-raise',builtin:true,name:'FHL Calf Raise',category:'Calf / Foot',plan:'1 x 20',cue:'Ở tư thế calf raise có điểm tựa, hơi nghiêng người theo biến thể đã chọn. Nâng gót chậm, đẩy qua vùng ngón cái và hạ có kiểm soát.',caution:'Không để cổ chân đổ mạnh vào trong/ngoài; giảm biên độ nếu xuất hiện khó chịu ở gân Achilles hoặc bàn chân.',defaultRows:[row(1,'',20)]},
+    {id:'step-ups',builtin:true,name:'Step Ups',category:'Knee / Quad',plan:'3 x 10 mỗi chân',cue:'Đứng trên bục chắc chắn. Giữ một chân làm chân trụ, hạ chân còn lại xuống có kiểm soát rồi dùng chân trụ đưa cơ thể trở lại.',caution:'Giữ gối chân trụ theo hướng ngón chân, không để hông rơi sang một bên. Chọn độ cao bục phù hợp.',defaultRows:[row(1,'mỗi chân',10),row(2,'mỗi chân',10),row(3,'mỗi chân',10)]},
+    {id:'standing-hip-flexion',builtin:true,name:'Standing Hip Flexion',category:'Hip flexor',plan:'2 x 25 mỗi chân',cue:'Đứng thẳng, giữ thân ổn định và nâng gối lên bằng cơ gấp hông. Hạ xuống chậm, tránh ngả người ra sau.',caution:'Không dùng quán tính hoặc ưỡn lưng để nâng gối; có thể vịn nhẹ nếu cần thăng bằng.',defaultRows:[row(1,'mỗi chân',25),row(2,'mỗi chân',25)]},
+    {id:'isometric-glute-bridge',builtin:true,name:'Isometric Glute Bridge',category:'Glute / Isometric',plan:'1 x 45 giây',cue:'Vào tư thế cầu mông theo biến thể một chân, nâng hông và giữ vị trí ổn định trong thời gian mục tiêu.',caution:'Giữ xương chậu cân, không ưỡn thắt lưng. Nếu một chân quá khó, giảm thời gian hoặc dùng hai chân.',defaultRows:[row(1,'','','45 giây')]},
+    {id:'elephant-walk',builtin:true,name:'Elephant Walk',category:'Hamstring mobility',plan:'2 x 30 lần',cue:'Cúi người, tay chạm sàn hoặc điểm tựa phù hợp. Luân phiên co một gối và duỗi chân còn lại để tạo cảm giác kéo giãn gân kheo.',caution:'Không ép đầu gối khóa cứng hoặc cố chạm sàn bằng mọi giá; giữ nhịp nhẹ và kiểm soát.',defaultRows:[row(1,'',30),row(2,'',30)]},
+    {id:'calf-stretch',builtin:true,name:'Calf Stretch',category:'Calf mobility',plan:'60 giây',cue:'Đặt chân trên bục nghiêng hoặc vị trí kéo giãn phù hợp, giữ gót ổn định và duy trì cảm giác căng vừa phải ở bắp chân.',caution:'Không nhún bật và không kéo đến mức đau nhói; giữ hơi thở tự nhiên.',defaultRows:[row(1,'','','60 giây')]}
+  ];
+
+  const TEMPLATES=[
+    {id:'run-basic-1',name:'Run Basic 1',duration:'45',note:'Set 1: 10–12 rep với tạ nhẹ hoặc không tạ. Set 2: 8–10 rep với mức tạ tương đối nặng nhưng vẫn giữ đúng kỹ thuật. Nghỉ khoảng 60–90 giây; set nặng có thể nghỉ lâu hơn nếu cần.',items:['good-morning','reverse-lunge','one-leg-deadlift','glute-bridge','single-leg-squat','single-calf-raise']},
+    {id:'knee-support-1',name:'Bổ trợ khớp gối 1',duration:'',note:'Thực hiện chậm và ưu tiên biên độ không đau. Đây là buổi bổ trợ, không phải bài kiểm tra sức mạnh tối đa. Với động tác theo thời gian, dùng ô “Thời gian / quãng đường”; với động tác theo rep, dùng ô “Số rep”.',items:['backward-walk','banded-knee-extension','tib-raise','fhl-calf-raise','tib-raise','step-ups','standing-hip-flexion','isometric-glute-bridge','elephant-walk','calf-stretch']}
+  ];
+
+  function cloneRows(rows){return (rows||[]).map(r=>row(r.set,r.group,r.reps,r.time,r.weight,r.note))}
+  function libraryById(id){return data.library.find(x=>x.id===id)}
+  function instanceFromLibrary(ex){return {instanceId:uid('ex'),libraryId:ex.id,name:ex.name,category:ex.category||'',plan:ex.plan||'',cue:ex.cue||'',caution:ex.caution||'',imageData:ex.imageData||'',imageName:ex.imageName||'',done:false,rows:cloneRows(ex.defaultRows?.length?ex.defaultRows:[row(1)])}}
+  function sessionFromTemplate(templateId){
+    const t=TEMPLATES.find(x=>x.id===templateId)||TEMPLATES[0];
+    return {workoutName:t.name,templateId:t.id,date:localDate(),calories:'',duration:t.duration||'',rpe:'',sessionNote:'',workoutNote:t.note||'',exercises:t.items.map(id=>instanceFromLibrary(BUILTIN_LIBRARY.find(x=>x.id===id)))};
+  }
+  function defaultData(){return {version:3,library:BUILTIN_LIBRARY.map(x=>({...x,imageData:'',imageName:'',defaultRows:cloneRows(x.defaultRows)})),session:sessionFromTemplate('run-basic-1')}}
+
+  function migrateOld(){
+    try{
+      const raw=localStorage.getItem(OLD_KEY);if(!raw)return null;const old=JSON.parse(raw);const next=defaultData();
+      next.session.date=old.date||next.session.date;next.session.calories=old.calories??'';next.session.duration=old.duration??'45';next.session.rpe=old.rpe??'';next.session.sessionNote=old.sessionNote??'';
+      (old.exercises||[]).forEach(oe=>{const dest=next.session.exercises.find(e=>e.libraryId===oe.id);if(dest){dest.done=!!oe.done;dest.rows=(oe.rows||[]).map(r=>row(r.set,r.group,r.reps,'',r.weight,r.note));}});
+      return next;
+    }catch(e){return null}
+  }
+  function normalizeData(raw){
+    const base=defaultData();if(!raw||typeof raw!=='object')return base;
+    const rawLib=Array.isArray(raw.library)?raw.library:[];
+    const savedById=new Map(rawLib.filter(x=>x&&x.id).map(x=>[String(x.id),x]));
+    const builtins=BUILTIN_LIBRARY.map(x=>{const saved=savedById.get(x.id)||{};return {...x,imageData:String(saved.imageData||''),imageName:String(saved.imageName||''),defaultRows:cloneRows(x.defaultRows)}});
+    const custom=rawLib.filter(x=>x&&!x.builtin&&x.id).map(x=>({...x,builtin:false,imageData:String(x.imageData||''),imageName:String(x.imageName||''),defaultRows:cloneRows(x.defaultRows?.length?x.defaultRows:[row(1)])}));
+    base.version=3;base.library=[...builtins,...custom.filter((x,i,a)=>a.findIndex(y=>y.id===x.id)===i)];
+    if(raw.session){
+      const s=raw.session;base.session.workoutName=s.workoutName||base.session.workoutName;base.session.templateId=s.templateId||'';base.session.date=s.date||base.session.date;base.session.calories=String(s.calories??'');base.session.duration=String(s.duration??'');base.session.rpe=String(s.rpe??'');base.session.sessionNote=String(s.sessionNote??'');base.session.workoutNote=String(s.workoutNote??'');
+      if(Array.isArray(s.exercises)) base.session.exercises=s.exercises.map(e=>{const lib=base.library.find(x=>x.id===e.libraryId);return {instanceId:e.instanceId||uid('ex'),libraryId:e.libraryId||'',name:String(lib&&lib.builtin?lib.name:(e.name||'Bài tập')),category:String(lib&&lib.builtin?lib.category:(e.category||'')),plan:String(lib&&lib.builtin?lib.plan:(e.plan||'')),cue:String(lib&&lib.builtin?lib.cue:(e.cue||'')),caution:String(lib&&lib.builtin?lib.caution:(e.caution||'')),imageData:String((lib&&lib.imageData)||e.imageData||''),imageName:String((lib&&lib.imageName)||e.imageName||''),done:!!e.done,rows:cloneRows(e.rows?.length?e.rows:[row(1)])}});
+    }
+    return base;
+  }
+  function loadData(){
+    try{const raw=localStorage.getItem(STORAGE_KEY);if(raw)return normalizeData(JSON.parse(raw));const migrated=migrateOld();return migrated||defaultData();}catch(e){return defaultData()}
+  }
+  let data=loadData();
+  let editingLibraryId=null;
+  let libraryDraftRows=[row(1)];
+  let libraryDraftImageData='';
+  let libraryDraftImageName='';
+  let pendingImageTarget=null;
+
+  const $=id=>document.getElementById(id);
+  function persistData(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));return true}catch(err){alert('Không thể lưu thêm dữ liệu. Bộ nhớ trình duyệt có thể đã gần đầy. Hãy xuất JSON để sao lưu, sau đó giảm số lượng/kích thước ảnh.');return false}}
+  function displayImageForExercise(ex){const lib=ex.libraryId?libraryById(ex.libraryId):null;return (lib&&lib.imageData)||ex.imageData||''}
+  function imageNameForExercise(ex){const lib=ex.libraryId?libraryById(ex.libraryId):null;return (lib&&lib.imageName)||ex.imageName||''}
+  function formatBytes(bytes){if(!bytes)return '';if(bytes<1024)return bytes+' B';if(bytes<1024*1024)return (bytes/1024).toFixed(0)+' KB';return (bytes/1024/1024).toFixed(1)+' MB'}
+  async function compressImage(file,maxSide=1200,quality=.82){
+    if(!file||!file.type.startsWith('image/'))throw new Error('Hãy chọn một file ảnh.');
+    const url=URL.createObjectURL(file);let img;
+    try{img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Không đọc được ảnh.'));im.src=url});
+      let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;if(!w||!h)throw new Error('Ảnh không hợp lệ.');
+      const scale=Math.min(1,maxSide/Math.max(w,h));w=Math.max(1,Math.round(w*scale));h=Math.max(1,Math.round(h*scale));
+      const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);
+      let dataUrl=canvas.toDataURL('image/webp',quality);if(!dataUrl.startsWith('data:image/webp'))dataUrl=canvas.toDataURL('image/jpeg',quality);
+      return {dataUrl,name:file.name||'exercise-image',width:w,height:h,originalBytes:file.size||0,storedBytes:Math.round((dataUrl.length-dataUrl.indexOf(',')-1)*.75)};
+    }finally{URL.revokeObjectURL(url)}
+  }
+  function renderLibraryImageDraft(){const box=$('libImagePreview'),remove=$('libRemoveImageBtn'),add=$('libAddImageBtn');if(libraryDraftImageData){box.classList.remove('hidden');box.innerHTML=`<img src="${libraryDraftImageData}" alt="Ảnh mô tả bài tập"><div class="image-note">${esc(libraryDraftImageName||'Ảnh mô tả đã chọn')}</div>`;remove.classList.remove('hidden');add.textContent='Thay ảnh mô tả'}else{box.classList.add('hidden');box.innerHTML='';remove.classList.add('hidden');add.textContent='+ Add ảnh mô tả'}}
+  function syncImageToMatchingSession(libraryId,imageData,imageName){data.session.exercises.forEach(ex=>{if(ex.libraryId===libraryId){ex.imageData=imageData||'';ex.imageName=imageName||''}})}
+
+  function syncSessionFields(){data.session.date=$('sessionDate').value;data.session.calories=$('calories').value;data.session.duration=$('duration').value;data.session.rpe=$('rpe').value;data.session.sessionNote=$('sessionNote').value}
+  function save(show=false){syncSessionFields();persistData();updateSummary();if(show){$('saveStatus').textContent='Đã lưu trên thiết bị lúc '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});setTimeout(()=>{$('saveStatus').textContent=''},2200)}}
+
+  function renderTemplateSelect(){
+    $('templateSelect').innerHTML=TEMPLATES.map(t=>`<option value="${esc(t.id)}" ${data.session.templateId===t.id?'selected':''}>${esc(t.name)}</option>`).join('');
+  }
+  function renderSession(){
+    $('sessionDate').value=data.session.date;$('calories').value=data.session.calories;$('duration').value=data.session.duration;$('rpe').value=data.session.rpe;$('sessionNote').value=data.session.sessionNote;$('workoutNote').innerHTML='<b>Gợi ý:</b> '+esc(data.session.workoutNote||'Tập đúng kỹ thuật và điều chỉnh tải theo cảm nhận trong ngày.');
+    $('heroSub').textContent=data.session.workoutName;$('heroBadge').textContent=data.session.exercises.length+' bài';
+    const holder=$('exerciseList');holder.innerHTML='';
+    data.session.exercises.forEach((ex,i)=>holder.appendChild(makeExerciseCard(ex,i)));
+    updateSummary();renderPicker();
+  }
+  function makeExerciseCard(ex,i){
+    const card=document.createElement('section');card.className='card'+(ex.done?' completed':'');card.dataset.instanceId=ex.instanceId;
+    const imageData=displayImageForExercise(ex),imageName=imageNameForExercise(ex);
+    const media=imageData?`<div class="exercise-media"><img src="${imageData}" alt="Mô tả ${esc(ex.name)}"><div class="media-actions"><button class="btn soft exercise-image-add">Thay ảnh</button><button class="btn danger exercise-image-remove">Xóa ảnh</button></div><div class="image-note">${esc(imageName||'Ảnh mô tả động tác')}</div></div>`:`<div class="image-empty"><button class="btn soft exercise-image-add">+ Add ảnh mô tả</button><span class="small">Ảnh sẽ nằm ngay dưới phần mô tả kỹ thuật.</span></div>`;
+    card.innerHTML=`<div class="exercise-head"><div class="exercise-num">${i+1}</div><div class="exercise-title"><h3>${esc(ex.name)}</h3><div class="plan">${esc(ex.plan||ex.category||'')}</div></div><div class="done-wrap"><input class="done-check" type="checkbox" ${ex.done?'checked':''}><label>Xong</label></div><button class="icon-btn toggle">⌃</button><button class="icon-btn danger remove-exercise" title="Bỏ khỏi buổi tập">×</button></div><div class="exercise-body"><div class="guide"><b>Cách tập</b><p>${esc(ex.cue||'Chưa có hướng dẫn.')}</p>${media}<b style="display:block;margin-top:6px">Chú ý</b><p class="caution">${esc(ex.caution||'Ưu tiên kỹ thuật ổn định và dừng nếu có đau nhói.')}</p></div><div class="log-label">Nhật ký set / rep / thời gian</div><div class="rows"></div><div class="row-actions"><button class="btn soft add-row">+ Thêm dòng</button><button class="btn copy-row">Sao chép dòng cuối</button></div></div>`;
+    renderRows(card.querySelector('.rows'),ex.rows);return card;
+  }
+  function renderRows(container,rows){
+    container.innerHTML='';rows.forEach((r,i)=>{const el=document.createElement('div');el.className='log-row';el.dataset.index=i;el.innerHTML=`<div class="log-row-top"><div class="mini"><label>SET</label><input class="f-set" value="${esc(r.set)}" inputmode="numeric"></div><div class="mini"><label>REP/NHÓM</label><input class="f-group" value="${esc(r.group)}" placeholder="mỗi chân"></div><div class="mini"><label>SỐ REP</label><input class="f-reps" type="number" min="0" inputmode="numeric" value="${esc(r.reps)}"></div><div class="mini"><label>TIME/KM</label><input class="f-time" value="${esc(r.time)}" placeholder="45s"></div><div class="mini"><label>KG</label><input class="f-weight" type="number" min="0" step="0.5" inputmode="decimal" value="${esc(r.weight)}"></div><button class="remove-row">×</button></div><div class="row-note"><textarea class="f-note" placeholder="Ghi chú cho rep hoặc nhóm rep này...">${esc(r.note)}</textarea></div>`;container.appendChild(el)})
+  }
+  function updateSummary(){let sets=0,reps=0,done=0;data.session.exercises.forEach(ex=>{if(ex.done)done++;ex.rows.forEach(r=>{if([r.set,r.group,r.reps,r.time,r.weight,r.note].some(v=>String(v).trim()))sets++;const n=Number(r.reps);if(Number.isFinite(n))reps+=n})});$('sumSets').textContent=sets;$('sumReps').textContent=reps;$('sumDone').textContent=`${done}/${data.session.exercises.length}`;$('heroBadge').textContent=data.session.exercises.length+' bài'}
+  function exByInstance(card){return data.session.exercises.find(e=>e.instanceId===card.dataset.instanceId)}
+
+  $('exerciseList').addEventListener('input',e=>{const rowEl=e.target.closest('.log-row');if(!rowEl)return;const card=e.target.closest('.card'),ex=exByInstance(card),r=ex.rows[Number(rowEl.dataset.index)];if(e.target.classList.contains('f-set'))r.set=e.target.value;if(e.target.classList.contains('f-group'))r.group=e.target.value;if(e.target.classList.contains('f-reps'))r.reps=e.target.value;if(e.target.classList.contains('f-time'))r.time=e.target.value;if(e.target.classList.contains('f-weight'))r.weight=e.target.value;if(e.target.classList.contains('f-note'))r.note=e.target.value;save(false)});
+  $('exerciseList').addEventListener('change',e=>{if(e.target.classList.contains('done-check')){const card=e.target.closest('.card'),ex=exByInstance(card);ex.done=e.target.checked;card.classList.toggle('completed',ex.done);save(false)}});
+  $('exerciseList').addEventListener('click',e=>{const card=e.target.closest('.card');if(!card)return;const ex=exByInstance(card);if(e.target.closest('.toggle')){const body=card.querySelector('.exercise-body');body.classList.toggle('hidden');e.target.closest('.toggle').textContent=body.classList.contains('hidden')?'⌄':'⌃'}if(e.target.closest('.exercise-image-add')){pendingImageTarget={type:'session',instanceId:ex.instanceId};$('imageFileInput').click();return}if(e.target.closest('.exercise-image-remove')){if(confirm('Xóa ảnh mô tả của bài này?')){ex.imageData='';ex.imageName='';const lib=ex.libraryId?libraryById(ex.libraryId):null;if(lib){lib.imageData='';lib.imageName='';syncImageToMatchingSession(lib.id,'','')}persistData();renderSession();renderLibrary()}return}if(e.target.closest('.add-row')){ex.rows.push(row(ex.rows.length+1));renderRows(card.querySelector('.rows'),ex.rows);save(false)}if(e.target.closest('.copy-row')){const last=ex.rows.at(-1)||row(1);ex.rows.push({...last});renderRows(card.querySelector('.rows'),ex.rows);save(false)}if(e.target.closest('.remove-row')){ex.rows.splice(Number(e.target.closest('.log-row').dataset.index),1);if(!ex.rows.length)ex.rows.push(row(1));renderRows(card.querySelector('.rows'),ex.rows);save(false)}if(e.target.closest('.remove-exercise')){data.session.exercises=data.session.exercises.filter(x=>x.instanceId!==ex.instanceId);data.session.templateId='';renderTemplateSelect();renderSession();save(false)}});
+
+  ['sessionDate','calories','duration','rpe','sessionNote'].forEach(id=>$(id).addEventListener('input',()=>save(false)));
+  $('saveBtn').addEventListener('click',()=>save(true));
+
+  $('libAddImageBtn').addEventListener('click',()=>{pendingImageTarget={type:'draft'};$('imageFileInput').click()});
+  $('libRemoveImageBtn').addEventListener('click',()=>{libraryDraftImageData='';libraryDraftImageName='';renderLibraryImageDraft()});
+  $('imageFileInput').addEventListener('change',async e=>{const file=e.target.files[0];if(!file||!pendingImageTarget){e.target.value='';return}document.body.classList.add('busy');try{const img=await compressImage(file);const target=pendingImageTarget;if(target.type==='draft'){libraryDraftImageData=img.dataUrl;libraryDraftImageName=img.name;renderLibraryImageDraft()}else if(target.type==='session'){const ex=data.session.exercises.find(x=>x.instanceId===target.instanceId);if(ex){ex.imageData=img.dataUrl;ex.imageName=img.name;const lib=ex.libraryId?libraryById(ex.libraryId):null;if(lib){lib.imageData=img.dataUrl;lib.imageName=img.name;syncImageToMatchingSession(lib.id,img.dataUrl,img.name)}persistData();renderSession();renderLibrary()}}else if(target.type==='library'){const lib=libraryById(target.libraryId);if(lib){lib.imageData=img.dataUrl;lib.imageName=img.name;syncImageToMatchingSession(lib.id,img.dataUrl,img.name);persistData();renderLibrary();renderSession()}}}catch(err){alert('Không thể thêm ảnh: '+err.message)}finally{document.body.classList.remove('busy');pendingImageTarget=null;e.target.value=''}});
+
+  $('loadTemplateBtn').addEventListener('click',()=>{const id=$('templateSelect').value;const t=TEMPLATES.find(x=>x.id===id);const oldMeta={date:data.session.date,calories:data.session.calories,rpe:data.session.rpe,sessionNote:data.session.sessionNote};data.session=sessionFromTemplate(id);Object.assign(data.session,oldMeta);renderTemplateSelect();renderSession();save(true)});
+  $('openPickerBtn').addEventListener('click',()=>{$('libraryPicker').classList.remove('hidden');$('pickerSearch').focus()});$('closePickerBtn').addEventListener('click',()=>$('libraryPicker').classList.add('hidden'));$('pickerSearch').addEventListener('input',renderPicker);
+  function renderPicker(){const q=$('pickerSearch').value.trim().toLowerCase();const list=data.library.filter(x=>!q||[x.name,x.category,x.plan].join(' ').toLowerCase().includes(q));$('pickerList').innerHTML=list.map(x=>`<div class="pick-item" data-id="${esc(x.id)}"><div class="pick-top"><div><div class="pick-name">${esc(x.name)}</div><div class="meta">${esc(x.category||'Chưa phân nhóm')} · ${esc(x.plan||'Chưa có prescription')}</div></div><button class="btn good add-from-picker">+ Thêm</button></div></div>`).join('')||'<div class="small">Không tìm thấy bài phù hợp.</div>'}
+  $('pickerList').addEventListener('click',e=>{const btn=e.target.closest('.add-from-picker');if(!btn)return;const item=e.target.closest('.pick-item'),lib=libraryById(item.dataset.id);if(!lib)return;data.session.exercises.push(instanceFromLibrary(lib));data.session.templateId='';renderTemplateSelect();renderSession();save(false)});
+
+  document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');const isToday=btn.dataset.tab==='today';$('todayView').classList.toggle('hidden',!isToday);$('libraryView').classList.toggle('hidden',isToday);if(!isToday)renderLibrary()}));
+
+  function renderDefaultRowsEditor(){const h=$('defaultRowsEditor');h.innerHTML='';libraryDraftRows.forEach((r,i)=>{const el=document.createElement('div');el.className='editor-row';el.dataset.index=i;el.innerHTML=`<div class="mini"><label>SET</label><input class="d-set" value="${esc(r.set)}"></div><div class="mini"><label>REP/NHÓM</label><input class="d-group" value="${esc(r.group)}"></div><div class="mini"><label>SỐ REP</label><input class="d-reps" type="number" min="0" value="${esc(r.reps)}"></div><div class="mini"><label>TIME/KM</label><input class="d-time" value="${esc(r.time)}"></div><div class="mini"><label>KG</label><input class="d-weight" type="number" min="0" step="0.5" value="${esc(r.weight)}"></div><button class="remove-row d-remove">×</button>`;h.appendChild(el)})}
+  $('defaultRowsEditor').addEventListener('input',e=>{const el=e.target.closest('.editor-row');if(!el)return;const r=libraryDraftRows[Number(el.dataset.index)];if(e.target.classList.contains('d-set'))r.set=e.target.value;if(e.target.classList.contains('d-group'))r.group=e.target.value;if(e.target.classList.contains('d-reps'))r.reps=e.target.value;if(e.target.classList.contains('d-time'))r.time=e.target.value;if(e.target.classList.contains('d-weight'))r.weight=e.target.value});
+  $('defaultRowsEditor').addEventListener('click',e=>{if(!e.target.closest('.d-remove'))return;libraryDraftRows.splice(Number(e.target.closest('.editor-row').dataset.index),1);if(!libraryDraftRows.length)libraryDraftRows.push(row(1));renderDefaultRowsEditor()});
+  $('addDefaultRowBtn').addEventListener('click',()=>{libraryDraftRows.push(row(libraryDraftRows.length+1));renderDefaultRowsEditor()});
+  function resetLibraryForm(){editingLibraryId=null;$('libFormTitle').textContent='Thêm bài tập vào thư viện';$('libName').value='';$('libCategory').value='';$('libPlan').value='';$('libCue').value='';$('libCaution').value='';libraryDraftRows=[row(1)];libraryDraftImageData='';libraryDraftImageName='';renderDefaultRowsEditor();renderLibraryImageDraft()}
+  $('resetLibraryFormBtn').addEventListener('click',resetLibraryForm);
+  $('saveLibraryExerciseBtn').addEventListener('click',()=>{const name=$('libName').value.trim();if(!name){alert('Hãy nhập tên bài tập.');return}const obj={id:editingLibraryId||uid('custom'),builtin:false,name,category:$('libCategory').value.trim(),plan:$('libPlan').value.trim(),cue:$('libCue').value.trim(),caution:$('libCaution').value.trim(),imageData:libraryDraftImageData||'',imageName:libraryDraftImageName||'',defaultRows:cloneRows(libraryDraftRows)};if(editingLibraryId){const idx=data.library.findIndex(x=>x.id===editingLibraryId);if(idx>=0){data.library[idx]=obj;syncImageToMatchingSession(obj.id,obj.imageData,obj.imageName)}}else data.library.push(obj);persistData();resetLibraryForm();renderLibrary();renderPicker();renderSession()});
+  function renderLibrary(){const q=$('librarySearch').value.trim().toLowerCase();const arr=data.library.filter(x=>!q||[x.name,x.category,x.plan].join(' ').toLowerCase().includes(q));$('libraryCount').textContent=data.library.length+' bài';$('libraryList').innerHTML=arr.map(x=>`<div class="library-item" data-id="${esc(x.id)}"><div class="lib-top"><div><div class="lib-name">${esc(x.name)}</div><div class="meta"><span class="pill ${x.builtin?'builtin':''}">${x.builtin?'Mặc định':'Tự tạo'}</span>${x.imageData?'<span class="pill image-pill">Có ảnh</span>':''}${esc(x.category||'Chưa phân nhóm')} · ${esc(x.plan||'Chưa có prescription')}</div></div>${x.imageData?`<img class="lib-thumb" src="${x.imageData}" alt="${esc(x.name)}">`:''}</div><div class="lib-actions"><button class="btn good lib-add">+ Buổi tập</button><button class="btn soft lib-image">${x.imageData?'Thay ảnh':'Add ảnh'}</button>${x.builtin?'<button class="btn lib-copy">Tạo bản sao</button>':'<button class="btn lib-edit">Sửa</button><button class="btn danger lib-delete">Xóa</button>'}${x.imageData?'<button class="btn danger lib-image-remove">Xóa ảnh</button>':''}</div></div>`).join('')||'<div class="small">Không tìm thấy bài phù hợp.</div>'}
+  $('librarySearch').addEventListener('input',renderLibrary);
+  $('libraryList').addEventListener('click',e=>{const item=e.target.closest('.library-item');if(!item)return;const lib=libraryById(item.dataset.id);if(!lib)return;if(e.target.closest('.lib-add')){data.session.exercises.push(instanceFromLibrary(lib));data.session.templateId='';renderTemplateSelect();renderSession();save(false);return}if(e.target.closest('.lib-image')){pendingImageTarget={type:'library',libraryId:lib.id};$('imageFileInput').click();return}if(e.target.closest('.lib-image-remove')){if(confirm('Xóa ảnh mô tả của “'+lib.name+'”?')){lib.imageData='';lib.imageName='';syncImageToMatchingSession(lib.id,'','');persistData();renderLibrary();renderSession()}return}if(e.target.closest('.lib-copy')){editingLibraryId=null;$('libFormTitle').textContent='Tạo bản sao bài tập';$('libName').value=lib.name+' - bản sao';$('libCategory').value=lib.category||'';$('libPlan').value=lib.plan||'';$('libCue').value=lib.cue||'';$('libCaution').value=lib.caution||'';libraryDraftRows=cloneRows(lib.defaultRows);libraryDraftImageData=lib.imageData||'';libraryDraftImageName=lib.imageName||'';renderDefaultRowsEditor();renderLibraryImageDraft();window.scrollTo({top:0,behavior:'smooth'});return}if(e.target.closest('.lib-edit')){editingLibraryId=lib.id;$('libFormTitle').textContent='Sửa bài tập trong thư viện';$('libName').value=lib.name;$('libCategory').value=lib.category||'';$('libPlan').value=lib.plan||'';$('libCue').value=lib.cue||'';$('libCaution').value=lib.caution||'';libraryDraftRows=cloneRows(lib.defaultRows);libraryDraftImageData=lib.imageData||'';libraryDraftImageName=lib.imageName||'';renderDefaultRowsEditor();renderLibraryImageDraft();window.scrollTo({top:0,behavior:'smooth'});return}if(e.target.closest('.lib-delete')){if(confirm('Xóa bài “'+lib.name+'” khỏi thư viện?')){data.library=data.library.filter(x=>x.id!==lib.id);persistData();renderLibrary();renderPicker()}}});
+
+  function downloadBlob(blob,filename){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500)}
+  const safeDate=()=>data.session.date||localDate();
+  $('exportJsonBtn').addEventListener('click',()=>{save(false);const out={...data,exportedAt:new Date().toISOString()};downloadBlob(new Blob([JSON.stringify(out,null,2)],{type:'application/json'}),`T17_Run_Training_${safeDate()}.json`)});
+  $('exportExcelBtn').addEventListener('click',()=>{save(false);if(typeof XLSX==='undefined'){alert('Không tải được thư viện Excel. Hãy kiểm tra Internet rồi mở lại app. JSON vẫn dùng bình thường.');return}const s=data.session;const sessionRows=[['Workout',s.workoutName],['Template ID',s.templateId],['Ngày tập',s.date],['Calories (kcal)',s.calories],['Thời lượng (phút)',s.duration],['RPE',s.rpe],['Ghi chú chung',s.sessionNote],['Ghi chú giáo án',s.workoutNote]];const log=[['Thứ tự','Instance ID','Library ID','Bài','Nhóm','Prescription','Hoàn tất','Set','Rep / nhóm','Số rep','Thời gian / quãng đường','Trọng lượng (kg)','Ghi chú']];s.exercises.forEach((ex,idx)=>ex.rows.forEach(r=>log.push([idx+1,ex.instanceId,ex.libraryId,ex.name,ex.category,ex.plan,ex.done?'Có':'Không',r.set,r.group,numOrText(r.reps),r.time,numOrText(r.weight),r.note])));const guide=[['Bài','Prescription','Cách tập','Chú ý','Có ảnh','Tên ảnh']];s.exercises.forEach(ex=>guide.push([ex.name,ex.plan,ex.cue,ex.caution,displayImageForExercise(ex)?'Có':'Không',imageNameForExercise(ex)]));const lib=[['Library ID','Builtin','Tên bài','Nhóm','Prescription','Cách tập','Chú ý','Có ảnh','Tên ảnh','Default rows JSON']];data.library.forEach(x=>lib.push([x.id,x.builtin?'Có':'Không',x.name,x.category,x.plan,x.cue,x.caution,x.imageData?'Có':'Không',x.imageName||'',JSON.stringify(x.defaultRows)]));const wb=XLSX.utils.book_new();[['Session',sessionRows],['Workout Log',log],['Guide',guide],['Library',lib]].forEach(([n,a])=>{const ws=XLSX.utils.aoa_to_sheet(a);XLSX.utils.book_append_sheet(wb,ws,n)});XLSX.writeFile(wb,`T17_Run_Training_${safeDate()}.xlsx`)});
+
+  $('importBtn').addEventListener('click',()=>$('fileInput').click());$('fileInput').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{if(file.name.toLowerCase().endsWith('.json')){data=normalizeData(JSON.parse(await file.text()))}else{if(typeof XLSX==='undefined')throw new Error('Không tải được thư viện Excel.');const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});importWorkbook(wb)}renderTemplateSelect();renderSession();renderLibrary();resetLibraryForm();save(true)}catch(err){alert('Không thể nhập file: '+err.message)}e.target.value=''});
+  function importWorkbook(wb){const next=defaultData();const wsLib=wb.Sheets['Library'];if(wsLib){const rows=XLSX.utils.sheet_to_json(wsLib,{defval:''});const customs=[];rows.forEach(r=>{if(String(r['Builtin']).toLowerCase().startsWith('c'))return;let dr=[row(1)];try{const p=JSON.parse(r['Default rows JSON']||'[]');if(Array.isArray(p)&&p.length)dr=cloneRows(p)}catch(e){}customs.push({id:String(r['Library ID']||uid('custom')),builtin:false,name:String(r['Tên bài']||'Bài tập'),category:String(r['Nhóm']||''),plan:String(r['Prescription']||''),cue:String(r['Cách tập']||''),caution:String(r['Chú ý']||''),imageData:'',imageName:String(r['Tên ảnh']||''),defaultRows:dr})});next.library=[...next.library,...customs]}
+    const wsSession=wb.Sheets['Session'];if(wsSession){const arr=XLSX.utils.sheet_to_json(wsSession,{header:1,defval:''});const o={};arr.forEach(r=>{if(r[0])o[String(r[0])]=r[1]});next.session.workoutName=String(o['Workout']||next.session.workoutName);next.session.templateId=String(o['Template ID']||'');next.session.date=String(o['Ngày tập']||next.session.date).slice(0,10);next.session.calories=String(o['Calories (kcal)']??'');next.session.duration=String(o['Thời lượng (phút)']??'');next.session.rpe=String(o['RPE']??'');next.session.sessionNote=String(o['Ghi chú chung']??'');next.session.workoutNote=String(o['Ghi chú giáo án']??'')}
+    const wsLog=wb.Sheets['Workout Log'];if(wsLog){const rows=XLSX.utils.sheet_to_json(wsLog,{defval:''});const map=new Map();rows.forEach(r=>{const inst=String(r['Instance ID']||('excel-'+r['Thứ tự']+'-'+r['Bài']));if(!map.has(inst))map.set(inst,{instanceId:inst,libraryId:String(r['Library ID']||''),name:String(r['Bài']||'Bài tập'),category:String(r['Nhóm']||''),plan:String(r['Prescription']||''),cue:'',caution:'',imageData:'',imageName:'',done:String(r['Hoàn tất']||'').toLowerCase().startsWith('c'),rows:[]});map.get(inst).rows.push(row(r['Set'],r['Rep / nhóm'],r['Số rep'],r['Thời gian / quãng đường'],r['Trọng lượng (kg)'],r['Ghi chú']))});next.session.exercises=[...map.values()];const wsGuide=wb.Sheets['Guide'];if(wsGuide){const gr=XLSX.utils.sheet_to_json(wsGuide,{defval:''});next.session.exercises.forEach(ex=>{const g=gr.find(x=>String(x['Bài'])===ex.name);if(g){ex.cue=String(g['Cách tập']||'');ex.caution=String(g['Chú ý']||'')}})}}data=normalizeData(next)}
+
+  renderTemplateSelect();renderSession();renderDefaultRowsEditor();renderLibraryImageDraft();renderLibrary();save(false);
+})();
+</script>
+</body>
+</html>
