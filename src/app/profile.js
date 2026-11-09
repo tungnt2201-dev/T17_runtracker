@@ -18,8 +18,14 @@ function preview() {
   $('pfNote').innerHTML = est.length ? `Đang dùng giá trị ước tính: ${esc(est.join(' · '))}. Nhập số đo thật để vùng tập và điểm tải chính xác hơn.` : 'Đủ thông số nhịp tim.';
   $('pfHrZones').innerHTML = `<table class="an-table"><tbody>${A.hrZoneTable(draft).map(z => `<tr><td>${esc(z.name)}</td><td>${z.from}–${z.to} bpm</td></tr>`).join('')}</tbody></table>`;
   const pz = A.paceZoneTable(draft);
+  if (root.T17EnergyUI) root.T17EnergyUI.profilePreview(draftProfile());
   $('pfPaceZones').innerHTML = pz.length ? `<table class="an-table"><tbody>${pz.map(z => `<tr><td>${esc(z.name)}</td><td>${esc(z.label)}</td></tr>`).join('')}</tbody></table>` : '<div class="an-empty">Nhập pace ngưỡng để xem vùng pace.</div>';
   return paceOk;
+}
+/** Hồ sơ nháp (đang nhập) — để xem trước calo nền. */
+function draftProfile() {
+  const n = v => v === '' ? '' : Number(String(v).replace(',', '.'));
+  return root.T17Users.mergePersonal({ ...(db.profile || {}), sex: $('pfSex').value, weightKg: n($('pfWeight').value.trim()) }, readPersonal());
 }
 function headPreview() {
   const Us = root.T17Users, per = readPersonal(), merged = Us.mergePersonal({ sex: $('pfSex').value, weightKg: $('pfWeight').value, hrMax: $('pfHrMax').value, hrRest: $('pfHrRest').value, lthr: $('pfLthr').value, thresholdPace: $('pfPace').value }, per);
@@ -37,20 +43,25 @@ function open() {
   $('pfHrRest').value = p.hrRest ?? ''; $('pfHrMax').value = p.hrMax ?? ''; $('pfLthr').value = p.lthr ?? ''; $('pfPace').value = p.thresholdPace ?? ''; $('pfWeight').value = p.weightKg ?? '';
   const sug = root.T17Athlete.suggestHrMax(db), sb = $('pfSuggestMax');
   sb.hidden = !sug; if (sug) { sb.textContent = `Dùng HR cao nhất từ FIT: ${sug} bpm`; sb.onclick = () => { $('pfHrMax').value = sug; preview(); }; }
+  if (root.T17EnergyUI) root.T17EnergyUI.fillProfile(p);
   preview(); $('profileModal').classList.add('show');
 }
 function close() { $('profileModal').classList.remove('show'); }
 function init() {
   ['pfSex', 'pfHrRest', 'pfHrMax', 'pfLthr', 'pfPace', 'pfWeight', ...Object.values(PERSONAL_IDS)].forEach(id => $(id).addEventListener('input', preview));
+  if (root.T17EnergyUI) root.T17EnergyUI.initProfile(preview);
   $('pfCancel').onclick = close;
   $('profileModal').addEventListener('mousedown', e => { if (e.target === $('profileModal')) close(); });
   $('profileForm').onsubmit = e => {
     e.preventDefault(); if (!preview()) return alert('Pace ngưỡng chưa đúng dạng mm:ss, ví dụ 5:10.');
     const f = readForm(), n = v => v === '' ? '' : Number(String(v).replace(',', '.'));
     if (f.hrMax && f.hrRest && +f.hrMax <= +f.hrRest + 20) return alert('HR tối đa phải lớn hơn HR nghỉ ít nhất 20 bpm.');
+    const enErr = root.T17EnergyUI ? root.T17EnergyUI.validateProfile() : ''; if (enErr) return alert(enErr);
+    const energy = root.T17EnergyUI ? root.T17EnergyUI.readProfile(db.profile) : undefined;
     db.profile = root.T17Users.mergePersonal({ ...(db.profile || {}), sex: f.sex, hrRest: n(f.hrRest), hrMax: n(f.hrMax), lthr: n(f.lthr), thresholdPace: f.thresholdPace ? root.T17Core.secToPace(root.T17Core.paceToSec(f.thresholdPace)) : '', weightKg: n(f.weightKg), updatedAt: new Date().toISOString() }, readPersonal());
+    if (energy) db.profile.energy = energy;
     if (root.T17UserUI) root.T17UserUI.syncName();
-    saveDb(); close(); refreshViews(); render({ preserveScroll: true }); toast('Đã lưu hồ sơ — điểm tải được tính lại');
+    saveDb(); close(); refreshViews(); render({ preserveScroll: true }); toast('Đã lưu hồ sơ — điểm tải và calo được tính lại');
   };
   const rail = $('railProfile'); if (rail) rail.onclick = open;
 }

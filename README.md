@@ -14,6 +14,7 @@ chứa cả hai bản trên, `HUONG_DAN.txt`, `CHANGELOG.md` và **Hướng dẫ
 **Nhiều người dùng** (từ v2.2): mỗi người có lịch tập, kết quả và hồ sơ cá nhân riêng; chuyển qua lại bằng nút ở góc phải thanh trên.
 **Fitness** (từ v2.3): thư viện bài tập (kèm ảnh) và mẫu buổi, giao bài vào lịch, nhập kết quả, điểm tải RPE × phút; trao đổi file hai chiều với app điện thoại *T17 Run Training* (gửi buổi đã giao sang điện thoại, nhập buổi đã tập về — tự nhận diện, có xem trước, không nhân đôi).
 **Chỉ số cơ thể** (từ v2.4): nhập cân nặng, % mỡ, vòng eo… tại từng thời điểm, so với lần trước / 30 ngày / lần đầu, nhập CSV từ cân thông minh; Analytics › *Cơ thể*: biểu đồ có tiêu đề kết luận, tải tập theo tuần cùng trục thời gian, so sánh hai mốc.
+**Calo trong ngày** (từ v2.5): nền (BMR × mức hoạt động) + calo tập ròng cho từng ngày, sửa được (công thức, PAL, số cố định, ghi đè từng ngày); hiện trên lịch, Tổng quan tuần và Analytics. Chỉ là ước tính (±10–15%), không phải tư vấn dinh dưỡng hay y tế.
 Không cần tài khoản, không gửi dữ liệu đi đâu. File Garmin FIT được đọc ngay trên máy.
 
 ## Tải về & chạy
@@ -52,7 +53,7 @@ Bản sao lưu của T17 vẫn giữ mảng `weeks` ở cấp cao nhất nên **
 
 ```bash
 npm install
-npm test              # build + 107 test (FIT decoder, dữ liệu cũ, Excel, chạy thử app trong jsdom)
+npm test              # build + 126 test (FIT decoder, dữ liệu cũ, Excel, chạy thử app trong jsdom)
 npm run build         # dist/web/T17_runtracker.html + resources/ cho Neutralino
 npm run dev           # chạy cửa sổ desktop (neu run) để thử
 npm run exe           # tải Neutralino 6.10 + đóng gói release/yymmdd_T17_runtracker_vX.Y.Z.zip

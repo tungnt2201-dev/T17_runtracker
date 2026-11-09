@@ -112,6 +112,26 @@ Mảng `bodyMetrics` ở cấp cao nhất của dữ liệu **mỗi người dù
 - Fixture: `body-scale-en.csv` (kiểu file xuất của cân thông minh, giả lập), `body-manual-vi.csv` (ghi tay, tiếng Việt).
 - Lượt 5 (biểu đồ, so sánh A/B) **không đổi dữ liệu**: mốc A/B chỉ nằm trong phiên, không lưu vào file.
 
+## Năng lượng — calo trong ngày (v2.5, lượt 6)
+
+Trường tuỳ chọn `profile.energy` (trong hồ sơ của **mỗi người dùng**; chỉ có khi người dùng đã lưu cài đặt hoặc ghi đè một ngày). Logic: `src/core/energy.js` (`T17Energy`).
+
+```jsonc
+"profile": { …,
+  "energy": {
+    "mode": "auto",                 // "auto" = BMR × PAL ; "manual" = dùng baselineKcalManual
+    "formula": "auto",              // "auto" (BMR đo → Katch → Mifflin) | "mifflin" | "katch"
+    "pal": 1.3,                     // 1,1–2,0 ; ngoài khoảng → 1,3
+    "baselineKcalManual": null,     // 500–8000 hoặc null
+    "overrides": { "2026-11-09": 2500 }   // ghi đè nền theo ngày, 300–8000; ngày sai dạng bị bỏ
+  } }
+```
+
+- Chuẩn hoá trong `legacy.normalizeDb` (`T17Energy.normalizeSettings`), giữ field lạ. `features.energy = 1` khi có `profile.energy`.
+- **Không lưu số calo ước tính** ở đâu cả — mọi con số được tính lại khi hiển thị; `actual.calories` chỉ chứa số người dùng nhập hoặc số trong file FIT / app mobile.
+- Nguồn đầu vào: `profile.sex`, `profile.heightCm`, `profile.birthDate`, `profile.weightKg`; `bodyMetrics[].weightKg / bodyFatPct / bmrKcal` (lần đo gần nhất vào hoặc trước ngày tính).
+- Bản v2.2.0 giữ nguyên `profile.energy` và `features.energy` khi nạp / sao lưu (test `compat.test.js`).
+
 ### Vì sao giữ `schemaVersion = 2` và thêm `features`
 
 Đã thử bằng `git worktree` của tag `v2.2.0` (chạy cả lõi lẫn app hoàn chỉnh trong jsdom) và RunPlan v1.8.9:

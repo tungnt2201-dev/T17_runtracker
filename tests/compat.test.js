@@ -150,3 +150,14 @@ test('normalizeWorkout: khối fitness hỏng không làm mất bài; buổi ch�
   assert.ok(b && b.fitness.exercises.length === 1);
   assert.equal(L.normalizeWorkout({ fitness: { exercises: [] } }, new Set(), rep), null);
 });
+
+test('(b) v2.5 profile.energy: bản v2.2.0 nạp → sao lưu → giữ nguyên cài đặt calo và features.energy', () => {
+  const src = { app: 'T17_runtracker', schemaVersion: 2, weeks: [], profile: { sex: 'male', weightKg: 80, heightCm: '175', birthDate: '1991-01-15',
+    energy: { mode: 'manual', formula: 'auto', pal: 1.4, baselineKcalManual: 2150, overrides: { '2026-11-09': 2500 } } } };
+  const nNew = runNew(M => M.normalizeDb(clone(src)).db);
+  assert.deepEqual(nNew.features, { energy: 1 });
+  const viaOld = runOld(M => JSON.parse(JSON.stringify(M.toBackup(M.normalizeDb(clone(nNew)).db, '2.2.0'))));
+  assert.deepEqual(viaOld.profile.energy, nNew.profile.energy);
+  assert.deepEqual(viaOld.features, { energy: 1 });
+  assert.deepEqual(runNew(M => M.normalizeDb(clone(viaOld)).db).profile, nNew.profile);
+});

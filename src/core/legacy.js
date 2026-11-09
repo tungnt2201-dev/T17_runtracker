@@ -10,6 +10,7 @@
  *   - chuỗi JSON lồng (localStorage dump bị stringify 2 lần), có BOM, ...
  *   Phần mở rộng fitness (v2.3): workout.fitness, actual.fitness, db.fitnessLibrary, db.features — xem core/fitness.js.
  *   Chỉ số cơ thể (v2.4): db.bodyMetrics — xem core/body.js.
+ *   Năng lượng (v2.5): db.profile.energy (tuỳ chọn) — xem core/energy.js.
  *
  * Pure: không đụng DOM/localStorage. Dùng được trong app (globalThis.T17Legacy) và Node test.
  */
@@ -19,12 +20,13 @@ const C = root.T17Core || (typeof require === 'function' ? require('./utils.js')
 const { DAYS, cleanDescription, genId, hasWorkoutContent, isYmd, excelYmd, parseDurationInput, mondayYmd, addDaysYmd, isoWeekNumber, blankDay, samePlanRecord, deepClone } = C;
 const F = root.T17Fitness || (typeof require === 'function' ? require('./fitness.js') : null);
 const B = root.T17Body || (typeof require === 'function' ? require('./body.js') : null);
+const E = root.T17Energy || (typeof require === 'function' ? require('./energy.js') : null);
 
 const APP_ID = 'T17_runtracker';
 // Giữ 2: bản v2.2.0 trở về trước tự ghi đè schemaVersion về 2 khi lưu, nên số này không còn là tín hiệu tin cậy.
 // Phần mở rộng (cộng thêm, tuỳ chọn) được đánh dấu bằng `features` — bản cũ giữ nguyên field này. Xem docs/DATA_FORMAT.md.
 const SCHEMA_VERSION = 2;
-const FEATURES = { fitness: 1, body: 1 };
+const FEATURES = { fitness: 1, body: 1, energy: 1 };
 const LEGACY_STORAGE_KEY = 'runplan-tracker-v1';
 const DAY_LEVEL_FIELDS = ['workoutName', 'workoutType', 'planKm', 'planMinutes', 'description', 'planNote', 'workoutStructure', 'actual'];
 
@@ -185,6 +187,9 @@ function normalizeDb(input, opts = {}) {
   if (orphans.length) db.orphans = orphans;
   if ('fitnessLibrary' in rest) db.fitnessLibrary = F.normalizeLibrary(rest.fitnessLibrary);
   if ('bodyMetrics' in rest) db.bodyMetrics = B.normalizeList(rest.bodyMetrics); // v2.4 chỉ số cơ thể
+  if (rest.profile && typeof rest.profile === 'object' && 'energy' in rest.profile) { // v2.5 cài đặt calo (tuỳ chọn)
+    const en = E.normalizeSettings(rest.profile.energy); db.profile = { ...rest.profile }; if (en) db.profile.energy = en; else delete db.profile.energy;
+  }
   const features = featuresOf(db);
   if (features) db.features = features; else if (db.features && !Object.keys(db.features).length) delete db.features;
   delete db.exportedAt;
@@ -197,6 +202,7 @@ function featuresOf(db) {
   const hasFitness = 'fitnessLibrary' in db || (db.weeks || []).some(w => (w.days || []).some(d => (d.workouts || []).some(F.isFitnessWorkout)));
   if (hasFitness) out.fitness = Math.max(+out.fitness || 0, FEATURES.fitness);
   if (Array.isArray(db.bodyMetrics) && db.bodyMetrics.length) out.body = Math.max(+out.body || 0, FEATURES.body);
+  if (db.profile?.energy && typeof db.profile.energy === 'object') out.energy = Math.max(+out.energy || 0, FEATURES.energy);
   return Object.keys(out).length ? out : null;
 }
 

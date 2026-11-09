@@ -18,3 +18,4 @@
 - Kiểm tra trước khi đẩy: `npm run check && npm test`.
 - Phát hành: tăng `version` trong `package.json` + ghi CHANGELOG; Actions tự tạo Release `yymmdd_T17_runtracker_vX.Y.Z.zip`.
 - **Nhiều người dùng**: `db` luôn là dữ liệu của MỘT người dùng; mọi đường lưu/nạp đi qua `T17Platform` (theo `activeUserId`). Không tự ghép đường dẫn file dữ liệu; dùng `T17Users.fileNameFor/lsKeyFor`. Người dùng `main` giữ file/khoá đời cũ.
+- **Calo trong ngày (v2.5)**: tính trong `src/core/energy.js`, giao diện `src/app/energy-ui.js`. Cài đặt chỉ ở `db.profile.energy` (tuỳ chọn, theo người dùng). Số ước tính CHỈ HIỂN THỊ — không bao giờ ghi vào `actual.calories`. Đầu vào cơ thể lấy lần đo vào/trước ngày tính (không dùng số đo tương lai); thiếu dữ liệu → báo ô thiếu, không đoán. Mọi chỗ hiển thị calo phải có câu “ước tính… ±10–15%… không phải tư vấn dinh dưỡng hay y tế”.

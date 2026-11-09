@@ -73,6 +73,7 @@
       </div>
     </div>
     <div class="summary-card"><div class="summary-title">Tổng quan tuần</div><div class="sum-grid" id="metrics"></div></div>
+    <div class="summary-card" id="energyCard"><div class="summary-title">Calo ngày <small>· ước tính</small></div><div id="energyWeek"></div></div>
     <div class="summary-card"><div class="summary-title">Mức độ hoàn thành</div><div class="legend"><div class="legend-row"><span class="legend-dot done"></span>Đạt: lệch ≤ ±10%</div><div class="legend-row"><span class="legend-dot variance30"></span>Lệch nhẹ: >10% đến 30%</div><div class="legend-row"><span class="legend-dot variance50"></span>Lệch vừa: >30% đến 50%</div><div class="legend-row"><span class="legend-dot variance80"></span>Lệch lớn: >50% đến 80%</div><div class="legend-row"><span class="legend-dot varianceOver"></span>Lệch rất lớn: >80%</div><div class="legend-row"><span class="legend-dot skipped"></span>Không tập / bỏ buổi</div><div class="legend-row"><span class="legend-dot planned"></span>Chưa đến / đang kế hoạch</div><div class="legend-row"><span class="legend-dot overdue"></span>Quá hạn, chưa nhập kết quả</div></div></div>
     <div class="summary-card"><div class="summary-title">Dữ liệu</div><div class="mini-actions"><button id="restoreSide" type="button">Khôi phục</button><button id="backupSide" type="button">Sao lưu</button><button id="clearSide" class="wide" type="button">Xóa toàn bộ dữ liệu</button></div></div>
     <div class="data-note">Nhập FIT sẽ tạo thẻ hoạt động riêng đúng ngày chạy (hoặc tự ghép khi nhập nhiều FIT). Có thể mở kết quả → Tách kết quả khỏi bài tập để trả kết quả về thẻ tím, sau đó kéo thẻ này vào đúng bài kế hoạch; nếu có nhiều bài kế hoạch, ứng dụng sẽ hỏi chọn bài. Trên điện thoại dùng nút “Ghép kết quả vào bài kế hoạch”. Mỗi ngày có thể có nhiều bài tập. Kéo thả 1 bài sang ngày khác để đổi ngày; giữ Ctrl khi kéo (hoặc bấm nút ⧉) để copy sang ngày khác thay vì chuyển hẳn. Import Excel / Nhập JSON chỉ gộp thêm vào lịch, không xóa bài cũ, tự bỏ qua bài trùng. Dùng <b>Xuất bài tập (JSON)</b> để gửi lịch tập cho người khác — họ chỉ cần <b>Nhập bài tập (JSON)</b> để tập theo và tự nhập kết quả. Kéo xuống để xem thêm các tuần kế tiếp.</div>
@@ -286,6 +287,16 @@
       </div>
       <div class="pf-note" id="pfNote"></div>
       <div class="pf-zones"><div><h3>Vùng nhịp tim</h3><div id="pfHrZones"></div></div><div><h3>Vùng pace</h3><div id="pfPaceZones"></div></div></div>
+      <h3 class="pf-h" id="pfEnSection">Năng lượng — calo trong ngày</h3>
+      <div class="profile-grid">
+        <div class="field"><label>Cách tính calo nền (hoạt động bình thường)</label><select id="pfEnMode"><option value="auto">Tự tính: BMR × mức hoạt động (PAL)</option><option value="manual">Số kcal cố định do tôi nhập</option></select></div>
+        <div class="field"><label>Công thức BMR</label><select id="pfEnFormula"><option value="auto">Tự chọn: BMR đo → Katch–McArdle (có % mỡ) → Mifflin–St Jeor</option><option value="mifflin">Luôn dùng Mifflin–St Jeor</option><option value="katch">Luôn dùng Katch–McArdle (cần % mỡ)</option></select></div>
+        <div class="field"><label>Mức hoạt động ngoài giờ tập (PAL)</label><select id="pfEnPalSel"></select><input id="pfEnPal" type="text" inputmode="decimal" placeholder="vd. 1,35" hidden /><small class="time-input-hint">Không tính giờ tập — calo tập được cộng riêng.</small></div>
+        <div class="field" id="pfEnManualField"><label>Kcal nền cố định / ngày</label><input id="pfEnManual" type="text" inputmode="numeric" placeholder="vd. 2200" /><small class="time-input-hint">Chỉ dùng khi chọn “Số kcal cố định”.</small></div>
+      </div>
+      <div class="pf-note en-preview" id="pfEnPreview"></div>
+      <div class="en-ovs" id="pfEnOverrides"></div>
+      <div class="en-pf-actions"><button type="button" id="pfEnReset">Về giá trị tự tính</button><small>Ước tính theo công thức, sai số thường ±10–15%. Không phải tư vấn dinh dưỡng hay y tế. Ghi đè từng ngày: bấm dòng 🔥 kcal ở đầu mỗi ngày trên lịch.</small></div>
       <div class="sheetactions"><button type="button" id="pfCancel">Đóng</button><button type="submit" class="primary">Lưu hồ sơ</button></div>
     </form>
   </div>

@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.5.0 — 2026-11-09 (Calo trong ngày)
+
+Gói: `261109_T17_runtracker_v2.5.0.zip`. Dữ liệu cũ nạp nguyên vẹn, kết quả chạy bộ không đổi. File của 2.5 vẫn mở được bằng 2.2.0 – 2.4.0 (cài đặt calo `profile.energy` được giữ nguyên, có test với mã nguyên văn của 2.2.0).
+
+Tất cả là **ước tính theo công thức, sai số thường ±10–15%, không phải tư vấn dinh dưỡng hay y tế** (ghi rõ ở mọi chỗ hiển thị).
+
+- **Calo ngày = nền (hoạt động bình thường) + calo tập (ròng)**, tính riêng cho từng người dùng.
+- **BMR**: BMR đo bằng cân (chỉ số cơ thể) → Katch–McArdle (khi có % mỡ) → Mifflin–St Jeor (cân nặng, chiều cao, tuổi từ ngày sinh, giới tính). Cân nặng / % mỡ lấy lần đo gần nhất **vào hoặc trước** ngày đó, không dùng số đo về sau; chưa có số đo thì dùng cân nặng trong Hồ sơ. Thiếu dữ liệu thì báo ô còn thiếu, không đoán.
+- **Nền = BMR × PAL** (bảng 1,2–1,6, mặc định 1,3, hoặc tự nhập 1,1–2,0). Ba mức sửa, ưu tiên từ trên xuống: **ghi đè từng ngày** → **số kcal cố định** → công thức. Mỗi con số có nhãn nguồn *tự tính / bạn đã sửa / ghi đè ngày*; nút **Về giá trị tự tính**.
+- **Calo tập ròng** mỗi buổi (chạy bộ và fitness, nhiều buổi trong ngày thì cộng): calo nhập tay → calo trong file FIT → chạy 1,0 kcal/kg/km → fitness theo MET từ RPE (≤4: 3,5 · 5–6 hoặc trống: 5 · ≥7: 6). Calo nhập tay / FIT được trừ phần nghỉ (BMR theo thời gian tập) để không tính trùng với nền. Bài kế hoạch chưa tập chỉ hiện **dự kiến**, không cộng vào tổng thực; bài bỏ = 0.
+- **Lịch**: dòng 🔥 kcal ở đầu mỗi ngày; bấm vào để xem **chi tiết ngày** (BMR, nền, từng buổi và cách tính) và **sửa nền của ngày đó tại chỗ**.
+- **Tổng quan tuần**: thẻ *Calo ngày* — mỗi ngày một dòng nền + tập = tổng, thanh cột chồng, trung bình mỗi ngày.
+- **Hồ sơ › Năng lượng**: cách tính nền, công thức BMR, PAL, số cố định, danh sách ngày đã ghi đè (bỏ từng ngày), xem trước BMR và nền hôm nay.
+- **Analytics › Tập luyện**: biểu đồ cột chồng calo (nền dưới, tập trên) kèm đường trung bình; 8 tuần vẽ theo ngày (bấm cột mở chi tiết ngày), dài hơn vẽ trung bình mỗi ngày theo tuần. Hiện cả khi chưa có buổi chạy nào.
+- Số ước tính **không bao giờ** được ghi vào `actual.calories` (số đo thật giữ sạch). Người dùng chưa thiết lập: tự tính nếu đủ dữ liệu, file không thêm trường nào cho tới khi lưu cài đặt.
+
 ## 2.4.0 — 2026-11-09 (Chỉ số cơ thể)
 
 Gói: `261109_T17_runtracker_v2.4.0.zip`. Không đổi định dạng dữ liệu so với lượt 4; file của 2.4 vẫn mở được bằng 2.2.0 / 2.3.0 (số đo cơ thể được giữ nguyên).

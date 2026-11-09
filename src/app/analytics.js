@@ -90,7 +90,8 @@ function render() {
   document.querySelectorAll('#anRange [data-weeks]').forEach(b => b.classList.toggle('active', +b.dataset.weeks === weeksShown));
   document.querySelectorAll('#anSub [data-sub]').forEach(b => b.classList.toggle('active', b.dataset.sub === subTab));
   if (subTab === 'body') return root.T17BodyCharts.render(host, { weeksShown, chartW });
-  if (!rows.some(r => r.done)) { host.innerHTML = `<div class="an-empty big">Chưa có buổi chạy nào có kết quả. Hãy nhập kết quả hoặc Import FIT để xem phân tích.</div>`; return; }
+  const energyCard = () => root.T17EnergyUI ? root.T17EnergyUI.chartCard({ weeksShown, chartW, tip: { show: showTip, hide: hideTip } }) : '';
+  if (!rows.some(r => r.done)) { host.innerHTML = `<div class="an-empty big">Chưa có buổi chạy nào có kết quả. Hãy nhập kết quả hoặc Import FIT để xem phân tích.</div>${energyCard()}`; host.querySelectorAll('[data-open-profile]').forEach(b => b.onclick = () => root.T17Profile.open()); return; }
 
   const firstDate = rows[0].date;
   const start = weeksShown ? C.addDaysYmd(C.mondayYmd(today), -7 * (weeksShown - 1)) : C.mondayYmd(firstDate);
@@ -152,6 +153,7 @@ function render() {
     <section class="an-card"><div class="an-card-head"><h3>Tuần gần đây</h3></div>
       <table class="an-table"><thead><tr><th>Tuần</th><th>Km KH / TT</th><th>Buổi</th><th>Tải</th><th>CTL cuối tuần</th></tr></thead><tbody>${weeks.filter(w => w.week <= today).slice(-8).reverse().map(w => { const end = pmcAll.find(p => p.date === C.addDaysYmd(w.week, 6)) || pmcAll.filter(p => p.date <= C.addDaysYmd(w.week, 6)).at(-1); return `<tr><td>${fmtD(w.week)}</td><td>${r1(w.planKm)} / <b>${r1(w.actualKm)}</b></td><td>${w.done}/${w.planned}</td><td>${r0(w.load)}</td><td>${end ? r0(end.ctl) : '—'}</td></tr>`; }).join('')}</tbody></table></section>
   </div>
+  ${energyCard()}
   <div class="an-note">Điểm tải 100 = chạy 60 phút đúng ngưỡng. Cách tính trong khoảng này: ${Object.entries(methods).map(([m, c]) => `${esc(LD.METHOD_LABEL[m] || m)} ${c} buổi`).join(' · ')}. Pace chưa hiệu chỉnh độ dốc. Biểu đồ thể lực tính trên toàn bộ lịch sử, chỉ hiển thị khoảng đã chọn.</div>`;
   host.querySelectorAll('[data-open-profile]').forEach(b => b.onclick = () => root.T17Profile.open());
 }
