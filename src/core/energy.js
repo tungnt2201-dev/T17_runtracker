@@ -50,9 +50,23 @@ const settingsOf = profile => normalizeSettings(profile?.energy) || normalizeSet
 
 /* ---------- đầu vào tại một ngày ---------- */
 /** Bản ghi chỉ số cơ thể gần nhất VÀO HOẶC TRƯỚC `date` có trường `key`. */
+const PLAUSIBLE = { weightKg: [20, 300], bodyFatPct: [2, 70], bmrKcal: [500, 5000] }; // ngoài khoảng → bỏ qua số đo (không đoán)
+/** Chỉ mục số đo (v2.5.1, hiệu năng): mỗi chỉ số một mảng [mốc 'ngày giờ', giá trị, ngày] đã sắp xếp → tìm nhị phân. */
+function prepareBody(list) {
+  const series = {};
+  for (const key of Object.keys(PLAUSIBLE)) { const [lo, hi] = PLAUSIBLE[key]; const a = [];
+    for (const r of Array.isArray(list) ? list : []) { const v = num(r?.[key]); if (v == null || v < lo || v > hi || !r || typeof r.date !== 'string') continue; a.push([`${r.date} ${r.time || ''}`, v, r.date]); }
+    a.sort((x, y) => (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0)); series[key] = a; }
+  return { __bodyIndex: true, series };
+}
 function bodyAt(list, date, key) {
-  let best = null;
-  for (const r of Array.isArray(list) ? list : []) { const v = num(r?.[key]); if (v == null || !r.date || r.date > date) continue; if (!best || `${r.date} ${r.time || ''}` > `${best.date} ${best.time || ''}`) best = { ...r, [key]: v }; }
+  if (list && list.__bodyIndex) { // tìm phần tử cuối có ngày ≤ date
+    const a = list.series[key] || []; let lo = 0, hi = a.length - 1, at = -1;
+    while (lo <= hi) { const m = (lo + hi) >> 1; if (a[m][2] <= date) { at = m; lo = m + 1; } else hi = m - 1; }
+    return at < 0 ? null : { value: a[at][1], date: a[at][2] };
+  }
+  let best = null; const [lo, hi] = PLAUSIBLE[key] || [-Infinity, Infinity];
+  for (const r of Array.isArray(list) ? list : []) { const v = num(r?.[key]); if (v == null || v < lo || v > hi || !r || typeof r.date !== 'string' || r.date > date) continue; if (!best || `${r.date} ${r.time || ''}` > `${best.date} ${best.time || ''}`) best = { ...r, [key]: v }; }
   return best ? { value: best[key], date: best.date } : null;
 }
 function ageAt(birth, date) {
@@ -63,10 +77,10 @@ function ageAt(birth, date) {
 /** Đầu vào công thức tại ngày: cân nặng, % mỡ, BMR đo, chiều cao, tuổi, giới tính (kèm nguồn). */
 function inputsAt(profile, bodyMetrics, date) {
   const p = profile || {};
-  const w = bodyAt(bodyMetrics, date, 'weightKg'); const wp = num(p.weightKg);
+  const w = bodyAt(bodyMetrics, date, 'weightKg'); let wp = num(p.weightKg); if (wp != null && (wp < 20 || wp > 300)) wp = null;
   const h = num(p.heightCm);
   return {
-    weightKg: w ? w.value : (wp && wp > 20 ? wp : null), weightFrom: w ? `số đo ${w.date}` : (wp ? 'hồ sơ' : ''),
+    weightKg: w ? w.value : wp, weightFrom: w ? `số đo ${w.date}` : (wp ? 'hồ sơ' : ''),
     bodyFatPct: bodyAt(bodyMetrics, date, 'bodyFatPct')?.value ?? null,
     bmrMeasured: bodyAt(bodyMetrics, date, 'bmrKcal')?.value ?? null,
     heightCm: h && h >= 100 && h <= 250 ? h : null,
@@ -129,17 +143,21 @@ function sessionNet(item, ctx = {}) {
 function workoutsOn(db, date) { for (const w of db?.weeks || []) for (const d of w.days || []) if (d.date === date) return d.workouts || []; return []; }
 /** → { date, baseline, sessions:[{ id, name, fitness, kcal, method, planned, missing }], exerciseKcal, plannedKcal, total, ok, missing } */
 function day(db, date, opts = {}) {
-  const profile = opts.profile || db?.profile || {}; const body = db?.bodyMetrics || [];
+  const profile = opts.profile || db?.profile || {}; const body = opts.bodyIndex || db?.bodyMetrics || [];
   const base = baseline(profile, body, date);
   const inp = base.bmr.inputs; const ctx = { weightKg: inp.weightKg, bmrKcal: base.bmr.ok ? base.bmr.kcal : null };
-  const sessions = workoutsOn(db, date).map(it => ({ id: it.id, name: it.workoutName || (F.isFitnessWorkout(it) ? 'Fitness' : 'Buổi chạy'), fitness: F.isFitnessWorkout(it), ...sessionNet(it, ctx) }));
+  const sessions = (opts.byDate ? (opts.byDate.get(date) || []) : workoutsOn(db, date)).map(it => ({ id: it.id, name: it.workoutName || (F.isFitnessWorkout(it) ? 'Fitness' : 'Buổi chạy'), fitness: F.isFitnessWorkout(it), ...sessionNet(it, ctx) }));
   const exerciseKcal = sessions.filter(s => !s.planned && s.kcal != null).reduce((a, s) => a + s.kcal, 0);
   const plannedKcal = sessions.filter(s => s.planned && s.kcal != null).reduce((a, s) => a + s.kcal, 0);
   const missing = [...new Set([...base.missing, ...sessions.filter(s => !s.planned && s.kcal == null).flatMap(s => s.missing || [])])];
   return { date, baseline: base, sessions, exerciseKcal, plannedKcal, total: base.ok ? base.kcal + exerciseKcal : null, ok: base.ok, missing };
 }
+/** Nhiều ngày liên tiếp — dựng chỉ mục một lần (ngày → bài, số đo đã sắp xếp) thay vì quét lại cho từng ngày. */
 function days(db, from, to, opts = {}) {
-  const out = []; for (let d = from; d <= to; d = C.addDaysYmd(d, 1)) out.push(day(db, d, opts)); return out;
+  const byDate = new Map(); for (const w of db?.weeks || []) for (const d of w.days || []) if (d && d.date && !byDate.has(d.date)) byDate.set(d.date, d.workouts || []);
+  const o = { ...opts, byDate, bodyIndex: prepareBody(db?.bodyMetrics) };
+  const out = []; if (!C.isYmd(from) || !C.isYmd(to)) return out;
+  for (let d = from, n = 0; d <= to && n < 5000; d = C.addDaysYmd(d, 1), n++) out.push(day(db, d, o)); return out;
 }
 /** Gộp theo tuần (thứ Hai): trung bình mỗi ngày của nền và tập, chỉ tính ngày có nền. */
 function weekly(dayList) {
@@ -156,7 +174,7 @@ function setOverride(profile, date, kcal) {
 }
 function resetAuto(profile) { const e = settingsOf(profile); return { ...(profile || {}), energy: { ...e, mode: 'auto', formula: 'auto', pal: DEFAULT_PAL, baselineKcalManual: null } }; }
 
-const api = { PAL_TABLE, DEFAULT_PAL, PAL_MIN, PAL_MAX, RUN_KCAL_PER_KG_KM, SOURCE_LABEL, METHOD_LABEL, normalizeSettings, settingsOf, bodyAt, ageAt, inputsAt, mifflin, katch, bmr, baseline, metForRpe, sessionNet, day, days, weekly, setOverride, resetAuto };
+const api = { PAL_TABLE, DEFAULT_PAL, PAL_MIN, PAL_MAX, RUN_KCAL_PER_KG_KM, SOURCE_LABEL, METHOD_LABEL, normalizeSettings, settingsOf, prepareBody, bodyAt, ageAt, inputsAt, mifflin, katch, bmr, baseline, metForRpe, sessionNet, day, days, weekly, setOverride, resetAuto };
 root.T17Energy = api;
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

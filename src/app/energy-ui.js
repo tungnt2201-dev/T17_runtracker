@@ -32,7 +32,7 @@ function dayLine(date) {
 /* ---------- thẻ Calo ngày trong Tổng quan tuần ---------- */
 function renderWeek(w) {
   const host = $('energyWeek'); if (!host || !w || typeof db === 'undefined') return;
-  const list = (w.days || []).filter(d => d.date).map(d => E().day(db, d.date));
+  const dates = (w.days || []).map(d => d.date).filter(Boolean).sort(); const all = dates.length ? E().days(db, dates[0], dates.at(-1)) : []; const list = all.filter(d => dates.includes(d.date));
   const ok = list.filter(d => d.ok);
   if (!ok.length) {
     const miss = [...new Set(list.flatMap(d => d.missing))];

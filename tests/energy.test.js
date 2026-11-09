@@ -111,3 +111,11 @@ test('Không bao giờ ghi số ước tính vào actual.calories', () => {
   const it = { id: 'r', actual: { status: 'done', km: 10, minutes: 60 } }; const db = { profile: MAN, ...wk([[D, [it]]]) };
   const before = JSON.stringify(db); E.day(db, D); E.days(db, D, '2026-11-12'); assert.equal(JSON.stringify(db), before);
 });
+
+test('days() dùng chỉ mục cho kết quả y hệt day() từng ngày (kể cả nhiều lần đo cùng ngày, số đo sai khoảng)', () => {
+  const body = [{ date: '2026-11-03', time: '20:00', weightKg: 78 }, { date: '2026-11-03', time: '06:00', weightKg: 80, bodyFatPct: 21 }, { date: '2026-11-05', weightKg: 1e9 }, { date: '2026-11-06', time: '', weightKg: 79, bmrKcal: 1650 }, { date: 'x', weightKg: 70 }, null];
+  const db = { profile: MAN, bodyMetrics: body, ...wk([['2026-11-04', [{ id: 'r', actual: { status: 'done', km: 8, minutes: 50 } }]], ['2026-11-07', [{ id: 'f', workoutType: 'Fitness', planMinutes: 40, fitness: { schema: 1, exercises: [] } }]]]) };
+  const fast = E.days(db, '2026-11-01', '2026-11-08'); const slow = fast.map(d => E.day(db, d.date));
+  assert.deepEqual(fast, slow); assert.equal(fast[3].baseline.bmr.inputs.weightKg, 78); assert.equal(fast[5].baseline.bmr.method, 'measured');
+  assert.deepEqual(E.days(db, 'sai', '2026-11-08'), []);
+});

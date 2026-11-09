@@ -25,11 +25,13 @@ const pad = n => String(n).padStart(2, '0');
 /** Ngày "YYYY-MM-DD" theo giờ địa phương. Chuỗi ISO có múi giờ (Z, +07:00) được đổi sang giờ địa phương —
  *  23:30Z ngày 7 là 06:30 ngày 8 ở Việt Nam. Chuỗi ngày trần / số serial Excel giữ nguyên ngày ghi trên lịch.
  *  tzOffsetMin: như Date#getTimezoneOffset (Việt Nam = −420); bỏ trống = múi giờ của máy. */
+/** Ngày có thật trên lịch (loại 2026-13-45, 2026-02-30). */
+function realYmd(s) { if (!isYmd(s)) return false; const [y, m, d] = s.split('-').map(Number); const t = new Date(Date.UTC(y, m - 1, d)); return y >= 1900 && y <= 2200 && t.getUTCMonth() === m - 1 && t.getUTCDate() === d; }
 function localYmd(v, tzOffsetMin) {
   if (v == null || v === '') return '';
   if (typeof v === 'number') { const s = excelYmd(v); return isYmd(s) ? s : ''; }
   const s = str(v).trim();
-  if (isYmd(s)) return s;
+  if (isYmd(s)) return realYmd(s) ? s : '';
   if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})$/i.test(s)) {
     const ms = Date.parse(s); if (!Number.isFinite(ms)) return '';
     const off = tzOffsetMin == null ? new Date(ms).getTimezoneOffset() : tzOffsetMin;
@@ -43,21 +45,22 @@ function localYmd(v, tzOffsetMin) {
 /* ---------- Excel của app mobile ---------- */
 function isMobileWorkbook(names) { const set = new Set((names || []).map(String)); return MOBILE_SHEETS.every(n => set.has(n)); }
 function rowsToObjects(aoa) {
-  const rows = Array.isArray(aoa) ? aoa : []; const head = (rows[0] || []).map(str);
+  const rows = Array.isArray(aoa) ? aoa : []; const head = (Array.isArray(rows[0]) ? rows[0] : []).map(str);
   return rows.slice(1).filter(r => Array.isArray(r) && r.some(c => c !== '' && c != null)).map(r => Object.fromEntries(head.map((h, i) => [h, r[i] ?? ''])));
 }
 /** Workbook (Map/Object tên sheet → mảng hàng) → object dạng JSON v3, giống importWorkbook() của app mobile. */
 function parseMobileWorkbook(sheets) {
   const get = n => sheets instanceof Map ? sheets.get(n) : sheets[n];
   if (!isMobileWorkbook(sheets instanceof Map ? [...sheets.keys()] : Object.keys(sheets))) throw new Error('Workbook không có sheet Session + Workout Log của app fitness.');
-  const o = {}; for (const r of get('Session') || []) if (r && r[0] !== '' && r[0] != null) o[str(r[0])] = r[1];
-  const library = rowsToObjects(get('Library')).filter(r => !norm(r['Builtin']).startsWith('c')).map(r => {
+  const rowsOf = n => { const x = get(n); return Array.isArray(x) ? x : []; };
+  const o = {}; for (const r of rowsOf('Session')) if (Array.isArray(r) && r[0] !== '' && r[0] != null) o[str(r[0])] = r[1];
+  const library = rowsToObjects(rowsOf('Library')).filter(r => !norm(r['Builtin']).startsWith('c')).map(r => {
     let dr = []; try { const p = JSON.parse(str(r['Default rows JSON']) || '[]'); if (Array.isArray(p)) dr = p; } catch (e) { /* bỏ qua */ }
     return { id: str(r['Library ID']), builtin: false, name: str(r['Tên bài']), category: str(r['Nhóm']), plan: str(r['Prescription']), cue: str(r['Cách tập']), caution: str(r['Chú ý']), imageData: '', imageName: str(r['Tên ảnh']), defaultRows: dr };
   }).filter(x => x.id);
-  const guide = rowsToObjects(get('Guide'));
+  const guide = rowsToObjects(rowsOf('Guide'));
   const map = new Map();
-  for (const r of rowsToObjects(get('Workout Log'))) {
+  for (const r of rowsToObjects(rowsOf('Workout Log'))) {
     const inst = str(r['Instance ID']) || `excel-${str(r['Thứ tự'])}-${str(r['Bài'])}`;
     if (!map.has(inst)) { const g = guide.find(x => str(x['Bài']) === str(r['Bài'])) || {}; map.set(inst, { instanceId: inst, libraryId: str(r['Library ID']), name: str(r['Bài']) || 'Bài tập', category: str(r['Nhóm']), plan: str(r['Prescription']), cue: str(g['Cách tập']), caution: str(g['Chú ý']), done: norm(r['Hoàn tất']).startsWith('c'), rows: [] }); }
     map.get(inst).rows.push({ set: str(r['Set']), group: str(r['Rep / nhóm']), reps: str(r['Số rep']), time: str(r['Thời gian / quãng đường']), weight: str(r['Trọng lượng (kg)']), note: str(r['Ghi chú']) });
@@ -195,7 +198,7 @@ function applyImport(db, parsed, plan, choices, opts = {}) {
     const w = { id: genId(), workoutName: s.session.workoutName || 'Fitness', workoutType: F.FITNESS_TYPE, planKm: '', planMinutes: s.session.duration, description: F.summaryText(exercises), planNote: s.session.workoutNote || '', workoutStructure: null,
       fitness: { schema: F.FITNESS_SCHEMA, sessionId: sid, templateId: s.session.templateId || '', workoutNote: s.session.workoutNote || '', exercises: planEx }, actual: null };
     w.actual = makeActual(sid, w.workoutName);
-    const loc = L.ensureDateIn(db, date); loc.d.workouts = loc.d.workouts || []; loc.d.workouts.push(w); res.created++;
+    const loc = realYmd(date) ? L.ensureDateIn(db, date) : null; if (!loc) { res.skipped++; return; } loc.d.workouts = loc.d.workouts || []; loc.d.workouts.push(w); res.created++;
   });
   if (libChanged || res.attached || res.created || res.overwritten) db.fitnessLibrary = F.normalizeLibrary(lib);
   db.weeks.sort((a, b) => str(a.days?.[0]?.date).localeCompare(str(b.days?.[0]?.date)));

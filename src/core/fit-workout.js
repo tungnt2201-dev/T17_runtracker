@@ -48,8 +48,8 @@ function structureToSteps(structure, opts = {}) {
     return st;
   };
   if (structure?.warmup) steps.push(stepOf(structure.warmup, 'warm'));
-  for (const g of structure?.groups || []) {
-    const inner = (g.steps || []).filter(s => Number(s.value) > 0);
+  for (const g of (Array.isArray(structure?.groups) ? structure.groups : []).filter(g => g && typeof g === 'object')) {
+    const inner = (Array.isArray(g.steps) ? g.steps : []).filter(s => s && typeof s === 'object' && Number(s.value) > 0);
     if (!inner.length) continue;
     const reps = Math.max(1, Math.min(99, Number(g.repeats) || 1));
     const first = steps.length;

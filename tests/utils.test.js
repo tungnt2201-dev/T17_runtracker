@@ -46,3 +46,11 @@ test('segmentHeight: sửa lỗi chia đôi HR khi chỉ có HR min (bug v1.8.9)
   assert.equal(onlyMin, both);
   assert.ok(onlyMin > 60);
 });
+
+test('storageAdvice: dưới 4 MB không cảnh báo; gần đầy gợi ý exe + ảnh/FIT', () => {
+  const C = require('../src/core/utils.js');
+  assert.equal(C.storageAdvice({ chars: 3_900_000 }), null);
+  const w = C.storageAdvice({ chars: 4_200_000, imageChars: 1_200_000, fitChars: 2_000_000 });
+  assert.equal(w.level, 'warn'); assert.match(w.text, /4,0 \/ 5,0 MB/); assert.match(w.text, /\.exe/); assert.match(w.text, /ảnh bài tập.*1,1 MB/); assert.match(w.text, /FIT.*1,9 MB/);
+  assert.equal(C.storageAdvice({ chars: 5_100_000 }).level, 'full');
+});

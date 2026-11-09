@@ -135,12 +135,28 @@ function drain() {
   return writing;
 }
 
+const isAppKey = k => k === LS_USERS || k === LS_BASE || String(k).startsWith(LS_BASE + ':');
+function lsKeys() { const out = []; try { for (let i = 0; i < root.localStorage.length; i++) out.push(root.localStorage.key(i)); } catch (e) { /* bị chặn */ } return out; }
+function dropSnapshots() { let n = 0; for (const k of lsKeys()) if (isAppKey(k) && k.includes(':truoc-')) { try { root.localStorage.removeItem(k); n++; } catch (e) { /* ignore */ } } return n; }
+/** Bản web: số ký tự localStorage đang dùng (tất cả người dùng + bản dự phòng). null với bản exe. */
+function storageUsage(db) {
+  if (isDesktop) return null;
+  let chars = 0, snapshotChars = 0; for (const k of lsKeys()) { let v = ''; try { v = root.localStorage.getItem(k) || ''; } catch (e) { /* ignore */ } const n = k.length + v.length; chars += n; if (isAppKey(k) && k.includes(':truoc-')) snapshotChars += n; }
+  const imageChars = (db?.fitnessLibrary || []).reduce((a, x) => a + String(x?.imageData || '').length, 0);
+  let fitChars = 0; // chỉ đếm khi đã gần đầy (tốn thời gian với dữ liệu lớn)
+  if (chars >= ((root.T17Core && root.T17Core.LS_WARN_CHARS) || 4e6)) for (const w of db?.weeks || []) for (const d of w.days || []) for (const it of d.workouts || []) if (it?.actual?.fitImport) { try { fitChars += JSON.stringify(it.actual.fitImport).length; } catch (e) { /* ignore */ } }
+  return { chars, snapshotChars, imageChars, fitChars };
+}
 /** Lưu DB của người dùng đang chọn. Trả true nếu đã nhận lệnh lưu (desktop ghi bất đồng bộ, gộp các lần lưu liên tiếp). */
 function save(db) {
   const json = JSON.stringify(db), id = index.activeUserId;
   if (!isDesktop) {
-    try { root.localStorage.setItem(U.lsKeyFor(id, LS_BASE), json); status.lastSavedAt = new Date().toISOString(); return true; }
-    catch (e) { status.lastError = 'localStorage đầy hoặc bị chặn'; onError('Trình duyệt không lưu được dữ liệu (localStorage đầy hoặc bị chặn). Hãy Sao lưu JSON ngay, hoặc dùng bản .exe để lưu ra file.'); return false; }
+    const key = U.lsKeyFor(id, LS_BASE);
+    try { root.localStorage.setItem(key, json); status.lastSavedAt = new Date().toISOString(); return true; }
+    catch (e0) { // v2.5.1: kho đầy → bỏ các bản dự phòng tự động (…:truoc-…) rồi thử lại một lần
+      try { if (dropSnapshots()) { root.localStorage.setItem(key, json); status.lastSavedAt = new Date().toISOString(); return true; } } catch (e1) { /* vẫn đầy */ }
+    }
+    status.lastError = 'localStorage đầy hoặc bị chặn'; onError('Trình duyệt không lưu được dữ liệu (localStorage đầy hoặc bị chặn). Thay đổi vừa rồi CHƯA được lưu — hãy Sao lưu JSON ngay, hoặc dùng bản .exe để lưu ra file.'); return false;
   }
   pendingJson = json; pendingId = id; clearTimeout(timer); timer = setTimeout(drain, 300); return true;
 }
@@ -204,5 +220,5 @@ async function openDataFolder() {
   else await Neutralino.os.open('file://' + dataDir);
 }
 
-root.T17Platform = { isDesktop, init, save, flush, snapshot, saveFile, openDataFolder, status, listUsers, activeUserId, activeUser, switchUser, createUser, renameUser, removeUser };
+root.T17Platform = { storageUsage, dropSnapshots, isDesktop, init, save, flush, snapshot, saveFile, openDataFolder, status, listUsers, activeUserId, activeUser, switchUser, createUser, renameUser, removeUser };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

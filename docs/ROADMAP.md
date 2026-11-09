@@ -25,7 +25,8 @@
 - ✅ Lượt 4: chỉ số cơ thể — dữ liệu, nhập tại một thời điểm, so sánh theo mốc, CSV / Excel.
 - ✅ Lượt 5: biểu đồ chỉ số cơ thể, tải tuần cùng trục, so sánh hai mốc — **v2.4.0**.
 - ✅ Lượt 6: calo trong ngày (nền + tập, sửa được, biểu đồ) — **v2.5.0**.
-- Lượt 7–8: rà soát tương thích + cập nhật hướng dẫn.
+- ✅ Lượt 7: rà soát tương thích (ma trận 5 phiên bản), fuzz, hiệu năng 3 năm, E2E exe — **v2.5.1**.
+- Lượt 8: cập nhật hướng dẫn Word.
 
 ## P2 — Thành tích & thiết bị
 - Tự phát hiện best efforts / PR (1 km, 5 km, 10 km, HM, FM) từ bản ghi FIT.

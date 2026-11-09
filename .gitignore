@@ -15,3 +15,5 @@ resources/icons/
 data/
 *.fit
 *.FIT
+.compat/
+.e2e/

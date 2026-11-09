@@ -53,7 +53,10 @@ Bản sao lưu của T17 vẫn giữ mảng `weeks` ở cấp cao nhất nên **
 
 ```bash
 npm install
-npm test              # build + 126 test (FIT decoder, dữ liệu cũ, Excel, chạy thử app trong jsdom)
+npm test              # build + 141 test (FIT decoder, dữ liệu cũ, Excel, fuzz, chạy thử app trong jsdom)
+npm run compat        # ma trận tương thích v1.8.9 → v2.0.0 → v2.1.1 → v2.2.0 → hiện tại (docs/COMPAT_MATRIX.md)
+npm run perf          # đo hiệu năng với dữ liệu 3 năm
+npm run e2e:exe       # chạy thật exe Neutralino (Linux + Xvfb): người dùng, fitness, cơ thể, sao lưu/khôi phục
 npm run build         # dist/web/T17_runtracker.html + resources/ cho Neutralino
 npm run dev           # chạy cửa sổ desktop (neu run) để thử
 npm run exe           # tải Neutralino 6.10 + đóng gói release/yymmdd_T17_runtracker_vX.Y.Z.zip

@@ -132,6 +132,12 @@ Trường tuỳ chọn `profile.energy` (trong hồ sơ của **mỗi người d
 - Nguồn đầu vào: `profile.sex`, `profile.heightCm`, `profile.birthDate`, `profile.weightKg`; `bodyMetrics[].weightKg / bodyFatPct / bmrKcal` (lần đo gần nhất vào hoặc trước ngày tính).
 - Bản v2.2.0 giữ nguyên `profile.energy` và `features.energy` khi nạp / sao lưu (test `compat.test.js`).
 
+## Ràng buộc khi nạp (v2.5.1)
+
+- `fitnessLibrary[].imageData` chỉ nhận `data:image/(png|jpeg|gif|webp);base64,…` hợp lệ; giá trị khác thành `''` (không đổi định dạng file, chỉ chặn dữ liệu xấu).
+- Bản web lưu trong localStorage: Chromium / Edge / WebView2 cho mỗi trang ~5.242.880 ký tự (tính cả tên khoá) cho **mọi** người dùng cộng lại; app cảnh báo từ 4.000.000 ký tự. Mỗi buổi chạy nhập từ FIT lưu kèm chuỗi điểm chi tiết (`actual.fitImport.sectionSource`, thường 20–70 KB/buổi) — dữ liệu nhiều năm có FIT nên dùng bản exe.
+- Ma trận tương thích đầy đủ: `docs/COMPAT_MATRIX.md` (tạo bằng `npm run compat`).
+
 ### Vì sao giữ `schemaVersion = 2` và thêm `features`
 
 Đã thử bằng `git worktree` của tag `v2.2.0` (chạy cả lõi lẫn app hoàn chỉnh trong jsdom) và RunPlan v1.8.9:

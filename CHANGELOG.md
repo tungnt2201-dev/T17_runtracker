@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.5.1 — 2026-11-09 (Rà soát tương thích, hiệu năng, chất lượng — lượt 7)
+
+Gói: `261109_T17_runtracker_v2.5.1.zip`. Không thêm tính năng; dữ liệu và kết quả chạy bộ không đổi.
+
+**Kiểm chứng mới** (chạy lại được):
+- `npm run compat` — ma trận tương thích thật giữa RunPlan v1.8.9, T17 v2.0.0, v2.1.1, v2.2.0 và bản hiện tại (git worktree, chạy bản web trong jsdom): sao lưu JSON, Xuất bài tập JSON, Excel. 75/75 ô đạt — xem `docs/COMPAT_MATRIX.md`.
+- `tests/fuzz.test.js`, `tests/fuzz-ui.test.js` — fuzz các đường nhập (file hỏng, thiếu trường, số dạng chữ, ngày sai, phần tử null, ảnh base64 hỏng, file rất lớn).
+- `npm run perf` — dữ liệu 3 năm (~1.000 buổi, 500 lần đo cơ thể, 100 ảnh); `npm run e2e:exe` — chạy thật bản Neutralino (Linux) với kịch bản chuyển người dùng, nhập fitness, nhập chỉ số cơ thể, sao lưu, khôi phục.
+
+**Sửa lỗi**
+- **Bảo mật**: ảnh bài tập (`imageData`) trong file sao lưu / file app mobile được chèn thẳng vào thuộc tính `src` → một file có chủ đích xấu có thể chạy mã trong app. Nay chỉ nhận ảnh data URL png/jpeg/gif/webp base64 hợp lệ (ở lớp chuẩn hoá) và luôn escape khi hiển thị.
+- Lịch / điểm tải / Analytics / xuất FIT không còn văng lỗi khi cấu trúc bài (`workoutStructure`) có phần tử null hoặc sai kiểu.
+- Nhập file app mobile: ngày không có thật (vd. 2026-13-45, 30/02) bị bỏ qua thay vì làm hỏng lịch; sheet Excel thiếu / sai dạng không còn văng lỗi.
+- Calo: số đo cơ thể ngoài khoảng hợp lý (cân 20–300 kg, % mỡ 2–70, BMR 500–5.000) bị bỏ qua thay vì ra kết quả vô hạn.
+- Khôi phục sao lưu: cảnh báo rõ khi file không có bài nào trong khi lịch đang có dữ liệu; luôn giữ một bản dự phòng (`…-truoc-khoi-phuc-…`) trước khi ghi đè.
+- File nhập trên 60 MB (ảnh trên 30 MB) bị chặn trước khi đọc, có thông báo — tránh treo.
+- Bản web: khi bộ nhớ trình duyệt đầy, tự bỏ các bản dự phòng tự động trong trình duyệt rồi lưu lại; nếu vẫn không lưu được thì báo rõ “thay đổi CHƯA được lưu”.
+
+**Hiệu năng / bộ nhớ**
+- Calo nhiều ngày dùng chỉ mục (ngày → bài, số đo đã sắp xếp): Analytics › Tất cả với dữ liệu 3 năm từ ~2,5 s xuống ~0,7 s (jsdom) / 0,3 s (exe).
+- Bản web cảnh báo khi localStorage dùng từ 4 / 5 MB (Chromium, Edge, WebView2 cho mỗi trang ~5,24 triệu ký tự), nêu phần chiếm chỗ (ảnh bài tập, dữ liệu chi tiết FIT, bản dự phòng) và gợi ý dùng bản exe hoặc nén / xoá ảnh.
+
 ## 2.5.0 — 2026-11-09 (Calo trong ngày)
 
 Gói: `261109_T17_runtracker_v2.5.0.zip`. Dữ liệu cũ nạp nguyên vẹn, kết quả chạy bộ không đổi. File của 2.5 vẫn mở được bằng 2.2.0 – 2.4.0 (cài đặt calo `profile.energy` được giữ nguyên, có test với mã nguyên văn của 2.2.0).

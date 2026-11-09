@@ -52,6 +52,9 @@ const BUILTIN_BY_ID = new Map(BUILTIN_LIBRARY.map(x => [x.id, x]));
 /* ---------- tiện ích ---------- */
 const str = v => v == null ? '' : String(v);
 const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+/** Ảnh bài tập: CHỈ nhận data URL ảnh raster base64 hợp lệ (png/jpeg/gif/webp). Mọi thứ khác → '' (chặn chuỗi lạ chèn vào thuộc tính src). */
+const IMG_RE = /^data:image\/(png|jpe?g|gif|webp);base64,[A-Za-z0-9+/]+={0,2}$/;
+function safeImageData(v) { const s = typeof v === 'string' ? v.replace(/\s/g, '') : ''; return s && IMG_RE.test(s) ? s : ''; }
 function rand36(n) { let s = ''; while (s.length < n) s += Math.random().toString(36).slice(2); return s.slice(0, n); }
 function newSessionId() { return 'fs-' + Date.now().toString(36) + '-' + rand36(6); }
 function newInstanceId() { return 'ex-' + Date.now().toString(36) + '-' + rand36(6); }
@@ -73,14 +76,14 @@ function normalizeLibrary(list) {
   const saved = new Map(src.map(x => [str(x.id), x]));
   const out = BUILTIN_LIBRARY.map(b => {
     const s = saved.get(b.id) || {}; const o = builtinItem(b);
-    o.imageData = str(s.imageData); o.imageName = str(s.imageName);
+    o.imageData = safeImageData(s.imageData); o.imageName = str(s.imageName).slice(0, 200);
     if (Number.isFinite(numOf(s.met)) && numOf(s.met) > 0) o.met = numOf(s.met);
     return o;
   });
   const seen = new Set(out.map(x => x.id));
   for (const x of src) {
     const id = str(x.id); if (seen.has(id) || BUILTIN_BY_ID.has(id)) continue; seen.add(id);
-    const o = { ...x, id, builtin: false, name: str(x.name).trim() || 'Bài tập', category: str(x.category), plan: str(x.plan), cue: str(x.cue), caution: str(x.caution), imageData: str(x.imageData), imageName: str(x.imageName) };
+    const o = { ...x, id, builtin: false, name: str(x.name).trim() || 'Bài tập', category: str(x.category), plan: str(x.plan), cue: str(x.cue), caution: str(x.caution), imageData: safeImageData(x.imageData), imageName: str(x.imageName).slice(0, 200) };
     const dr = normalizeRows(x.defaultRows); o.defaultRows = dr.length ? dr : [row({ set: '1' })];
     if ('met' in x) { const m = numOf(x.met); if (Number.isFinite(m) && m > 0) o.met = m; else delete o.met; }
     out.push(o);
@@ -334,7 +337,7 @@ function mobileFileName(date, name) { return `${toDate(date) || 'ngay'}_${safeFi
 /** Kích thước thật (byte) của data URL base64. */
 function dataUrlBytes(url) { const i = str(url).indexOf(','); if (i < 0) return 0; const b64 = str(url).slice(i + 1).replace(/\s/g, ''); return Math.floor(b64.length * 3 / 4) - (b64.endsWith('==') ? 2 : b64.endsWith('=') ? 1 : 0); }
 
-const api = { FITNESS_SCHEMA, FITNESS_TYPE, ROW_KEYS, BUILTIN_LIBRARY, BUILTIN_TEMPLATES, newSessionId, newInstanceId, normalizeRows, normalizeLibrary, customItems, normalizeExercise, normalizeFitnessBlock, isFitnessWorkout, hasFitnessContent, sessionVolume, summaryText, contentHash, mobileKind, templateSession, fromMobile, toWorkout,
+const api = { safeImageData, FITNESS_SCHEMA, FITNESS_TYPE, ROW_KEYS, BUILTIN_LIBRARY, BUILTIN_TEMPLATES, newSessionId, newInstanceId, normalizeRows, normalizeLibrary, customItems, normalizeExercise, normalizeFitnessBlock, isFitnessWorkout, hasFitnessContent, sessionVolume, summaryText, contentHash, mobileKind, templateSession, fromMobile, toWorkout,
   DEFAULT_RPE, IMAGE_MAX_BYTES, exerciseBrief, prefixInstances, sessionIdFromInstances, withNewSessionId, templateToSession, planFromTemplate, templateFromSession, repeatDates, completion, buildActual, toMobileData, safeFileName, mobileFileName, dataUrlBytes };
 root.T17Fitness = api;
 if (typeof module !== 'undefined' && module.exports) module.exports = api;

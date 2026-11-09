@@ -21,7 +21,10 @@ function defaultTemplates(){
 }
 /** Chuẩn hoá dữ liệu nạp từ file/localStorage (mọi phiên bản cũ) rồi gieo thư viện mẫu mặc định nếu chưa có. */
 function loadDbFrom(raw){const {db:out,report}=T17Legacy.normalizeDb(raw||{weeks:[]});if(!out.templatesSeeded){const have=new Set((out.templates||[]).map(t=>norm(t.name)));out.templates=(out.templates||[]).concat(defaultTemplates().filter(t=>!have.has(norm(t.name))));out.templatesSeeded=true}return{db:out,report}}
-function saveDb(){const f=T17Legacy.featuresOf(db);if(f)db.features=f;return T17Platform.save(db)}// features: đánh dấu phần mở rộng (fitness…) để bản sau nhận biết
+function saveDb(){const f=T17Legacy.featuresOf(db);if(f)db.features=f;const ok=T17Platform.save(db);if(ok)checkStorageSoon();return ok}
+// v2.5.1: bản web — cảnh báo khi localStorage gần đầy (≈4/5 MB), gợi ý dùng exe hoặc nén ảnh
+let storageT=null,storageWarned=false;function checkStorageSoon(){clearTimeout(storageT);storageT=setTimeout(checkStorage,400)}
+function checkStorage(){const u=T17Platform.storageUsage?T17Platform.storageUsage(db):null;if(!u)return null;const a=T17Core.storageAdvice(u);if(a){showSupport(a.level==='full'?'bad':'warn',a.text);storageWarned=true}else if(storageWarned){supportBox.className='support';storageWarned=false}return a}// features: đánh dấu phần mở rộng (fitness…) để bản sau nhận biết
 /** Tìm lại vị trí bài theo id (chỉ số wi/di/ii có thể lệch sau khi lịch được sắp xếp lại). */
 function resolveRef(ref){if(!ref)return null;const cur=db.weeks[ref.wi]?.days?.[ref.di]?.workouts?.[ref.ii];if(cur&&(!ref.id||cur.id===ref.id))return ref;if(!ref.id)return null;for(let wi=0;wi<db.weeks.length;wi++)for(let di=0;di<db.weeks[wi].days.length;di++){const ii=(db.weeks[wi].days[di].workouts||[]).findIndex(x=>x.id===ref.id);if(ii>=0)return{wi,di,ii,id:ref.id}}return null}
 function toast(t){const x=$('toast');x.textContent=t;x.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>x.classList.remove('show'),2400)}
@@ -30,8 +33,10 @@ function fmtDate(s,short=false){if(!s)return'';const [y,m,d]=s.split('-').map(Nu
 function dayNum(s){return s?String(+s.slice(8,10)):''}
 function actualDurationLabel(minutes){const x=formatDurationClock(minutes);return x||'—'}
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function readFileArrayBuffer(file){return new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=()=>reject(fr.error||new Error('Không đọc được file.'));fr.readAsArrayBuffer(file)})}
-function readFileText(file){return new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=()=>reject(fr.error||new Error('Không đọc được file.'));fr.readAsText(file,'utf-8')})}
+// v2.5.1: chặn file quá lớn trước khi đọc (tránh treo / hết bộ nhớ). Sao lưu thật kể cả 100 ảnh chỉ vài MB.
+const MAX_IMPORT_MB=60;function tooBig(file){return file&&file.size>MAX_IMPORT_MB*1048576?new Error(`File “${file.name}” quá lớn (${Math.round(file.size/1048576)} MB, tối đa ${MAX_IMPORT_MB} MB) — có lẽ chọn nhầm file.`):null}
+function readFileArrayBuffer(file){return new Promise((resolve,reject)=>{const big=tooBig(file);if(big)return reject(big);const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=()=>reject(fr.error||new Error('Không đọc được file.'));fr.readAsArrayBuffer(file)})}
+function readFileText(file){return new Promise((resolve,reject)=>{const big=tooBig(file);if(big)return reject(big);const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=()=>reject(fr.error||new Error('Không đọc được file.'));fr.readAsText(file,'utf-8')})}
 function addWorkoutFromRecord(dst,src){dst.workouts=dst.workouts||[];const rec={id:genId(),...T17Legacy.planRecord(src),actual:null};if(rec.fitness)rec.fitness=T17Fitness.withNewSessionId(rec.fitness);dst.workouts.push(rec)}
 async function importExcel(file){
  if(!file)return;if(!/\.xlsx$/i.test(file.name))throw new Error('Bản này hỗ trợ file .xlsx. Nếu đang dùng .xls, hãy Save As thành .xlsx trước.');if(!window.RunPlanXLSX)throw new Error('Bộ đọc Excel nội bộ chưa tải được.');
@@ -525,14 +530,18 @@ function saveBlob(blob,name){return T17Platform.saveFile(blob,name).then(p=>{if(
 function backup(){saveBlob(new Blob([JSON.stringify(T17Legacy.toBackup(db,APP_VERSION),null,2)],{type:'application/json'}),`T17_RunTracker_backup_${T17Platform.activeUserId()==='main'?'':T17Users.slug(T17Platform.activeUser().name)+'_'}${ymd(new Date())}.json`)}backupBtn.onclick=backup;$('backupSide').onclick=backup;
 function triggerRestore(){try{restoreFile.value='';restoreFile.click()}catch(e){alert('Không mở được trình chọn file.')}}restoreBtn.onclick=triggerRestore;$('restoreSide').onclick=triggerRestore;
 /** Khôi phục toàn bộ: nhận mọi định dạng sao lưu (RunPlan v1.x, T17 v2, localStorage dump, mảng tuần). */
-function restoreFromData(data,sourceName=''){
+async function restoreFromData(data,sourceName=''){
  const kind=T17Legacy.detectKind(data);
  if(kind==='fitness-session'){T17FitnessImportUI.importSources([{name:sourceName||'file',data}]);return true}
  if(kind==='plan'||kind==='log')return mergeExportData(data,kind);
  if(!['backup','backup-wrapped','weeks'].includes(kind))throw new Error('File JSON không đúng định dạng sao lưu RunPlan / T17 RunTracker.');
  const {db:next,report}=loadDbFrom(data);
- if(!confirm(`Khôi phục toàn bộ dữ liệu từ ${sourceName||'file'}?\n\nFile chứa: ${T17Legacy.describeReport(report)}.\n\nDữ liệu hiện tại của người dùng “${T17Platform.activeUser().name}” sẽ bị GHI ĐÈ (người dùng khác không bị ảnh hưởng). Nên bấm "Sao lưu toàn bộ" trước nếu chưa chắc.`))return false;
- db=next;saveDb();currentWeek=findCurrentWeek();render();refreshViews();toast('Đã khôi phục: '+T17Legacy.describeReport(report));return true;
+ const countW=x=>(x.weeks||[]).reduce((n,w)=>n+(w.days||[]).reduce((m,d)=>m+(d.workouts||[]).length,0),0),haveNow=countW(db);
+ // v2.5.1: file rỗng/hỏng (0 bài) không được lặng lẽ xoá sạch lịch đang có
+ const emptyWarn=!countW(next)&&haveNow?`\n\n⚠ FILE KHÔNG CÓ BÀI TẬP NÀO, trong khi lịch hiện tại có ${haveNow} bài. Có thể file bị hỏng hoặc chọn nhầm.`:'';
+ if(!confirm(`Khôi phục toàn bộ dữ liệu từ ${sourceName||'file'}?\n\nFile chứa: ${T17Legacy.describeReport(report)}.${emptyWarn}\n\nDữ liệu hiện tại của người dùng “${T17Platform.activeUser().name}” sẽ bị GHI ĐÈ (người dùng khác không bị ảnh hưởng). Nên bấm "Sao lưu toàn bộ" trước nếu chưa chắc.`))return false;
+ let snap='';if(haveNow){try{snap=await T17Platform.snapshot(db,'khoi-phuc')}catch(e){console.warn('snapshot',e)}}
+ db=next;saveDb();currentWeek=findCurrentWeek();render();refreshViews();toast('Đã khôi phục: '+T17Legacy.describeReport(report)+(snap?' · dữ liệu cũ được giữ một bản dự phòng':''));return true;
 }
 /** Gộp thêm file "Xuất bài tập" (plan) hoặc "Training Log" (log, có kèm kết quả). Không xoá dữ liệu cũ. */
 function mergeExportData(data,kind){
@@ -542,7 +551,7 @@ function mergeExportData(data,kind){
  toast(`Đã thêm ${res.added} bài${res.actualsAttached?` · gắn ${res.actualsAttached} kết quả`:''}${res.duplicates?` · ${res.duplicates} bài trùng được bỏ qua`:''}${res.invalid?` · ${res.invalid} mục không hợp lệ`:''}`);
  return true;
 }
-restoreFile.addEventListener('change',async e=>{try{const f=e.target.files&&e.target.files[0];if(!f)return;restoreFromData(T17Legacy.parseJsonText(await readFileText(f)),f.name)}catch(err){alert(err.message||err)}finally{e.target.value=''}});
+restoreFile.addEventListener('change',async e=>{try{const f=e.target.files&&e.target.files[0];if(!f)return;await restoreFromData(T17Legacy.parseJsonText(await readFileText(f)),f.name)}catch(err){alert(err.message||err)}finally{e.target.value=''}});
 
 function planExportRecord(item){return T17Legacy.planRecord(item)}
 async function exportPlanJson(){const EXPORT_TITLE='Xuất bài tập (JSON) để chia sẻ';
@@ -744,7 +753,7 @@ async function boot(){
  else if(!raw)saveDb();
  T17Analytics.init();T17Profile.init();T17FitnessUI.init();T17BodyUI.init();T17EnergyUI.init();T17UserUI.init();T17UserUI.syncName();
  currentWeek=findCurrentWeek();render();initEnvironment();
- booted=true;if(warnings.length)showSupport('warn',warnings.join(' '));
+ booted=true;if(warnings.length)showSupport('warn',warnings.join(' '));else checkStorage();
  if(loadError)showSupport('bad','Không mở được kho dữ liệu: '+loadError+'. Dữ liệu tạm thời chỉ nằm trong phiên này — hãy Sao lưu JSON.');
  if(raw&&T17Platform.status.loadedFrom==='webview-localStorage')toast('Đã chuyển dữ liệu cũ sang file: '+T17Legacy.describeReport(report));
  const ml=$('storageModeLabel');if(ml)ml.textContent=T17Platform.isDesktop?'Dữ liệu lưu thành file cạnh exe':'Dữ liệu lưu trong trình duyệt';const of=$('openDataFolderBtn');if(of){of.hidden=!T17Platform.isDesktop;of.onclick=()=>T17Platform.openDataFolder()}

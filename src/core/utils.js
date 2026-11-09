@@ -58,7 +58,9 @@ function paceToSec(v) { const s = String(v ?? '').trim(); if (!s) return 0; cons
 function secToPace(sec) { sec = Math.round(+sec || 0); if (sec <= 0) return ''; return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`; }
 function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 function stepEstimate(step) { if (!step) return { minutes: 0, km: 0, paceSec: 0 }; const value = +step.value || 0; const p1 = paceToSec(step.paceFrom), p2 = paceToSec(step.paceTo); const p = p1 && p2 ? (p1 + p2) / 2 : (p1 || p2 || 0); let minutes = 0, km = 0; if (step.mode === 'distance') { km = value; if (p) minutes = km * p / 60; } else { minutes = value; if (p) km = minutes / (p / 60); } return { minutes, km, paceSec: p }; }
-function flattenStructuredSegments(structure) { if (!structure) return []; const out = []; const push = (step, role) => { if (!step) return; const e = stepEstimate(step); if (!(e.minutes > 0 || e.km > 0)) return; out.push({ ...step, role, duration: e.minutes || Math.max(0.2, e.km * (e.paceSec || 600) / 60), paceSec: e.paceSec }); }; push(structure.warmup, 'warm'); for (const g of structure.groups || []) { const reps = clamp(+g.repeats || 1, 1, 30); for (let r = 0; r < reps; r++) for (const s of g.steps || []) push(s, 'main'); } push(structure.cooldown, 'cool'); return out.slice(0, 90); }
+/** Mảng chỉ gồm object (bỏ null / số / chuỗi) — dữ liệu nhập có thể hỏng. */
+function objArr(x) { return Array.isArray(x) ? x.filter(v => v && typeof v === 'object' && !Array.isArray(v)) : []; }
+function flattenStructuredSegments(structure) { if (!structure) return []; const out = []; const push = (step, role) => { if (!step) return; const e = stepEstimate(step); if (!(e.minutes > 0 || e.km > 0)) return; out.push({ ...step, role, duration: e.minutes || Math.max(0.2, e.km * (e.paceSec || 600) / 60), paceSec: e.paceSec }); }; push(structure.warmup, 'warm'); for (const g of objArr(structure.groups)) { const reps = clamp(+g.repeats || 1, 1, 30); for (let r = 0; r < reps; r++) for (const s of objArr(g.steps)) push(s, 'main'); } push(structure.cooldown, 'cool'); return out.slice(0, 90); }
 /* v2.0 fix: HR trung bình chỉ chia 2 khi có ĐỦ cả HR min và HR max
  * (bản v1.8.9 sai thứ tự toán tử nên chia 2 cả khi chỉ có một giá trị). */
 function segmentHeight(s) {
@@ -79,10 +81,23 @@ function deepClone(x) { return JSON.parse(JSON.stringify(x)); }
 function stepTargetsText(s) { const parts = []; if (s.paceFrom || s.paceTo) parts.push(`Pace ${s.paceFrom || '—'}–${s.paceTo || '—'}/km`); if (s.hrFrom || s.hrTo) parts.push(`HR ${s.hrFrom || '—'}–${s.hrTo || '—'} bpm`); return parts.join(' · '); }
 function stepText(s, showLabel = true) { const activity = s.activity === 'walk' ? 'Đi bộ' : s.activity === 'rest' ? 'Nghỉ' : 'Chạy'; const unit = s.mode === 'distance' ? 'km' : 'phút'; const prefix = showLabel ? `${s.label || activity}: ` : ''; return `${prefix}${activity} ${+s.value || 0} ${unit}${stepTargetsText(s) ? ' · ' + stepTargetsText(s) : ''}`; }
 function smartNum(v) { const n = +v || 0; return Number.isInteger(n) ? String(n) : String(Math.round((n + Number.EPSILON) * 1000) / 1000).replace('.', ','); }
-function descriptionOf(structure) { if (!structure) return ''; const lines = []; if (structure.warmup) lines.push('Warm-up: ' + stepText(structure.warmup, false)); for (const g of structure.groups || []) { lines.push(`Lặp ${Math.max(1, +g.repeats || 1)} lần${g.label ? ' – ' + g.label : ''}:`); for (const s of g.steps || []) lines.push('• ' + stepText(s, true)); } if (structure.cooldown) lines.push('Cool-down: ' + stepText(structure.cooldown, false)); return cleanDescription(lines.join('\n')); }
+function descriptionOf(structure) { if (!structure) return ''; const lines = []; if (structure.warmup) lines.push('Warm-up: ' + stepText(structure.warmup, false)); for (const g of objArr(structure.groups)) { lines.push(`Lặp ${Math.max(1, +g.repeats || 1)} lần${g.label ? ' – ' + g.label : ''}:`); for (const s of objArr(g.steps)) lines.push('• ' + stepText(s, true)); } if (structure.cooldown) lines.push('Cool-down: ' + stepText(structure.cooldown, false)); return cleanDescription(lines.join('\n')); }
 function totalsOf(structure) { const segs = flattenStructuredSegments(structure); let minutes = 0, km = 0; const p = [], h = []; for (const s of segs) { const e = stepEstimate(s); minutes += e.minutes || 0; km += e.km || 0; if (s.activity === 'run') { const a = paceToSec(s.paceFrom), b = paceToSec(s.paceTo); if (a) p.push(a); if (b) p.push(b); } if (+s.hrFrom) h.push(+s.hrFrom); if (+s.hrTo) h.push(+s.hrTo); } return { minutes, km, p, h }; }
 
-const api = { DAYS, cleanDescription, genId, hasWorkoutContent, norm, ymd, isYmd, excelYmd, pace, parseDurationInput, formatDurationClock, samePlanRecord, numVN, paceToSec, secToPace, clamp, stepEstimate, flattenStructuredSegments, segmentHeight, parseYmdLocal, addDaysYmd, mondayYmd, isoWeekNumber, blankDay, deepClone, stepTargetsText, stepText, smartNum, descriptionOf, totalsOf };
+/** Dung lượng localStorage của bản web (v2.5.1). Chromium/Edge/WebView2 cho mỗi trang ~5.242.880 ký tự (gồm cả tên khoá).
+ *  usage = { chars, imageChars, snapshotChars } → null (ổn) | { level:'warn'|'full', text } — lời khuyên tiếng Việt. */
+const LS_LIMIT_CHARS = 5242880, LS_WARN_CHARS = 4000000;
+function storageAdvice(usage) {
+  const u = usage || {}; const chars = +u.chars || 0; if (chars < LS_WARN_CHARS) return null;
+  const mb = n => (n / 1048576).toFixed(1).replace('.', ',');
+  const level = chars >= LS_LIMIT_CHARS * 0.95 ? 'full' : 'warn';
+  const tips = ['dùng bản Windows (.exe) — dữ liệu lưu ra file, không giới hạn 5 MB'];
+  if ((+u.fitChars || 0) > 500000) tips.push(`dữ liệu chi tiết của các file FIT đã nhập chiếm ${mb(u.fitChars)} MB — bản .exe phù hợp hơn khi nhập FIT thường xuyên`);
+  if ((+u.imageChars || 0) > 500000) tips.push(`nén hoặc xoá bớt ảnh bài tập trong Thư viện Fitness (ảnh đang chiếm ${mb(u.imageChars)} MB)`);
+  if ((+u.snapshotChars || 0) > 0) tips.push(`bản dự phòng tự động trong trình duyệt chiếm ${mb(u.snapshotChars)} MB (sẽ tự xoá khi cần chỗ)`);
+  return { level, text: `${level === 'full' ? '⚠ Bộ nhớ trình duyệt GẦN ĐẦY' : 'Bộ nhớ trình duyệt sắp đầy'}: đã dùng ${mb(chars)} / ${mb(LS_LIMIT_CHARS)} MB. Hãy Sao lưu JSON ngay, rồi ${tips.join('; hoặc ')}.` };
+}
+const api = { LS_LIMIT_CHARS, LS_WARN_CHARS, storageAdvice, DAYS, cleanDescription, genId, hasWorkoutContent, norm, ymd, isYmd, excelYmd, pace, parseDurationInput, formatDurationClock, samePlanRecord, numVN, paceToSec, secToPace, clamp, stepEstimate, flattenStructuredSegments, segmentHeight, parseYmdLocal, addDaysYmd, mondayYmd, isoWeekNumber, blankDay, deepClone, stepTargetsText, stepText, smartNum, descriptionOf, totalsOf };
 root.T17Core = api;
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
