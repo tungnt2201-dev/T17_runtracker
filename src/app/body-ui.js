@@ -84,7 +84,7 @@ function editRecord(id) {
     if (!rec) return null;
     const cur = list(); const i = cur.findIndex(x => x.id === rec.id);
     if (i >= 0) cur[i] = rec; else cur.push(rec);
-    db.bodyMetrics = B.normalizeList(cur); saveDb(); renderAll();
+    db.bodyMetrics = B.normalizeList(cur); saveDb(); renderAll(); refreshViews();
     toast(src ? 'Đã sửa số đo' : 'Đã lưu số đo');
     await maybeSyncWeight(rec);
     return rec;
@@ -108,7 +108,7 @@ async function maybeSyncWeight(rec) {
 function deleteRecord(id) {
   const r = list().find(x => x.id === id); if (!r) return;
   if (!confirm(`Xoá số đo ngày ${fmtDay(r.date)}${r.time ? ' ' + r.time : ''}?`)) return;
-  db.bodyMetrics = list().filter(x => x.id !== id); saveDb(); renderAll(); toast('Đã xoá số đo');
+  db.bodyMetrics = list().filter(x => x.id !== id); saveDb(); renderAll(); refreshViews(); toast('Đã xoá số đo');
 }
 
 /* ---------------- CSV ---------------- */
@@ -119,7 +119,7 @@ async function importCsvText(text, name = 'file') {
   const unk = res.unknownColumns.length ? `\nCột không dùng: ${res.unknownColumns.slice(0, 6).join(', ')}.` : '';
   if (!confirm(`“${name}”: đọc được ${res.records.length} lần đo (${res.records[0].date.split('-').reverse().join('/')} → ${res.records[res.records.length - 1].date.split('-').reverse().join('/')}).${errs}${unk}\n\nGộp vào số đo của “${T17Platform.activeUser().name}”? Lần đo trùng ngày + giờ không bị nhân đôi.`)) return null;
   const m = B.merge(db.bodyMetrics || [], res.records);
-  db.bodyMetrics = m.list; saveDb(); renderAll();
+  db.bodyMetrics = m.list; saveDb(); renderAll(); refreshViews();
   toast([`thêm ${m.added}`, m.merged && `bổ sung ${m.merged}`, m.duplicates && `trùng ${m.duplicates}`, m.conflicts && `${m.conflicts} khác giá trị (giữ bản đang có)`].filter(Boolean).join(' · '));
   const latest = B.latestByField(m.list, profile()).get('weightKg'); if (latest && m.added) await maybeSyncWeight(latest);
   return m;

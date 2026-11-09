@@ -121,3 +121,38 @@ test('legacy: bodyMetrics được chuẩn hoá + features.body; file chỉ ch�
   assert.deepEqual(old.bodyMetrics, db.bodyMetrics); assert.deepEqual(old.features, { body: 1 });
   assert.deepEqual(L.normalizeDb(old).db.bodyMetrics, db.bodyMetrics, 'đi qua bản cũ rồi về bản mới vẫn nguyên');
 });
+
+/* ===================== Lượt 5: dữ liệu biểu đồ, tiêu đề, so sánh hai mốc ===================== */
+const W8 = () => B.normalizeList([['2026-09-01', 71.2, 'nghỉ ốm'], ['2026-09-08', 70.9], ['2026-09-20', 70.4], ['2026-10-05', 70], ['2026-10-20', 69.6], ['2026-10-27', 69.4]].map(([d, w, n]) => ({ date: d, weightKg: w, note: n })));
+
+test('chartSeries: cắt theo khoảng, MA7 tính từ toàn bộ lịch sử, gắn ghi chú', () => {
+  const l = W8();
+  const all = B.chartSeries(l, 'weightKg'); assert.equal(all.length, 6); assert.deepEqual(all[0].notes, ['nghỉ ốm']);
+  const part = B.chartSeries(l, 'weightKg', { from: '2026-09-10', to: '2026-10-21' });
+  assert.deepEqual(part.map(p => p.date), ['2026-09-20', '2026-10-05', '2026-10-20']);
+  assert.equal(B.chartSeries(l, 'bodyFatPct').length, 0);
+  assert.equal(B.rangeStart('2026-11-09', 8), '2026-09-21'); assert.equal(B.rangeStart('2026-11-12', 1), '2026-11-09'); assert.equal(B.rangeStart('2026-11-09', 0, '2026-01-02'), '2026-01-02');
+});
+
+test('tiêu đề một câu kèm số: giảm / tăng / ổn định; màu theo ý nghĩa', () => {
+  assert.deepEqual(B.headline('weightKg', B.chartSeries(W8(), 'weightKg')), { text: 'Giảm 1,8 kg trong 8 tuần', delta: -1.8, from: 71.2, to: 69.4, days: 56, assess: 'neutral' });
+  assert.equal(B.headline('weightKg', B.chartSeries(W8(), 'weightKg'), { weightGoalKg: 68 }).assess, 'good');
+  const fat = B.normalizeList([{ date: '2026-10-01', bodyFatPct: 18.5 }, { date: '2026-10-08', bodyFatPct: 19.4 }]);
+  const h = B.headline('bodyFatPct', B.chartSeries(fat, 'bodyFatPct')); assert.equal(h.text, '% mỡ: tăng 0,9 điểm % trong 7 ngày'); assert.equal(h.assess, 'bad');
+  const flat = B.normalizeList([{ date: '2026-10-01', waistCm: 82 }, { date: '2026-10-29', waistCm: 82.3 }]);
+  assert.equal(B.headline('waistCm', B.chartSeries(flat, 'waistCm')).text, 'Vòng eo: ổn định quanh 82,3 cm trong 4 tuần (chênh +0,3 cm)');
+  assert.equal(B.headline('weightKg', [{ date: '2026-10-01', value: 70, ma7: 70 }]), null);
+});
+
+test('so sánh hai mốc A/B: lần đo gần ngày chọn nhất (cả trước và sau), chỉ chỉ số có ở cả hai, phím tắt', () => {
+  const l = B.normalizeList([{ date: '2026-09-01', weightKg: 72, bodyFatPct: 21 }, { date: '2026-10-01', weightKg: 70.5, waistCm: 85 }, { date: '2026-10-30', weightKg: 69.8, bodyFatPct: 19.6, waistCm: 83 }]);
+  const rows = B.compareAB(l, '2026-09-03', '2026-10-30', { heightCm: 175 });
+  assert.deepEqual(rows.map(r => r.key), ['weightKg', 'bodyFatPct', 'waistCm', 'bmi', 'ffmKg']); // eo/hông không có (chưa đo hông)
+  assert.equal(rows.find(r => r.key === 'waistCm').a.date, '2026-10-01'); // lần đo eo gần mốc A nhất (cách 28 ngày)
+  const waist = B.compareAB(l, '2026-10-02', '2026-10-30').find(r => r.key === 'waistCm');
+  assert.deepEqual([waist.a.date, waist.a.offsetDays, waist.b.value, waist.delta, waist.assess], ['2026-10-01', -1, 83, -2, 'good']);
+  const w = rows[0]; assert.deepEqual([w.a.value, w.a.date, w.a.offsetDays, w.a.near, w.delta, w.pct], [72, '2026-09-01', -2, true, -2.2, -3.1]);
+  assert.equal(rows.find(r => r.key === 'bodyFatPct').assess, 'good');
+  assert.deepEqual(B.abPreset(l, 'first'), { a: '2026-09-01', b: '2026-10-30' }); assert.deepEqual(B.abPreset(l, 'd30'), { a: '2026-09-30', b: '2026-10-30' }); assert.equal(B.abPreset([], 'first'), null);
+  const same = B.compareAB(l, '2026-10-30', '2026-10-30').find(r => r.key === 'weightKg'); assert.ok(same.same);
+});

@@ -285,3 +285,12 @@ button{font:inherit}button,.btn{border:0;cursor:pointer}.file-picker-input{posit
 .bd-cmp{display:block;min-height:14px;font-size:10px;color:#7d8796;margin-top:2px}
 .bd-derived{font-size:11.5px;color:#3f5373;margin-top:8px}.bd-warn{font-size:11px;color:#9a6408;margin-top:6px}
 @media(max-width:800px){.bd-grid{grid-template-columns:1fr 1fr}}
+
+/* ===== v2.4: Analytics › Cơ thể ===== */
+.an-sub button{min-width:84px}
+.bc-title{font-size:13px}.bc-card .an-card-head small .bd-d{font-size:12px}
+.bc-sub{font-size:10.5px;color:#7d8796;margin:10px 0 2px;font-weight:700}
+.bc-ab-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;font-size:11px}.bc-ab-bar input{height:30px;border:1px solid #ced5de;border-radius:6px;padding:0 6px;font-size:11px;margin-left:4px}
+.bc-ab-table td small{color:#8a94a3}.bc-ab-table td:last-child{white-space:nowrap}
+.bc-empty-actions{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.an-two>.an-card{min-width:0}

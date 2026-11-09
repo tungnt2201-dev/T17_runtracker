@@ -10,6 +10,7 @@
 - Fitness UI ở `src/app/fitness-ui.js` (`T17FitnessUI`); thẻ, nút ✎ và ⋮ của bài fitness phải đi qua `T17FitnessUI` (không mở Workout Builder / hộp kết quả chạy bộ). FIT chạy bộ không được ghép vào bài fitness (`isFitnessWorkout`). Mẫu fitness nằm trong `db.templates` (`workoutType: 'Fitness'`) — tab Bài chạy phải lọc ra.
 - Mọi nút / đường nhập file phải cho file đi qua `T17FitnessImportUI.takeFitnessFiles(files)` trước (tách file app fitness → hộp xem trước), phần còn lại mới vào luồng cũ. Logic nhập thuần ở `src/core/fitness-import.js`.
 - Chỉ số cơ thể: logic ở `src/core/body.js`, giao diện `src/app/body-ui.js`; dữ liệu `db.bodyMetrics` (theo người dùng). So sánh luôn THEO TỪNG CHỈ SỐ (`compare`), màu theo ý nghĩa (`assess`) — không tô màu theo lên/xuống. Excel: sheet đầu luôn là lưới tuần (bản cũ chỉ đọc sheet đầu), sheet phụ thêm sau.
+- Analytics › Cơ thể: `src/app/body-charts.js` (vẽ) + `T17Body.chartSeries / headline / compareAB` (tính). Trục x theo NGÀY THẬT (không theo chỉ số điểm); biểu đồ tải tuần dùng chung `axis()` với cân nặng để thẳng hàng. Tiêu đề biểu đồ là câu kết luận có số (`headline`).
 - `instanceId` bài trong buổi T17 = `<sessionId>:<k>` — không đổi quy ước này (app mobile chỉ giữ instanceId).
 - Fitness: logic trong `src/core/fitness.js`; bài fitness có `description` = `summaryText` để bản cũ đọc được; ảnh/hướng dẫn chỉ nằm trong `fitnessLibrary`. Copy/thêm từ mẫu phải cấp `sessionId` mới.
 - Lưu dữ liệu chỉ qua `saveDb()` → `T17Platform.save()`; tham chiếu bài theo `id` (`resolveRef`), không tin chỉ số `wi/di/ii`.

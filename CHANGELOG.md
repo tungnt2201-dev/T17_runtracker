@@ -1,6 +1,18 @@
 # Changelog
 
-## Chưa phát hành — Chỉ số cơ thể, lượt 4 (dữ liệu, nhập, so sánh)
+## 2.4.0 — 2026-11-09 (Chỉ số cơ thể)
+
+Gói: `261109_T17_runtracker_v2.4.0.zip`. Không đổi định dạng dữ liệu so với lượt 4; file của 2.4 vẫn mở được bằng 2.2.0 / 2.3.0 (số đo cơ thể được giữ nguyên).
+
+### Analytics › tab con “Cơ thể” (lượt 5)
+- Nút **Tập luyện / Cơ thể** cạnh bộ chọn khoảng (8 tuần / 12 tuần / 6 tháng / 12 tháng / tất cả).
+- Biểu đồ đường theo **trục thời gian thật** (số đo không đều ngày): cân nặng, % mỡ, khối cơ, vòng eo, nhịp tim nghỉ. Điểm = trung bình các lần đo trong ngày, đường = trung bình 7 ngày, vạch đứt = cân nặng mục tiêu, vòng cam = lần đo có ghi chú. Rê chuột xem giá trị, số lần đo và ghi chú.
+- **Tiêu đề là kết luận có số**, ví dụ “Giảm 1,8 kg trong 8 tuần”, “% mỡ: giảm 1,2 điểm % trong 10 tuần”, “Vòng eo: ổn định quanh 82,3 cm…”, kèm chấm màu theo ý nghĩa.
+- **Tải tập theo tuần (chạy + fitness)** vẽ ngay dưới cân nặng, cùng trục thời gian.
+- **So sánh hai mốc A → B**: chọn hai ngày; bảng cạnh nhau, cột thay đổi có màu theo ý nghĩa; phím tắt *Lần đầu ↔ mới nhất*, *30 ngày trước ↔ mới nhất*. Mỗi chỉ số lấy lần đo gần ngày chọn nhất và ghi rõ ngày đo thực tế nếu khác.
+- Dưới 2 lần đo: hiện hướng dẫn và nút nhập số đo thay vì biểu đồ trống. Biểu đồ co giãn theo khung; cửa sổ ≤ 1200 px chuyển một cột mà chữ không bị phóng to.
+
+### Lượt 4 — dữ liệu, nhập, so sánh
 
 - **Nút 📏 Chỉ số cơ thể** (thanh trái và menu người dùng): thẻ tóm tắt cho từng chỉ số có dữ liệu — giá trị mới nhất, so với **lần trước / 30 ngày / lần đầu** (mũi tên, số tuyệt đối và %). Màu theo **ý nghĩa**: % mỡ, vòng eo, mỡ nội tạng, nhịp tim nghỉ giảm là tốt; khối cơ, khối nạc, % nước tăng là tốt; cân nặng trung tính, trừ khi đặt **Cân nặng mục tiêu** trong Hồ sơ (gần mục tiêu hơn là tốt).
 - **Nhập tại một thời điểm**: ngày giờ mặc định là bây giờ, mọi ô tuỳ chọn (cân nặng, % mỡ, khối cơ, % nước, mỡ nội tạng, khối xương, BMR, vòng eo / hông / ngực / đùi / bắp tay, nhịp tim nghỉ, ghi chú); số thập phân dùng dấu phẩy hoặc chấm; đo nhiều lần trong ngày được. Đang gõ đã thấy “so với lần trước” và BMI (theo chiều cao trong Hồ sơ), khối nạc FFM, tỉ lệ eo/hông. Số ngoài khoảng thường gặp chỉ cảnh báo, không chặn.

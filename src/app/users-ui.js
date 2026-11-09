@@ -35,6 +35,7 @@ function applyRaw(raw) {
   saveDb(); // người dùng mới → tạo file; dữ liệu cũ → nâng schema
   closeOpenModals();
   editingKey = null; builderEditing = null; builderState = null; visibleWeekCount = 6;
+  if (root.T17BodyCharts) root.T17BodyCharts.reset();
   switchView('calendar'); currentWeek = findCurrentWeek(); render(); refreshViews();
   return report;
 }

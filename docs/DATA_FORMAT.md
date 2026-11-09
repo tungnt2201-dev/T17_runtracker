@@ -110,6 +110,7 @@ Mảng `bodyMetrics` ở cấp cao nhất của dữ liệu **mỗi người dù
 - CSV xuất: dấu `;`, số thập phân dấu phẩy, ngày `dd/mm/yyyy`, có BOM; tiêu đề `Ngày; Giờ; Cân nặng (kg); % mỡ (%); …; Ghi chú`. CSV nhập: tự nhận dấu phân cách (`;` `,` tab), tên cột tiếng Anh / tiếng Việt (bỏ dấu, bỏ đơn vị trong ngoặc).
 - Excel: sheet thứ hai `Body`, cùng cột như CSV (ngày `yyyy-mm-dd`, số là số). Sheet đầu vẫn là lưới tuần.
 - Fixture: `body-scale-en.csv` (kiểu file xuất của cân thông minh, giả lập), `body-manual-vi.csv` (ghi tay, tiếng Việt).
+- Lượt 5 (biểu đồ, so sánh A/B) **không đổi dữ liệu**: mốc A/B chỉ nằm trong phiên, không lưu vào file.
 
 ### Vì sao giữ `schemaVersion = 2` và thêm `features`
 

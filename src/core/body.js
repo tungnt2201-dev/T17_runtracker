@@ -245,7 +245,59 @@ function toCsv(list) {
   return '﻿' + rows.map(r => r.map(cell).join(';')).join('\r\n') + '\r\n';
 }
 
-const api = { FIELDS, DERIVED, KEYS, NEAR_DAYS, FIELD_BY_KEY, num, nowLocal, parseDateTime, normTime, normalizeRecord, normalizeList, warnings, derived, valueOf, findRef, compare, assess, latestByField, trend, merge, headerKey, fromAoa, parseCsvRows, parseCsv, toAoa, toCsv, exportHeader, newId };
+/* ================= v2.4 lượt 5: dữ liệu biểu đồ, tiêu đề kết luận, so sánh hai mốc ================= */
+/** Ngưỡng coi là "ổn định" khi viết tiêu đề (chênh nhỏ hơn mức này). */
+const STABLE = { weightKg: 0.3, bodyFatPct: 0.3, muscleKg: 0.2, waistCm: 0.5, hrRest: 1, waterPct: 0.3, visceralFat: 0.5, hipCm: 0.5 };
+/** Ngày bắt đầu khoảng xem: weeks = 0 → từ số đo đầu tiên. */
+function rangeStart(today, weeks, firstDate) {
+  if (!weeks) return firstDate || today;
+  const d = new Date(today + 'T00:00:00Z'); const dow = (d.getUTCDay() + 6) % 7; d.setUTCDate(d.getUTCDate() - dow - 7 * (weeks - 1));
+  return d.toISOString().slice(0, 10);
+}
+/** Chuỗi điểm theo ngày cho biểu đồ trong [from, to]: { date, value (TB trong ngày), count, ma7, notes:[…] }.
+ *  MA7 tính trên TOÀN BỘ lịch sử rồi mới cắt khoảng, nên điểm đầu khoảng vẫn có trung bình đúng. */
+function chartSeries(list, key, opts = {}) {
+  const t = trend(list, key, { profile: opts.profile });
+  const notes = new Map(); for (const r of list || []) if (r.note && valueOf(r, key, opts.profile) != null) { const a = notes.get(r.date) || []; a.push(r.note); notes.set(r.date, a); }
+  return t.points.filter(p => (!opts.from || p.date >= opts.from) && (!opts.to || p.date <= opts.to)).map(p => ({ ...p, notes: notes.get(p.date) || [] }));
+}
+function spanText(days) { return days >= 14 ? `${Math.round(days / 7)} tuần` : `${days} ngày`; }
+/** Tiêu đề một câu kèm số, ví dụ "Giảm 1,8 kg trong 8 tuần". Cân nặng dùng trung bình 7 ngày cho đỡ nhiễu. */
+function headline(key, points, profile) {
+  const f = FIELD_BY_KEY.get(key); if (!f || !points || points.length < 2) return null;
+  const pick = p => key === 'weightKg' ? p.ma7 : p.value;
+  const a = points[0], b = points[points.length - 1], from = pick(a), to = pick(b), delta = round(to - from, f.dec || 1);
+  const days = daysBetween(a.date, b.date); const unit = f.unit === '%' ? ' điểm %' : f.unit === 'mức' ? ' mức' : ` ${f.unit}`;
+  const fmt = v => String(round(Math.abs(v), f.dec || 1)).replace('.', ',');
+  const prefix = key === 'weightKg' ? '' : `${f.label}: `;
+  let text;
+  if (Math.abs(delta) < (STABLE[key] ?? 0.3)) text = `${prefix}${key === 'weightKg' ? 'Ổn định' : 'ổn định'} quanh ${fmt(to)}${f.unit === '%' ? '%' : unit} trong ${spanText(days)} (chênh ${delta >= 0 ? '+' : '−'}${fmt(delta)}${unit})`;
+  else text = `${prefix}${delta < 0 ? (key === 'weightKg' ? 'Giảm' : 'giảm') : (key === 'weightKg' ? 'Tăng' : 'tăng')} ${fmt(delta)}${unit} trong ${spanText(days)}`;
+  return { text, delta, from, to, days, assess: Math.abs(delta) < (STABLE[key] ?? 0.3) ? 'neutral' : assess(key, from, to, profile) };
+}
+/** Giá trị tại một ngày: bản CÓ chỉ số đó gần ngày nhất (cả trước lẫn sau). → { value, date, time, offsetDays, near } | null */
+function valueAt(list, key, date, profile) {
+  let best = null, bd = Infinity;
+  for (const r of list || []) { const v = valueOf(r, key, profile); if (v == null) continue; const d = Math.abs(daysBetween(date, r.date)); if (d < bd || (d === bd && r.date <= date && stamp(r) > stamp(best || { date: '', time: '' }))) { best = r; bd = d; } }
+  return best ? { value: valueOf(best, key, profile), date: best.date, time: best.time || '', offsetDays: daysBetween(date, best.date), near: bd <= NEAR_DAYS } : null;
+}
+/** So sánh hai mốc A → B, từng chỉ số có ở cả hai. → [{ key, label, unit, dec, a, b, delta, pct, assess }] */
+function compareAB(list, dateA, dateB, profile) {
+  const out = [];
+  for (const f of [...FIELDS, ...DERIVED]) {
+    const a = valueAt(list, f.key, dateA, profile), b = valueAt(list, f.key, dateB, profile); if (!a || !b) continue;
+    const delta = round(b.value - a.value, (f.dec || 0) + 1);
+    out.push({ key: f.key, label: f.label, unit: f.unit, dec: f.dec, a, b, same: a.date === b.date && a.time === b.time, delta, pct: a.value ? round((b.value - a.value) / a.value * 100, 1) : null, assess: assess(f.key, a.value, b.value, profile) });
+  }
+  return out;
+}
+/** Phím tắt mốc: 'first' (lần đầu ↔ mới nhất), 'd30' (30 ngày trước ↔ mới nhất). */
+function abPreset(list, kind) {
+  const l = list || []; if (!l.length) return null; const last = l[l.length - 1].date;
+  return kind === 'first' ? { a: l[0].date, b: last } : { a: addDaysYmd(last, -30), b: last };
+}
+
+const api = { FIELDS, DERIVED, KEYS, NEAR_DAYS, FIELD_BY_KEY, num, nowLocal, parseDateTime, normTime, normalizeRecord, normalizeList, warnings, derived, valueOf, findRef, compare, assess, latestByField, trend, merge, headerKey, fromAoa, parseCsvRows, parseCsv, toAoa, toCsv, exportHeader, newId, STABLE, rangeStart, chartSeries, headline, valueAt, compareAB, abPreset, daysBetween };
 root.T17Body = api;
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

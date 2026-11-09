@@ -7,6 +7,7 @@ const COLORS = { ctl: '#2a78d6', atl: '#eb6834', load: '#b9c3d0', plan: '#c9d0da
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const r0 = v => Math.round(v), r1 = v => Math.round(v * 10) / 10;
 let weeksShown = 12;
+let subTab = 'training'; // 'training' | 'body' (v2.4: tab con Cơ thể — app/body-charts.js)
 
 function fmtD(s) { return s ? `${s.slice(8, 10)}/${s.slice(5, 7)}` : ''; }
 function fmtDur(min) { min = Math.round(min || 0); const h = Math.floor(min / 60), m = min % 60; return h ? `${h}h${String(m).padStart(2, '0')}` : `${m}′`; }
@@ -87,6 +88,8 @@ function render() {
   const today = C.ymd(new Date());
   const rows = LD.collect(db, prof);
   document.querySelectorAll('#anRange [data-weeks]').forEach(b => b.classList.toggle('active', +b.dataset.weeks === weeksShown));
+  document.querySelectorAll('#anSub [data-sub]').forEach(b => b.classList.toggle('active', b.dataset.sub === subTab));
+  if (subTab === 'body') return root.T17BodyCharts.render(host, { weeksShown, chartW });
   if (!rows.some(r => r.done)) { host.innerHTML = `<div class="an-empty big">Chưa có buổi chạy nào có kết quả. Hãy nhập kết quả hoặc Import FIT để xem phân tích.</div>`; return; }
 
   const firstDate = rows[0].date;
@@ -157,7 +160,8 @@ let resizeT = null;
 function init() {
   window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { const v = document.getElementById('analyticsView'); if (v && v.style.display !== 'none') render(); }, 150); });
   document.querySelectorAll('#anRange [data-weeks]').forEach(b => b.onclick = () => { weeksShown = +b.dataset.weeks; render(); });
+  document.querySelectorAll('#anSub [data-sub]').forEach(b => b.onclick = () => { subTab = b.dataset.sub; render(); });
   const pb = document.getElementById('anProfileBtn'); if (pb) pb.onclick = () => root.T17Profile.open();
 }
-root.T17Analytics = { render, init };
+root.T17Analytics = { render, init, setSubTab: t => { subTab = t === 'body' ? 'body' : 'training'; render(); } };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
