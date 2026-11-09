@@ -17,6 +17,7 @@ const VERSION = pkg.version;
 const MODULES = [
   'src/core/utils.js',
   'src/core/fitness.js',
+  'src/core/body.js',
   'src/core/legacy.js',
   'src/core/fitness-import.js',
   'src/core/users.js',
@@ -34,6 +35,7 @@ const MODULES = [
   'src/app/profile.js',
   'src/app/fitness-ui.js',
   'src/app/fitness-import-ui.js',
+  'src/app/body-ui.js',
   'src/app/users-ui.js',
 ];
 

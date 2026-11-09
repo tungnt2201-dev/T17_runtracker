@@ -66,7 +66,7 @@ const backupPrefixFor = id => id === MAIN_ID ? 't17-runtracker' : id;
 const lsKeyFor = (id, base = 'runplan-tracker-v1') => id === MAIN_ID ? base : `${base}:${id}`;
 
 // ---- Hồ sơ cá nhân ----
-const PERSONAL_FIELDS = ['fullName', 'nickname', 'birthDate', 'heightCm', 'email', 'phone', 'city', 'club', 'goal', 'emergencyName', 'emergencyPhone', 'notes'];
+const PERSONAL_FIELDS = ['fullName', 'nickname', 'birthDate', 'heightCm', 'weightGoalKg', 'email', 'phone', 'city', 'club', 'goal', 'emergencyName', 'emergencyPhone', 'notes'];
 const MAX_LEN = { fullName: 80, nickname: 30, email: 120, phone: 30, city: 80, club: 80, goal: 300, emergencyName: 80, emergencyPhone: 30, notes: 1000 };
 
 function validBirthDate(s) { return /^\d{4}-\d{2}-\d{2}$/.test(s || '') && !Number.isNaN(Date.parse(s)) && new Date(s).toISOString().slice(0, 10) === s; }
@@ -92,6 +92,7 @@ function mergePersonal(profile, personal) {
     let v = String(personal[k] ?? '').trim();
     if (k === 'birthDate' && v && !validBirthDate(v)) v = '';
     if (k === 'heightCm') { const n = Number(v.replace(',', '.')); v = n >= 100 && n <= 250 ? String(Math.round(n * 10) / 10) : ''; }
+    if (k === 'weightGoalKg') { const n = Number(v.replace(',', '.')); v = v && n >= 20 && n <= 250 ? String(Math.round(n * 10) / 10) : ''; }
     if (MAX_LEN[k]) v = v.slice(0, MAX_LEN[k]);
     out[k] = v;
   }

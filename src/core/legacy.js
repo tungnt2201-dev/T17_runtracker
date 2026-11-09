@@ -9,6 +9,7 @@
  *   - weeks   : [ {label, days:[...]} ]                               (mảng tuần trần)
  *   - chuỗi JSON lồng (localStorage dump bị stringify 2 lần), có BOM, ...
  *   Phần mở rộng fitness (v2.3): workout.fitness, actual.fitness, db.fitnessLibrary, db.features — xem core/fitness.js.
+ *   Chỉ số cơ thể (v2.4): db.bodyMetrics — xem core/body.js.
  *
  * Pure: không đụng DOM/localStorage. Dùng được trong app (globalThis.T17Legacy) và Node test.
  */
@@ -17,12 +18,13 @@
 const C = root.T17Core || (typeof require === 'function' ? require('./utils.js') : null);
 const { DAYS, cleanDescription, genId, hasWorkoutContent, isYmd, excelYmd, parseDurationInput, mondayYmd, addDaysYmd, isoWeekNumber, blankDay, samePlanRecord, deepClone } = C;
 const F = root.T17Fitness || (typeof require === 'function' ? require('./fitness.js') : null);
+const B = root.T17Body || (typeof require === 'function' ? require('./body.js') : null);
 
 const APP_ID = 'T17_runtracker';
 // Giữ 2: bản v2.2.0 trở về trước tự ghi đè schemaVersion về 2 khi lưu, nên số này không còn là tín hiệu tin cậy.
 // Phần mở rộng (cộng thêm, tuỳ chọn) được đánh dấu bằng `features` — bản cũ giữ nguyên field này. Xem docs/DATA_FORMAT.md.
 const SCHEMA_VERSION = 2;
-const FEATURES = { fitness: 1 };
+const FEATURES = { fitness: 1, body: 1 };
 const LEGACY_STORAGE_KEY = 'runplan-tracker-v1';
 const DAY_LEVEL_FIELDS = ['workoutName', 'workoutType', 'planKm', 'planMinutes', 'description', 'planNote', 'workoutStructure', 'actual'];
 
@@ -182,6 +184,7 @@ function normalizeDb(input, opts = {}) {
   const db = { ...rest, app: APP_ID, schemaVersion: SCHEMA_VERSION, weeks, templates, templatesSeeded: !!x.templatesSeeded };
   if (orphans.length) db.orphans = orphans;
   if ('fitnessLibrary' in rest) db.fitnessLibrary = F.normalizeLibrary(rest.fitnessLibrary);
+  if ('bodyMetrics' in rest) db.bodyMetrics = B.normalizeList(rest.bodyMetrics); // v2.4 chỉ số cơ thể
   const features = featuresOf(db);
   if (features) db.features = features; else if (db.features && !Object.keys(db.features).length) delete db.features;
   delete db.exportedAt;
@@ -193,6 +196,7 @@ function featuresOf(db) {
   const out = db.features && typeof db.features === 'object' && !Array.isArray(db.features) ? { ...db.features } : {};
   const hasFitness = 'fitnessLibrary' in db || (db.weeks || []).some(w => (w.days || []).some(d => (d.workouts || []).some(F.isFitnessWorkout)));
   if (hasFitness) out.fitness = Math.max(+out.fitness || 0, FEATURES.fitness);
+  if (Array.isArray(db.bodyMetrics) && db.bodyMetrics.length) out.body = Math.max(+out.body || 0, FEATURES.body);
   return Object.keys(out).length ? out : null;
 }
 

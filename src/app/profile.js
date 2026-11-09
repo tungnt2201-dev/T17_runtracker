@@ -4,7 +4,7 @@
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-const PERSONAL_IDS = { fullName: 'pfFullName', nickname: 'pfNickname', birthDate: 'pfBirth', heightCm: 'pfHeight', email: 'pfEmail', phone: 'pfPhone', city: 'pfCity', club: 'pfClub', emergencyName: 'pfEmName', emergencyPhone: 'pfEmPhone', goal: 'pfGoal', notes: 'pfNotes' };
+const PERSONAL_IDS = { fullName: 'pfFullName', nickname: 'pfNickname', birthDate: 'pfBirth', heightCm: 'pfHeight', weightGoalKg: 'pfWeightGoal', email: 'pfEmail', phone: 'pfPhone', city: 'pfCity', club: 'pfClub', emergencyName: 'pfEmName', emergencyPhone: 'pfEmPhone', goal: 'pfGoal', notes: 'pfNotes' };
 function readPersonal() { const o = {}; for (const [k, id] of Object.entries(PERSONAL_IDS)) o[k] = $(id).value; return o; }
 function readForm() {
   return { sex: $('pfSex').value, hrRest: $('pfHrRest').value.trim(), hrMax: $('pfHrMax').value.trim(), lthr: $('pfLthr').value.trim(), thresholdPace: $('pfPace').value.trim(), weightKg: $('pfWeight').value.trim() };

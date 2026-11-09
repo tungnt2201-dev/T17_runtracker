@@ -35,11 +35,14 @@ function readFileText(file){return new Promise((resolve,reject)=>{const fr=new F
 function addWorkoutFromRecord(dst,src){dst.workouts=dst.workouts||[];const rec={id:genId(),...T17Legacy.planRecord(src),actual:null};if(rec.fitness)rec.fitness=T17Fitness.withNewSessionId(rec.fitness);dst.workouts.push(rec)}
 async function importExcel(file){
  if(!file)return;if(!/\.xlsx$/i.test(file.name))throw new Error('Bản này hỗ trợ file .xlsx. Nếu đang dùng .xls, hãy Save As thành .xlsx trước.');if(!window.RunPlanXLSX)throw new Error('Bộ đọc Excel nội bộ chưa tải được.');
- const data=await readFileArrayBuffer(file);const rows=await RunPlanXLSX.readFirstSheet(data);const imported=parseWorkbookRows(rows);
+ const data=await readFileArrayBuffer(file);const rows=await RunPlanXLSX.readFirstSheet(data);
+ // v2.4: sheet Body (chỉ số cơ thể) — Excel cũ không có sheet này vẫn nạp như trước
+ let bodyRes=null;try{const wb=await RunPlanXLSX.readSheets(data);const bs=wb.sheets.get('Body');if(bs){const parsed=T17Body.fromAoa(bs,{source:'excel'});if(parsed.records.length){const m=T17Body.merge(db.bodyMetrics||[],parsed.records);db.bodyMetrics=m.list;bodyRes=m}}}catch(e){console.warn('Body sheet',e)}
+ let imported;try{imported=parseWorkbookRows(rows)}catch(err){if(bodyRes){saveDb();T17BodyUI.renderAll();return toast(`Chỉ số cơ thể: thêm ${bodyRes.added}${bodyRes.duplicates?` · trùng ${bodyRes.duplicates}`:''}`)}throw err}
  let added=0,duplicates=0,invalid=0;
  for(const w of imported){for(const src of w.days){if(!src.date){invalid++;continue}if(!hasWorkoutContent(src))continue;const target=ensureDate(src.date),dst=target.d;const dup=(dst.workouts||[]).some(it=>samePlanRecord(it,src));if(dup){duplicates++;continue}addWorkoutFromRecord(dst,src);added++}}
  db.weeks.sort((a,b)=>String(a.days?.[0]?.date||'').localeCompare(String(b.days?.[0]?.date||'')));saveDb();currentWeek=findCurrentWeek();visibleWeekCount=Math.max(6,visibleWeekCount);render();
- toast(`Đã thêm ${added} bài mới${duplicates?` · ${duplicates} bài trùng được bỏ qua`:''}${invalid?` · ${invalid} dòng thiếu ngày`:''}`);
+ toast(`Đã thêm ${added} bài mới${duplicates?` · ${duplicates} bài trùng được bỏ qua`:''}${invalid?` · ${invalid} dòng thiếu ngày`:''}${bodyRes?` · chỉ số cơ thể: thêm ${bodyRes.added}${bodyRes.duplicates?`, trùng ${bodyRes.duplicates}`:''}`:''}`);
 }
 function findCurrentWeek(){const today=ymd(new Date());let idx=db.weeks.findIndex(w=>w.days.some(d=>d.date===today));if(idx>=0)return idx;idx=db.weeks.findIndex(w=>w.days.some(d=>d.date>=today));return idx>=0?idx:Math.max(0,db.weeks.length-1)}
 function hasPlan(d){return Array.isArray(d.workouts)&&d.workouts.length>0}
@@ -482,7 +485,8 @@ async function exportExcel(){const EXPORT_TITLE='Xuất Excel';
  const range=await T17UI.uiDateRange({title:EXPORT_TITLE});if(!range)return;const {from,to}=range;
  const inRange=d=>d.date&&(!from||d.date>=from)&&(!to||d.date<=to);
  const weeks=db.weeks.filter(w=>w.days.some(d=>inRange(d)&&(d.workouts||[]).length>0));
- if(!weeks.length)return toast('Không có dữ liệu trong khoảng ngày đã chọn');
+ const body=T17Body.normalizeList(db.bodyMetrics||[]).filter(r=>(!from||r.date>=from)&&(!to||r.date<=to));// v2.4: sheet Body
+ if(!weeks.length&&!body.length)return toast('Không có dữ liệu trong khoảng ngày đã chọn');
  const aoa=[['Tuần \\ Thứ',...DAYS]];
  const blocks=[],fitEntries=[];
  // v2.0: ngày có nhiều bài → thêm khối "Tuần N - bài k". Import Excel đọc lại được đủ các bài.
@@ -510,7 +514,7 @@ async function exportExcel(){const EXPORT_TITLE='Xuất Excel';
    if(bi<blocks.length-1)aoa.push([]);
  });
  const fitAoa=T17ExcelPlan.fitnessSectionAoa(fitEntries);if(fitAoa.length)aoa.push([],...fitAoa);// v2.3: khối chi tiết fitness (bản cũ bỏ qua)
- const blob=RunPlanXLSX.buildXlsxBlob(aoa,'Run tracker');
+ const blob=body.length?RunPlanXLSX.buildXlsxBlobMulti([{name:'Run tracker',aoa},{name:'Body',aoa:T17Body.toAoa(body)}]):RunPlanXLSX.buildXlsxBlob(aoa,'Run tracker');
  saveBlob(blob,`T17_RunTracker_${from||'start'}_${to||'end'}.xlsx`);
  if(!T17Platform.isDesktop)toast('Đã tạo file Excel (đủ mọi bài trong ngày)');
 }
@@ -737,7 +741,7 @@ async function boot(){
  // Lần đầu (hoặc dữ liệu được nâng cấp từ định dạng cũ) → ghi lại theo schema mới.
  if(raw&&(!raw.schemaVersion||raw.schemaVersion<T17Legacy.SCHEMA_VERSION||report.legacyDaysConverted||report.weeksRealigned||report.idsFixed))saveDb();
  else if(!raw)saveDb();
- T17Analytics.init();T17Profile.init();T17FitnessUI.init();T17UserUI.init();T17UserUI.syncName();
+ T17Analytics.init();T17Profile.init();T17FitnessUI.init();T17BodyUI.init();T17UserUI.init();T17UserUI.syncName();
  currentWeek=findCurrentWeek();render();initEnvironment();
  booted=true;if(warnings.length)showSupport('warn',warnings.join(' '));
  if(loadError)showSupport('bad','Không mở được kho dữ liệu: '+loadError+'. Dữ liệu tạm thời chỉ nằm trong phiên này — hãy Sao lưu JSON.');

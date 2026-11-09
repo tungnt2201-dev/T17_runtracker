@@ -1,5 +1,16 @@
 # Changelog
 
+## Chưa phát hành — Chỉ số cơ thể, lượt 4 (dữ liệu, nhập, so sánh)
+
+- **Nút 📏 Chỉ số cơ thể** (thanh trái và menu người dùng): thẻ tóm tắt cho từng chỉ số có dữ liệu — giá trị mới nhất, so với **lần trước / 30 ngày / lần đầu** (mũi tên, số tuyệt đối và %). Màu theo **ý nghĩa**: % mỡ, vòng eo, mỡ nội tạng, nhịp tim nghỉ giảm là tốt; khối cơ, khối nạc, % nước tăng là tốt; cân nặng trung tính, trừ khi đặt **Cân nặng mục tiêu** trong Hồ sơ (gần mục tiêu hơn là tốt).
+- **Nhập tại một thời điểm**: ngày giờ mặc định là bây giờ, mọi ô tuỳ chọn (cân nặng, % mỡ, khối cơ, % nước, mỡ nội tạng, khối xương, BMR, vòng eo / hông / ngực / đùi / bắp tay, nhịp tim nghỉ, ghi chú); số thập phân dùng dấu phẩy hoặc chấm; đo nhiều lần trong ngày được. Đang gõ đã thấy “so với lần trước” và BMI (theo chiều cao trong Hồ sơ), khối nạc FFM, tỉ lệ eo/hông. Số ngoài khoảng thường gặp chỉ cảnh báo, không chặn.
+- So sánh **theo từng chỉ số**: mốc là lần gần nhất có đúng chỉ số đó (cân thông minh và thước dây thường đo khác ngày). Mốc 30 ngày lấy lần đo trong ±3 ngày; không có thì dùng lần gần nhất và ghi rõ lệch bao nhiêu ngày. Xu hướng cân nặng: trung bình 7 ngày và độ dốc kg/tuần (28 ngày gần nhất).
+- **Bảng lịch sử**: sửa, xoá, lọc theo khoảng ngày.
+- **Đồng bộ cân nặng**: lưu cân nặng mới nhất thì hỏi có cập nhật cân nặng trong Hồ sơ không; chọn “luôn” hoặc “không bao giờ” thì app nhớ.
+- **CSV**: nhập từ cân thông minh — cột tiếng Anh hoặc tiếng Việt tự nhận, số `1,5` và `1.5`, ngày `dd/mm/yyyy`, `yyyy-mm-dd`, có giờ hoặc không; xuất CSV cho Excel tiếng Việt. Gộp không nhân đôi (khoá ngày + giờ; trùng khoá thì chỉ điền ô còn thiếu, giữ giá trị đang có).
+- **Excel**: xuất có thêm sheet `Body` (sheet đầu vẫn là lịch, bản cũ đọc như trước); *Import Excel* đọc lại sheet này; Excel cũ không có sheet `Body` nạp bình thường.
+- Số đo nằm trong file sao lưu (`bodyMetrics`) và riêng cho từng người dùng.
+
 ## 2.3.0 — 2026-11-09 (Fitness)
 
 Gói: `261109_T17_runtracker_v2.3.0.zip`. Dữ liệu cũ (RunPlan, T17 2.0–2.2, nhiều người dùng) mở được nguyên vẹn; file của bản 2.3 vẫn mở được bằng bản 2.2.0 (có test so với mã nguyên văn của 2.2.0).

@@ -91,6 +91,26 @@ Logic: `src/core/fitness.js` (`T17Fitness`), chuẩn hoá trong `src/core/legacy
 - Bản sao trước khi gộp (exe): `data/backups/<tiền tố người dùng>-truoc-nhap-fitness-YYYYMMDD-HHMMSS.json`, không trùng mẫu tên bản sao theo ngày nên không ảnh hưởng tự phục hồi.
 - Fixture: `fitness-mobile-v2.json` (định dạng v2 giả lập theo mã app: chưa có cột thời gian / templateId / workoutNote), `fitness-mobile-midnight.json`, `fitness-mobile-unknown-exercises.json`, `fitness-mobile-broken.json`.
 
+## Chỉ số cơ thể (v2.4, lượt 4)
+
+Mảng `bodyMetrics` ở cấp cao nhất của dữ liệu **mỗi người dùng** (chỉ có khi đã nhập). Logic: `src/core/body.js` (`T17Body`).
+
+```jsonc
+"bodyMetrics": [
+  { "id": "bm-…", "date": "2026-11-09", "time": "06:30",          // time có thể ""; ngày giờ theo giờ địa phương
+    "weightKg": 69.8, "bodyFatPct": 19, "muscleKg": 31.4, "waterPct": 55.6, "visceralFat": 7, "boneKg": 3,
+    "bmrKcal": 1604, "waistCm": 84, "hipCm": 96, "chestCm": 95, "thighCm": 55, "armCm": 31, "hrRest": 52,
+    "note": "…", "source": "manual|csv|excel" }               // mọi số đo đều tuỳ chọn; field lạ được giữ
+]
+```
+
+- Bản ghi không có ngày, hoặc không có số đo / ghi chú nào, bị bỏ khi chuẩn hoá. Số dạng chuỗi `"68,4"` → `68.4`.
+- Hồ sơ (`profile`) thêm `weightGoalKg` (cân nặng mục tiêu, tuỳ chọn) và `bodyWeightSync` (`"always"` / `"never"` — nhớ lựa chọn đồng bộ cân nặng).
+- `features.body = 1` khi `bodyMetrics` có ít nhất một bản ghi. Bản v2.2.0 giữ nguyên `bodyMetrics` khi nạp / lưu / sao lưu (có test).
+- CSV xuất: dấu `;`, số thập phân dấu phẩy, ngày `dd/mm/yyyy`, có BOM; tiêu đề `Ngày; Giờ; Cân nặng (kg); % mỡ (%); …; Ghi chú`. CSV nhập: tự nhận dấu phân cách (`;` `,` tab), tên cột tiếng Anh / tiếng Việt (bỏ dấu, bỏ đơn vị trong ngoặc).
+- Excel: sheet thứ hai `Body`, cùng cột như CSV (ngày `yyyy-mm-dd`, số là số). Sheet đầu vẫn là lưới tuần.
+- Fixture: `body-scale-en.csv` (kiểu file xuất của cân thông minh, giả lập), `body-manual-vi.csv` (ghi tay, tiếng Việt).
+
 ### Vì sao giữ `schemaVersion = 2` và thêm `features`
 
 Đã thử bằng `git worktree` của tag `v2.2.0` (chạy cả lõi lẫn app hoàn chỉnh trong jsdom) và RunPlan v1.8.9:

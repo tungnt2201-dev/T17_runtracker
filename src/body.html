@@ -10,6 +10,7 @@
         <div class="user-menu-sep"></div>
         <button type="button" id="userAddBtn">＋ Thêm người dùng</button>
         <button type="button" id="userProfileBtn">♥ Hồ sơ của người dùng này</button>
+        <button type="button" id="userBodyBtn">📏 Chỉ số cơ thể</button>
         <button type="button" id="userDeleteBtn" class="danger">⌫ Xoá người dùng này…</button>
       </div>
     </div>
@@ -53,6 +54,7 @@
     <button class="rail-btn" id="railLibrary" type="button">📚<span>Thư viện bài tập</span></button>
     <button class="rail-btn" id="railData" type="button">⇅<span>Import / Export / Dữ liệu</span></button>
     <button class="rail-btn" id="railProfile" type="button">♥<span>Hồ sơ người dùng · vùng tập</span></button>
+    <button class="rail-btn" id="railBody" type="button">📏<span>Chỉ số cơ thể</span></button>
     <div class="rail-bottom"><button class="rail-btn" id="railClear" type="button">⌫<span>Xóa dữ liệu</span></button></div>
   </aside>
   <main class="calendar-wrap" id="calendarWrap">
@@ -263,6 +265,7 @@
         <div class="field"><label>Ngày sinh</label><input id="pfBirth" type="date" /><small class="time-input-hint" id="pfAge"></small></div>
         <div class="field"><label>Giới tính (hệ số TRIMP)</label><select id="pfSex"><option value="male">Nam</option><option value="female">Nữ</option></select></div>
         <div class="field"><label>Chiều cao (cm)</label><input id="pfHeight" type="number" min="100" max="250" step="0.5" inputmode="decimal" /></div>
+        <div class="field"><label>Cân nặng mục tiêu (kg)</label><input id="pfWeightGoal" type="number" min="20" max="250" step="0.1" inputmode="decimal" placeholder="để màu so sánh cân nặng" /></div>
         <div class="field"><label>Cân nặng (kg)</label><input id="pfWeight" type="number" min="30" max="200" step="0.1" inputmode="decimal" /><small class="time-input-hint" id="pfBmi"></small></div>
         <div class="field"><label>Email</label><input id="pfEmail" type="email" maxlength="120" autocomplete="off" /></div>
         <div class="field"><label>Điện thoại</label><input id="pfPhone" type="text" maxlength="30" autocomplete="off" /></div>
@@ -284,6 +287,20 @@
       <div class="pf-zones"><div><h3>Vùng nhịp tim</h3><div id="pfHrZones"></div></div><div><h3>Vùng pace</h3><div id="pfPaceZones"></div></div></div>
       <div class="sheetactions"><button type="button" id="pfCancel">Đóng</button><button type="submit" class="primary">Lưu hồ sơ</button></div>
     </form>
+  </div>
+</div>
+
+<div class="modal" id="bodyModal">
+  <div class="sheet body-sheet">
+    <div class="sheet-head"><h2 id="bdTitle">Chỉ số cơ thể</h2><div class="meta">Nhập số đo tại từng thời điểm (mọi ô đều tuỳ chọn). App so sánh với lần trước, 30 ngày trước và lần đầu — màu theo ý nghĩa: xanh là tốt, đỏ là xấu, xám là trung tính.</div></div>
+    <div class="sheet-body">
+      <div class="bd-toolbar"><button type="button" class="primary" id="bdAdd">＋ Nhập số đo</button><button type="button" id="bdImportCsv">⇧ Nhập CSV (cân thông minh)</button><button type="button" id="bdExportCsv">⇩ Xuất CSV</button><span class="push"></span><label>Từ <input type="date" id="bdFrom" /></label><label>Đến <input type="date" id="bdTo" /></label><button type="button" id="bdClearFilter">Tất cả</button></div>
+      <div id="bdSummary" class="bd-summary"></div>
+      <div id="bdTrend" class="bd-trend"></div>
+      <div class="bd-table-wrap"><table class="an-table bd-table" id="bdTable"></table></div>
+      <input type="file" id="bdCsvFile" class="file-picker-input" accept=".csv,.txt,text/csv,text/plain" />
+      <div class="sheetactions"><button type="button" id="bdClose">Đóng</button></div>
+    </div>
   </div>
 </div>
 
