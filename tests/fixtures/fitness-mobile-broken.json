@@ -1,0 +1,18 @@
+{
+  "version": 3,
+  "library": [
+    {
+      "id": "good-morning",
+      "builtin": true,
+      "name": "Good Morning with Barbell",
+      "category": "Posterior chain",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Đặt barbell chắc trên phần cơ thang/upper back, đứng vững và gối hơi chùng. Đẩy hông ra sau như hip hinge, giữ cột sống trung tính rồi siết mông để trở về tư thế đứng.",
+      "caution": "Giữ thanh tạ ổn định trên lưng trên; không đặt tạ lên cổ, không cúi bằng lưng và không cố hạ quá sâu khi lưng bắt đầu cong.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "1-12",
+          "reps": "12",
+          "time": "",
+          "weight

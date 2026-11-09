@@ -376,7 +376,9 @@ async function fitHandleSelection(files){
  if(!files?.length)return;
  // Preserve the existing inspect / choose / overwrite flow for a single FIT.
  // When a ZIP contains multiple FIT entries, switch to automatic batch mode.
- const list=Array.from(files);
+ // v2.3: file của app fitness (JSON / Excel / ZIP chứa chúng) chọn chung ở đây → nhập fitness; FIT đi tiếp như cũ.
+ const list=await T17FitnessImportUI.takeFitnessFiles(Array.from(files));
+ if(!list.length)return;
  if(list.length===1&&!/\.zip$/i.test(list[0].name))return fitReadUpload(list[0]);
  const {good,bad}=await fitDecodeEntries(list);
  if(list.length===1&&good.length===1&&!bad.length&&/\.zip$/i.test(list[0].name))return fitReadUpload(list[0]);

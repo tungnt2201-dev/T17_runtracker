@@ -12,6 +12,7 @@ Mỗi phiên bản phát hành là một file nén **`yymmdd_T17_runtracker_vX.Y
 chứa cả hai bản trên, `HUONG_DAN.txt`, `CHANGELOG.md` và **Hướng dẫn sử dụng** (Word, có ảnh minh hoạ từng bước — cũng có tại [`docs/Huong_dan_su_dung_T17_RunTracker.docx`](docs/Huong_dan_su_dung_T17_RunTracker.docx)).
 
 **Nhiều người dùng** (từ v2.2): mỗi người có lịch tập, kết quả và hồ sơ cá nhân riêng; chuyển qua lại bằng nút ở góc phải thanh trên.
+**Fitness** (từ v2.3): thư viện bài tập (kèm ảnh) và mẫu buổi, giao bài vào lịch, nhập kết quả, điểm tải RPE × phút; trao đổi file hai chiều với app điện thoại *T17 Run Training* (gửi buổi đã giao sang điện thoại, nhập buổi đã tập về — tự nhận diện, có xem trước, không nhân đôi).
 Không cần tài khoản, không gửi dữ liệu đi đâu. File Garmin FIT được đọc ngay trên máy.
 
 ## Tải về & chạy
@@ -34,6 +35,7 @@ Mọi file JSON đời cũ đều đọc được (chi tiết: [docs/DATA_FORMAT
 - **Xuất bài tập (JSON)** (`format: runplan-plan`) → *Dữ liệu ▾ → Nhập bài tập / Training Log*: gộp thêm, bỏ qua bài trùng.
 - **Training Log → Xuất JSON** (`format: runplan-log`) → cùng nút trên: gộp cả **kết quả thực tế**.
 - File Excel `.xlsx` theo mẫu cũ → *Import Excel*.
+- File JSON / Excel / ZIP xuất từ app điện thoại *T17 Run Training* → bất kỳ nút nhập nào (*Nhập bài tập*, *Import FIT*, *Import Excel*) — app tự nhận ra và mở hộp xem trước.
 
 Cách nhanh nhất: mở RunPlan v1.8.9 cũ → *Sao lưu toàn bộ (JSON)* → mở T17 RunTracker → *Khôi phục toàn bộ* chọn file đó.
 Bản sao lưu của T17 vẫn giữ mảng `weeks` ở cấp cao nhất nên **RunPlan cũ cũng khôi phục được** (đi ngược phiên bản không mất dữ liệu).
@@ -49,7 +51,7 @@ Bản sao lưu của T17 vẫn giữ mảng `weeks` ở cấp cao nhất nên **
 
 ```bash
 npm install
-npm test              # build + 75 test (FIT decoder, dữ liệu cũ, Excel, chạy thử app trong jsdom)
+npm test              # build + 89 test (FIT decoder, dữ liệu cũ, Excel, chạy thử app trong jsdom)
 npm run build         # dist/web/T17_runtracker.html + resources/ cho Neutralino
 npm run dev           # chạy cửa sổ desktop (neu run) để thử
 npm run exe           # tải Neutralino 6.10 + đóng gói release/yymmdd_T17_runtracker_vX.Y.Z.zip
@@ -59,12 +61,12 @@ Cấu trúc:
 
 ```
 src/
-  core/        utils.js (thời gian, pace, cấu trúc bài) · legacy.js (đọc mọi định dạng JSON cũ) · users.js (nhiều người dùng, hồ sơ cá nhân) · fitness.js (dữ liệu fitness, đọc file app mobile) · excel-plan.js
+  core/        utils.js (thời gian, pace, cấu trúc bài) · legacy.js (đọc mọi định dạng JSON cũ) · users.js (nhiều người dùng, hồ sơ cá nhân) · fitness.js (dữ liệu fitness) · fitness-import.js (nhập file app mobile) · excel-plan.js
                athlete.js (hồ sơ VĐV, vùng HR/pace) · load.js (điểm tải, CTL/ATL/TSB) · fit-workout.js (xuất Workout FIT)
   lib/         xlsx.js (đọc/ghi .xlsx không cần thư viện) · fit-decoder.js (Garmin FIT)
   platform/    platform.js (lưu file cạnh exe / localStorage, Save As, sao lưu tự động)
   app/         app.js (lịch, builder, thư viện, nhập kết quả, log) · fit-ui.js (nhập FIT)
-               analytics.js (tab Analytics) · profile.js (hồ sơ) · users-ui.js (chuyển người dùng) · fitness-ui.js (thư viện, giao bài, kết quả fitness) · dialogs.js (hộp thoại trong app)
+               analytics.js (tab Analytics) · profile.js (hồ sơ) · users-ui.js (chuyển người dùng) · fitness-ui.js (thư viện, giao bài, kết quả fitness) · fitness-import-ui.js (hộp nhập file app mobile) · dialogs.js (hộp thoại trong app)
   styles/      app.css
   body.html, index.template.html
 scripts/       build.mjs · check-syntax.mjs · package-win.mjs

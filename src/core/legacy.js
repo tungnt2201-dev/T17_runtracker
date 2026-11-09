@@ -46,6 +46,7 @@ function detectKind(x) {
   if (x.data && typeof x.data === 'object' && Array.isArray(x.data.weeks)) return 'backup-wrapped';
   if (Array.isArray(x.days) && x.days.some(d => d && (d.workouts || d.workoutName))) return 'plan';
   if (Array.isArray(x.entries)) return 'log';
+  if (F && F.mobileKind(x)) return 'fitness-session'; // file của app mobile T17 Run Training (v1/v2/v3)
   return 'unknown';
 }
 

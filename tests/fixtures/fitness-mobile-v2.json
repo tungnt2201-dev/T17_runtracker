@@ -1,0 +1,65 @@
+{
+  "version": 2,
+  "library": [
+    {
+      "id": "custom-banded-walk",
+      "builtin": false,
+      "name": "Banded Lateral Walk",
+      "category": "Glute med",
+      "plan": "2 x 15 bước mỗi bên",
+      "cue": "Dây quanh gối, đi ngang.",
+      "caution": "Giữ gối hướng mũi chân.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi bên",
+          "reps": "15",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    }
+  ],
+  "session": {
+    "workoutName": "Run Basic 1",
+    "date": "2026-11-03",
+    "calories": "230",
+    "duration": "40",
+    "rpe": "6",
+    "sessionNote": "v2 cũ",
+    "exercises": [
+      {
+        "instanceId": "ex-v2-1",
+        "libraryId": "good-morning",
+        "name": "Good Morning with Barbell",
+        "done": true,
+        "rows": [
+          {
+            "set": "1",
+            "group": "",
+            "reps": "12",
+            "weight": "20",
+            "note": ""
+          }
+        ]
+      },
+      {
+        "instanceId": "ex-v2-2",
+        "libraryId": "custom-banded-walk",
+        "name": "Banded Lateral Walk",
+        "done": true,
+        "rows": [
+          {
+            "set": "1",
+            "group": "mỗi bên",
+            "reps": "15",
+            "weight": "",
+            "note": ""
+          }
+        ]
+      }
+    ]
+  }
+}

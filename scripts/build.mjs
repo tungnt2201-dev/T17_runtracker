@@ -18,6 +18,7 @@ const MODULES = [
   'src/core/utils.js',
   'src/core/fitness.js',
   'src/core/legacy.js',
+  'src/core/fitness-import.js',
   'src/core/users.js',
   'src/core/excel-plan.js',
   'src/core/athlete.js',
@@ -32,6 +33,7 @@ const MODULES = [
   'src/app/analytics.js',
   'src/app/profile.js',
   'src/app/fitness-ui.js',
+  'src/app/fitness-import-ui.js',
   'src/app/users-ui.js',
 ];
 

@@ -82,6 +82,15 @@ Logic: `src/core/fitness.js` (`T17Fitness`), chuẩn hoá trong `src/core/legacy
 - `db.features` được ghi mỗi lần lưu khi dữ liệu có fitness (`featuresOf`), dữ liệu chỉ có chạy bộ thì không.
 - Excel: hàng `Mã buổi fitness` trong lưới tuần (chỉ khi có buổi fitness) nối với khối `FITNESS — CHI TIẾT BÀI TẬP` cuối sheet, cột: `Fitness · mã buổi, Ngày, Buổi, KH/TT, Thứ tự, Library ID, Bài, Nhóm, Prescription, Set, Rep / nhóm, Số rep, Thời gian / quãng đường, Trọng lượng (kg), Ghi chú, Hoàn tất`. Bản v2.2.0 đọc cùng file ra đúng bài chạy và thấy buổi fitness như bài có tên / mô tả / phút (có test).
 
+### Lượt 3: nhập file app mobile
+
+- `detectKind` trả `'fitness-session'` cho JSON của app mobile (v1/v2/v3, kể cả object `session` trần). Excel của app mobile nhận diện bằng tên sheet (`Session` + `Workout Log`) — Excel kế hoạch của T17 (sheet `Run tracker`, khối tuần) không bị nhầm.
+- Kết quả nhập: `actual.source = "fitness-mobile"`, `actual.fitness` có thêm `importKey` (`"sid:<mã buổi>"` hoặc `"h:<ngày>|<tên chuẩn hoá>|<băm>"`), `importHash` (băm nội dung **gốc** trong file, để nhận ra lần nhập lại), `importedAt`, `sourceFile`.
+- Bài thêm từ file: phần tử `fitnessLibrary` có `unconfirmed: true`, `importedAt`, `importedFrom` (tên file); xác nhận hoặc sửa bài trong Thư viện sẽ bỏ `unconfirmed`.
+- Ngày buổi tập: chuỗi ngày trần / số serial Excel giữ nguyên; chuỗi ISO có múi giờ đổi sang giờ địa phương (`localYmd`).
+- Bản sao trước khi gộp (exe): `data/backups/<tiền tố người dùng>-truoc-nhap-fitness-YYYYMMDD-HHMMSS.json`, không trùng mẫu tên bản sao theo ngày nên không ảnh hưởng tự phục hồi.
+- Fixture: `fitness-mobile-v2.json` (định dạng v2 giả lập theo mã app: chưa có cột thời gian / templateId / workoutNote), `fitness-mobile-midnight.json`, `fitness-mobile-unknown-exercises.json`, `fitness-mobile-broken.json`.
+
 ### Vì sao giữ `schemaVersion = 2` và thêm `features`
 
 Đã thử bằng `git worktree` của tag `v2.2.0` (chạy cả lõi lẫn app hoàn chỉnh trong jsdom) và RunPlan v1.8.9:
@@ -108,7 +117,7 @@ không sửa buổi fitness.
 | JSON v3 | `{ version:3, library, session }` | `localStorage` key `T17_RUN_TRAINING_V2` |
 | JSON đời cũ | `{ date, calories, duration, rpe, sessionNote, exercises:[{id,done,rows}] }` | key `T17_RUN_BASIC_1_V1`; chuyển như `migrateOld()` của app: buổi Run Basic 1, phủ done/rows theo `id` |
 | Session trần | object `session` của v3 | |
-| Excel | 4 sheet `Session`, `Workout Log`, `Guide`, `Library` | fixture có sẵn; đọc ở lượt 3 |
+| Excel | 4 sheet `Session`, `Workout Log`, `Guide`, `Library` | `parseMobileWorkbook` (lượt 3) |
 
 App mobile chỉ giữ **một buổi hiện tại** và file xuất **không có mã buổi** — T17 lo phần lịch sử và chống trùng.
 

@@ -68,6 +68,14 @@ async function readFirstSheet(arrayBuffer){
   return parseSheet(sheet,shared);
 }
 
+/** Đọc MỌI sheet: { names:[…], sheets: Map(tên → mảng hàng) } (dùng nhận diện Excel của app fitness). */
+async function readSheets(arrayBuffer){
+  const zip=await unzip(arrayBuffer);const wb=textOf(zip,'xl/workbook.xml'),rels=textOf(zip,'xl/_rels/workbook.xml.rels');
+  const shared=parseSharedStrings(textOf(zip,'xl/sharedStrings.xml'));const names=[],sheets=new Map();
+  const relMap=new Map();const relRe=/<Relationship\b[^>]*>/g;let x;while((x=relRe.exec(rels||''))){relMap.set(attr(x[0],'Id'),attr(x[0],'Target'))}
+  const shRe=/<sheet\b[^>]*>/g;let i=0;while((x=shRe.exec(wb||''))){i++;const name=xmlDecode(attr(x[0],'name'));const rid=attr(x[0],'r:id');const target=relMap.get(rid);const p=target?resolvePath('xl/workbook.xml',target):`xl/worksheets/sheet${i}.xml`;const xml=textOf(zip,p);names.push(name);sheets.set(name,xml?parseSheet(xml,shared):[])}
+  return{names,sheets};
+}
 const CRC_TABLE=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
 function crc32(bytes){let c=0xffffffff;for(const b of bytes)c=CRC_TABLE[(c^b)&255]^(c>>>8);return (c^0xffffffff)>>>0}
 function dosDateTime(d=new Date()){let y=Math.max(1980,d.getFullYear());const date=((y-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate();const time=(d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1);return{date,time}}
@@ -101,6 +109,6 @@ function buildXlsxBlob(aoa,sheetName='Run tracker'){
   ];
   return new Blob([zipStore(files)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 }
-root.RunPlanXLSX={readFirstSheet,buildXlsxBlob,unzip,parseSheet,parseSharedStrings,zipStore};
+root.RunPlanXLSX={readFirstSheet,readSheets,buildXlsxBlob,unzip,parseSheet,parseSharedStrings,zipStore};
 if(typeof module!=='undefined'&&module.exports)module.exports=root.RunPlanXLSX;
 })(typeof globalThis!=='undefined'?globalThis:this);

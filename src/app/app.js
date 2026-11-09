@@ -475,7 +475,7 @@ function detachActualFromPlan(ref){
 $('detachActual').addEventListener('click',()=>{const r=resolveRef(editingKey);if(r)detachActualFromPlan({...r})});
 prevWeek.onclick=()=>{if(!db.weeks.length)ensureVisibleWeeks();if(currentWeek<=0){const mon=addDaysYmd(db.weeks[0].days[0].date,-7);currentWeek=ensureWeekByMonday(mon)}else currentWeek--;visibleWeekCount=6;render()};nextWeek.onclick=()=>{if(!db.weeks.length)ensureVisibleWeeks();if(currentWeek>=db.weeks.length-1){const mon=addDaysYmd(db.weeks[currentWeek].days[0].date,7);ensureWeekByMonday(mon)}currentWeek++;visibleWeekCount=6;render()};todayBtn.onclick=()=>{const mon=mondayYmd(ymd(new Date()));currentWeek=ensureWeekByMonday(mon);visibleWeekCount=6;render();$('calendarWrap').scrollTop=0};
 function triggerImport(){try{importFile.value='';importFile.click()}catch(e){alert('Không mở được trình chọn file.') }}importBtn.onclick=triggerImport;
-importFile.addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const old=importBtn.textContent;importBtn.disabled=true;importBtn.textContent='Đang đọc…';try{await importExcel(file)}catch(err){console.error(err);alert('Import Excel lỗi: '+(err.message||err))}finally{importBtn.disabled=false;importBtn.textContent=old;e.target.value=''}});
+importFile.addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const old=importBtn.textContent;importBtn.disabled=true;importBtn.textContent='Đang đọc…';try{const rest=await T17FitnessImportUI.takeFitnessFiles([file]);if(rest.length)await importExcel(file)}catch(err){console.error(err);alert('Import Excel lỗi: '+(err.message||err))}finally{importBtn.disabled=false;importBtn.textContent=old;e.target.value=''}});
 function dateForExcel(s){if(!s)return'';const [y,m,d]=s.split('-');return `${d}/${m}/${y}`}
 async function exportExcel(){const EXPORT_TITLE='Xuất Excel';
  if(!db.weeks.length)return toast('Chưa có dữ liệu');
@@ -522,6 +522,7 @@ function triggerRestore(){try{restoreFile.value='';restoreFile.click()}catch(e){
 /** Khôi phục toàn bộ: nhận mọi định dạng sao lưu (RunPlan v1.x, T17 v2, localStorage dump, mảng tuần). */
 function restoreFromData(data,sourceName=''){
  const kind=T17Legacy.detectKind(data);
+ if(kind==='fitness-session'){T17FitnessImportUI.importSources([{name:sourceName||'file',data}]);return true}
  if(kind==='plan'||kind==='log')return mergeExportData(data,kind);
  if(!['backup','backup-wrapped','weeks'].includes(kind))throw new Error('File JSON không đúng định dạng sao lưu RunPlan / T17 RunTracker.');
  const {db:next,report}=loadDbFrom(data);
@@ -555,6 +556,7 @@ async function importPlanJson(file){
  if(!file)return;
  const data=T17Legacy.parseJsonText(await readFileText(file));
  const kind=T17Legacy.detectKind(data);
+ if(kind==='fitness-session')return T17FitnessImportUI.importSources([{name:file.name,data}]);
  if(kind==='plan'||kind==='log')return mergeExportData(data,kind);
  if(kind==='backup'||kind==='backup-wrapped'||kind==='weeks'){
    if(!confirm('Đây là file SAO LƯU TOÀN BỘ (khôi phục sẽ GHI ĐÈ dữ liệu hiện tại), không phải file bài tập để gộp thêm.\n\nTiếp tục khôi phục toàn bộ?'))return;
@@ -565,7 +567,11 @@ async function importPlanJson(file){
 exportPlanBtn.onclick=exportPlanJson;
 function triggerImportPlan(){try{importPlanFile.value='';importPlanFile.click()}catch(e){alert('Không mở được trình chọn file.')}}
 importPlanBtn.onclick=triggerImportPlan;
-importPlanFile.addEventListener('change',async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const old=importPlanBtn.textContent;importPlanBtn.disabled=true;importPlanBtn.textContent='Đang đọc…';try{await importPlanJson(file)}catch(err){console.error(err);alert('Nhập bài tập lỗi: '+(err.message||err))}finally{importPlanBtn.disabled=false;importPlanBtn.textContent=old;e.target.value=''}});
+importPlanFile.addEventListener('change',async e=>{const files=Array.from(e.target.files||[]);if(!files.length)return;const old=importPlanBtn.textContent;importPlanBtn.disabled=true;importPlanBtn.textContent='Đang đọc…';try{
+ // v2.3: file của app fitness (JSON v1/v2/v3, Excel, ZIP) → hộp xem trước nhập fitness; còn lại như cũ
+ const rest=await T17FitnessImportUI.takeFitnessFiles(files);
+ for(const file of rest){if(/\.xlsx$/i.test(file.name))await importExcel(file);else await importPlanJson(file)}
+}catch(err){console.error(err);alert('Nhập bài tập lỗi: '+(err.message||err))}finally{importPlanBtn.disabled=false;importPlanBtn.textContent=old;e.target.value=''}});
 
 railData.onclick=()=>{const dm=$('dataMenu');dm.open=!dm.open};
 document.addEventListener('click',e=>{const dm=$('dataMenu');if(!dm||!dm.open)return;if(dm.contains(e.target))return;if(e.target.closest('#railData'))return;dm.open=false});

@@ -33,7 +33,7 @@
       <button id="exportBtn" type="button">⇩ Export Excel</button>
       <div class="menu-group-label">Chia sẻ bài tập (JSON, nhiều bài / ngày)</div>
       <button id="exportPlanBtn" type="button">⇩ Xuất bài tập (JSON)</button>
-      <button id="importPlanBtn" type="button">⇧ Nhập bài tập / Training Log (JSON)</button>
+      <button id="importPlanBtn" type="button">⇧ Nhập bài tập / Training Log / buổi app fitness (JSON, ZIP)</button>
       <div class="menu-group-label">Toàn bộ dữ liệu của người dùng đang chọn</div>
       <button id="backupBtn" type="button">Sao lưu toàn bộ (JSON)</button>
       <button id="restoreBtn" type="button">Khôi phục toàn bộ (ghi đè) — nhận cả file RunPlan cũ</button>
@@ -41,9 +41,9 @@
       <button id="clearBtn" class="danger" type="button">Xóa toàn bộ dữ liệu</button>
     </div>
   </details>
-  <input class="file-picker-input" id="fitImportFile" type="file" multiple accept=".fit,.FIT,.zip,.ZIP,application/octet-stream,application/zip" />
+  <input class="file-picker-input" id="fitImportFile" type="file" multiple accept=".fit,.FIT,.zip,.ZIP,.json,.xlsx,application/octet-stream,application/zip" />
   <input class="file-picker-input" id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
-  <input class="file-picker-input" id="importPlanFile" type="file" accept=".json,application/json" />
+  <input class="file-picker-input" id="importPlanFile" type="file" multiple accept=".json,.zip,.xlsx,application/json,application/zip" />
   <input class="file-picker-input" id="restoreFile" type="file" accept=".json,application/json" />
 </section>
 <div class="shell">

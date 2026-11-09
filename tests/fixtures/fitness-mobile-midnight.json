@@ -1,0 +1,494 @@
+{
+  "version": 3,
+  "library": [
+    {
+      "id": "good-morning",
+      "builtin": true,
+      "name": "Good Morning with Barbell",
+      "category": "Posterior chain",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Đặt barbell chắc trên phần cơ thang/upper back, đứng vững và gối hơi chùng. Đẩy hông ra sau như hip hinge, giữ cột sống trung tính rồi siết mông để trở về tư thế đứng.",
+      "caution": "Giữ thanh tạ ổn định trên lưng trên; không đặt tạ lên cổ, không cúi bằng lưng và không cố hạ quá sâu khi lưng bắt đầu cong.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "1-12",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "1-10",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "reverse-lunge",
+      "builtin": true,
+      "name": "Reverse Lunge with Dumbbells",
+      "category": "Knee / Hip",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Cầm tạ hai bên, bước một chân ra sau và hạ người có kiểm soát. Gối chân trước đi theo hướng bàn chân. Đạp chân trước xuống sàn để trở lại.",
+      "caution": "Tránh bước quá hẹp, gối đổ vào trong hoặc dùng chân sau đẩy mạnh để đứng lên.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "one-leg-deadlift",
+      "builtin": true,
+      "name": "One-Leg Deadlift with Dumbbells",
+      "category": "Hamstring / Balance",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Đứng trên một chân, gối hơi chùng, đẩy hông ra sau và nghiêng thân về trước. Giữ hai bên hông tương đối cân, chân còn lại duỗi ra sau.",
+      "caution": "Không xoay mở hông, không kéo tạ bằng lưng và không hy sinh thăng bằng để cố xuống sâu.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "glute-bridge",
+      "builtin": true,
+      "name": "Hip Thrust with Barbell",
+      "category": "Glute",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Tựa phần lưng trên vào ghế chắc chắn, bàn chân đặt vững, barbell nằm ngang vùng hông có đệm. Đẩy hông lên đến khi thân và đùi gần thành một đường thẳng, siết mông rồi hạ có kiểm soát.",
+      "caution": "Giữ ghế ổn định, cằm hơi thu, không ưỡn thắt lưng ở đỉnh và luôn kiểm soát thanh tạ trên hông.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "single-leg-squat",
+      "builtin": true,
+      "name": "Single Leg Squat / Single Leg Press",
+      "category": "Knee / Quad",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Chọn biến thể phù hợp. Hạ người hoặc đạp máy có kiểm soát, gối đi cùng hướng mũi chân và duy trì lực đều qua bàn chân.",
+      "caution": "Không để gối sụp vào trong. Giảm độ sâu hoặc tải nếu mất kiểm soát; với leg press không khóa cứng gối.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "single-calf-raise",
+      "builtin": true,
+      "name": "Single Calf Raise with Dumbbells",
+      "category": "Calf",
+      "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+      "cue": "Đứng một chân, nâng gót hết biên độ có kiểm soát, dừng ngắn ở đỉnh rồi hạ chậm. Có thể vịn nhẹ để giữ thăng bằng.",
+      "caution": "Không bật nảy, không lăn cổ chân ra ngoài/trong và không rút ngắn biên độ chỉ để tăng tạ.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "12",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "backward-walk",
+      "builtin": true,
+      "name": "Đi lùi",
+      "category": "Knee basic",
+      "plan": "10 phút",
+      "cue": "Đi lùi trên bề mặt phẳng và thông thoáng, bước ngắn, thân người thẳng, tiếp đất nhẹ và giữ nhịp đều.",
+      "caution": "Ưu tiên nơi an toàn, không có vật cản. Giảm tốc hoặc dừng nếu đau nhói ở gối, cổ chân hay bàn chân.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "",
+          "time": "10 phút",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "banded-knee-extension",
+      "builtin": true,
+      "name": "Banded Knee Extension",
+      "category": "Knee basic",
+      "plan": "2 phút",
+      "cue": "Cố định dây kháng lực phía sau gối. Từ tư thế gối hơi chùng, duỗi gối có kiểm soát đến gần thẳng rồi quay lại, giữ bàn chân ổn định.",
+      "caution": "Không giật dây hoặc khóa gối mạnh ở cuối biên độ; dùng lực vừa đủ để chuyển động trơn tru.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "",
+          "time": "2 phút",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "tib-raise",
+      "builtin": true,
+      "name": "Tib Raise",
+      "category": "Shin / Ankle",
+      "plan": "1 x 20",
+      "cue": "Giữ gót chân trên sàn, nâng mũi bàn chân lên bằng cơ mặt trước cẳng chân rồi hạ chậm xuống.",
+      "caution": "Không nhấc gót, không giật nhanh; giữ biên độ trong khả năng kiểm soát.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "20",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "fhl-calf-raise",
+      "builtin": true,
+      "name": "FHL Calf Raise",
+      "category": "Calf / Foot",
+      "plan": "1 x 20",
+      "cue": "Ở tư thế calf raise có điểm tựa, hơi nghiêng người theo biến thể đã chọn. Nâng gót chậm, đẩy qua vùng ngón cái và hạ có kiểm soát.",
+      "caution": "Không để cổ chân đổ mạnh vào trong/ngoài; giảm biên độ nếu xuất hiện khó chịu ở gân Achilles hoặc bàn chân.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "20",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "step-ups",
+      "builtin": true,
+      "name": "Step Ups",
+      "category": "Knee / Quad",
+      "plan": "3 x 10 mỗi chân",
+      "cue": "Đứng trên bục chắc chắn. Giữ một chân làm chân trụ, hạ chân còn lại xuống có kiểm soát rồi dùng chân trụ đưa cơ thể trở lại.",
+      "caution": "Giữ gối chân trụ theo hướng ngón chân, không để hông rơi sang một bên. Chọn độ cao bục phù hợp.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "3",
+          "group": "mỗi chân",
+          "reps": "10",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "standing-hip-flexion",
+      "builtin": true,
+      "name": "Standing Hip Flexion",
+      "category": "Hip flexor",
+      "plan": "2 x 25 mỗi chân",
+      "cue": "Đứng thẳng, giữ thân ổn định và nâng gối lên bằng cơ gấp hông. Hạ xuống chậm, tránh ngả người ra sau.",
+      "caution": "Không dùng quán tính hoặc ưỡn lưng để nâng gối; có thể vịn nhẹ nếu cần thăng bằng.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi chân",
+          "reps": "25",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "mỗi chân",
+          "reps": "25",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "isometric-glute-bridge",
+      "builtin": true,
+      "name": "Isometric Glute Bridge",
+      "category": "Glute / Isometric",
+      "plan": "1 x 45 giây",
+      "cue": "Vào tư thế cầu mông theo biến thể một chân, nâng hông và giữ vị trí ổn định trong thời gian mục tiêu.",
+      "caution": "Giữ xương chậu cân, không ưỡn thắt lưng. Nếu một chân quá khó, giảm thời gian hoặc dùng hai chân.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "",
+          "time": "45 giây",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "elephant-walk",
+      "builtin": true,
+      "name": "Elephant Walk",
+      "category": "Hamstring mobility",
+      "plan": "2 x 30 lần",
+      "cue": "Cúi người, tay chạm sàn hoặc điểm tựa phù hợp. Luân phiên co một gối và duỗi chân còn lại để tạo cảm giác kéo giãn gân kheo.",
+      "caution": "Không ép đầu gối khóa cứng hoặc cố chạm sàn bằng mọi giá; giữ nhịp nhẹ và kiểm soát.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "30",
+          "time": "",
+          "weight": "",
+          "note": ""
+        },
+        {
+          "set": "2",
+          "group": "",
+          "reps": "30",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "calf-stretch",
+      "builtin": true,
+      "name": "Calf Stretch",
+      "category": "Calf mobility",
+      "plan": "60 giây",
+      "cue": "Đặt chân trên bục nghiêng hoặc vị trí kéo giãn phù hợp, giữ gót ổn định và duy trì cảm giác căng vừa phải ở bắp chân.",
+      "caution": "Không nhún bật và không kéo đến mức đau nhói; giữ hơi thở tự nhiên.",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "",
+          "reps": "",
+          "time": "60 giây",
+          "weight": "",
+          "note": ""
+        }
+      ],
+      "imageData": "",
+      "imageName": ""
+    },
+    {
+      "id": "custom-banded-walk",
+      "builtin": false,
+      "name": "Banded Lateral Walk",
+      "category": "Glute med",
+      "plan": "2 x 15 bước mỗi bên",
+      "cue": "Dây quanh gối, đi ngang.",
+      "caution": "Giữ gối hướng mũi chân.",
+      "imageData": "",
+      "imageName": "",
+      "defaultRows": [
+        {
+          "set": "1",
+          "group": "mỗi bên",
+          "reps": "15",
+          "time": "",
+          "weight": "",
+          "note": ""
+        }
+      ]
+    }
+  ],
+  "session": {
+    "workoutName": "Run Basic 1",
+    "templateId": "run-basic-1",
+    "date": "2026-11-07T17:30:00.000Z",
+    "calories": "260",
+    "duration": "48",
+    "rpe": "7",
+    "sessionNote": "tập lúc 0:30 sáng (giờ VN)",
+    "workoutNote": "Set 1 nhẹ, set 2 nặng hơn",
+    "exercises": [
+      {
+        "instanceId": "ex-fixture-1",
+        "libraryId": "good-morning",
+        "name": "Good Morning with Barbell",
+        "category": "Posterior chain",
+        "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+        "cue": "Đặt barbell chắc trên phần cơ thang/upper back, đứng vững và gối hơi chùng. Đẩy hông ra sau như hip hinge, giữ cột sống trung tính rồi siết mông để trở về tư thế đứng.",
+        "caution": "Giữ thanh tạ ổn định trên lưng trên; không đặt tạ lên cổ, không cúi bằng lưng và không cố hạ quá sâu khi lưng bắt đầu cong.",
+        "imageData": "",
+        "imageName": "",
+        "done": true,
+        "rows": [
+          {
+            "set": "1",
+            "group": "",
+            "reps": "12",
+            "time": "",
+            "weight": "20",
+            "note": ""
+          },
+          {
+            "set": "2",
+            "group": "",
+            "reps": "10",
+            "time": "",
+            "weight": "30",
+            "note": "nặng"
+          }
+        ]
+      },
+      {
+        "instanceId": "ex-fixture-2",
+        "libraryId": "reverse-lunge",
+        "name": "Reverse Lunge with Dumbbells",
+        "category": "Knee / Hip",
+        "plan": "Set 1: 10–12 nhẹ · Set 2: 8–10 nặng hơn",
+        "cue": "Cầm tạ hai bên, bước một chân ra sau và hạ người có kiểm soát. Gối chân trước đi theo hướng bàn chân. Đạp chân trước xuống sàn để trở lại.",
+        "caution": "Tránh bước quá hẹp, gối đổ vào trong hoặc dùng chân sau đẩy mạnh để đứng lên.",
+        "imageData": "",
+        "imageName": "",
+        "done": true,
+        "rows": [
+          {
+            "set": "1",
+            "group": "mỗi chân",
+            "reps": "12",
+            "time": "",
+            "weight": "8",
+            "note": ""
+          },
+          {
+            "set": "2",
+            "group": "mỗi chân",
+            "reps": "10",
+            "time": "",
+            "weight": "12",
+            "note": ""
+          }
+        ]
+      }
+    ]
+  },
+  "exportedAt": "2026-11-07T12:00:00.000Z"
+}

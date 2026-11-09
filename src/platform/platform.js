@@ -146,6 +146,21 @@ function save(db) {
 }
 async function flush() { clearTimeout(timer); await drain(); }
 
+/** Bản sao an toàn trước thao tác gộp lớn (vd. nhập file app fitness), của người dùng đang chọn.
+ *  Exe: data/backups/<tiền tố>-truoc-<nhãn>-YYYYMMDD-HHMMSS.json (giữ 10 bản gần nhất mỗi nhãn; không lẫn với bản sao theo ngày).
+ *  Web: một bản trong localStorage "<khoá dữ liệu>:truoc-<nhãn>" (ghi đè). Trả đường dẫn / khoá, '' nếu không ghi được. */
+async function snapshot(db, label = 'nhap') {
+  const json = JSON.stringify(db); const id = index.activeUserId; const safe = String(label).replace(/[^a-z0-9-]/gi, '').slice(0, 20) || 'nhap';
+  if (!isDesktop) { const key = U.lsKeyFor(id, LS_BASE) + ':truoc-' + safe; try { root.localStorage.setItem(key, json); return key; } catch (e) { return ''; } }
+  await flush(); await ensureDir(backupDir);
+  const d = new Date(); const ts = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}${String(d.getSeconds()).padStart(2, '0')}`;
+  const prefix = `${U.backupPrefixFor(id)}-truoc-${safe}-`; const p = join(backupDir, `${prefix}${ts}.json`);
+  await Neutralino.filesystem.writeFile(p, json);
+  try { const files = (await Neutralino.filesystem.readDirectory(backupDir)).filter(f => f.type === 'FILE' && f.entry.startsWith(prefix)).map(f => f.entry).sort();
+    for (const f of files.slice(0, Math.max(0, files.length - 10))) await Neutralino.filesystem.remove(join(backupDir, f)); } catch (e) { /* ignore */ }
+  return p;
+}
+
 // ---- Quản lý người dùng ----
 const listUsers = () => index.users.map(u => ({ ...u }));
 const activeUserId = () => index.activeUserId;
@@ -189,5 +204,5 @@ async function openDataFolder() {
   else await Neutralino.os.open('file://' + dataDir);
 }
 
-root.T17Platform = { isDesktop, init, save, flush, saveFile, openDataFolder, status, listUsers, activeUserId, activeUser, switchUser, createUser, renameUser, removeUser };
+root.T17Platform = { isDesktop, init, save, flush, snapshot, saveFile, openDataFolder, status, listUsers, activeUserId, activeUser, switchUser, createUser, renameUser, removeUser };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

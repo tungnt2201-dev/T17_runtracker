@@ -250,3 +250,18 @@ button{font:inherit}button,.btn{border:0;cursor:pointer}.file-picker-input{posit
 .ui-dialog-sheet.xwide .field{margin-bottom:8px}.ui-dialog-sheet.xwide textarea{width:100%;font:inherit;font-size:12px;border:1px solid #ced5de;border-radius:6px;padding:7px 8px;resize:vertical}
 .ui-dialog-sheet.xwide input:disabled,.ui-dialog-sheet.xwide textarea:disabled{background:#f5f7fa;color:#5a6676}
 .workout-card.fitness .plan-note-small{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ===== v2.3: nhập file app fitness ===== */
+.fi-user{padding:8px 10px;border-radius:7px;background:#f7faff;border:1px solid #dce8f7;font-size:11px;color:#3f5373;margin-bottom:8px}
+.fi-list{display:grid;gap:8px;max-height:58vh;overflow:auto}
+.fi-item{border:1px solid var(--line);border-left:4px solid #2f6fda;border-radius:8px;padding:8px 10px;background:#fff}
+.fi-item.attach{border-left-color:#2fa36b}.fi-item.dup{border-left-color:#9aa3af;background:#fafbfc}.fi-item.changed{border-left-color:#e3a63b}
+.fi-head{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:12px}.fi-head .push{flex:1}.fi-head .ui-muted{font-size:10px}
+.fi-badge{font-size:9.5px;font-weight:800;border-radius:999px;padding:2px 7px;background:#edf4ff;color:#245baf}.fi-badge.attach{background:#e8f7ef;color:#1f7a45}.fi-badge.dup{background:#eef0f3;color:#5d6775}.fi-badge.changed{background:#fff4e0;color:#9a6408}
+.fi-meta{font-size:10.5px;color:#5d6775;margin:3px 0 6px}.fi-item select{height:28px;border:1px solid #ced5de;border-radius:6px;font-size:11px;max-width:100%}
+.fi-ex{list-style:none;margin:6px 0 0;padding:0;font-size:10.5px;columns:2;column-gap:16px}.fi-ex li{break-inside:avoid;padding:2px 0}.fi-ex select{height:24px;font-size:10px}
+.fi-ok{color:#1f7a45;font-weight:700}.fi-new{color:#9a6408;font-weight:700}.fi-done{color:#2fa36b;font-weight:900}.fi-notdone{color:#b3bac4}
+.fi-warn{margin:6px 0 0;padding-left:16px;font-size:10.5px;color:#9a6408}.fi-errors{padding:8px 10px;border-radius:7px;background:#fff1f0;border:1px solid #f3c9c5;color:#a03a2f;font-size:11px;margin-bottom:8px}.fi-errors ul{margin:4px 0 0;padding-left:18px}
+.lib-type-badge.fx-unconf{background:#fff4e0;color:#9a6408;margin-left:4px}
+@media(max-width:700px){.fi-ex{columns:1}}
+.fi-item .field{margin:4px 0 2px}.fi-item .field select{height:auto;min-height:30px;padding:5px 8px;line-height:1.3;font-size:11.5px;width:100%}

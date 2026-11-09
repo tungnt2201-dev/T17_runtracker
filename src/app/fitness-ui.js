@@ -92,12 +92,13 @@ async function editExercise(id, opts = {}) {
       if (met != null && !(met >= 1 && met <= 15)) throw new Error('MET phải trong khoảng 1–15 (để trống nếu không dùng).');
       if (!builtin) { if (!v('name')) throw new Error('Chưa nhập tên bài.'); Object.assign(draft, { name: v('name'), category: v('category'), plan: v('plan'), cue: v('cue'), caution: v('caution') }); }
       if (met == null) delete draft.met; else draft.met = met;
+      delete draft.unconfirmed; // đã xem và lưu = xác nhận
       return draft;
     } }).then(res => {
     if (!res) return null;
     const list = ensureLibrary();
     if (!res.id) { res.id = 'custom-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); list.push(res); }
-    else { const i = list.findIndex(x => x.id === res.id); if (i >= 0) list[i] = { ...list[i], ...res }; }
+    else { const i = list.findIndex(x => x.id === res.id); if (i >= 0) { list[i] = { ...list[i], ...res }; if (!res.unconfirmed) delete list[i].unconfirmed; } }
     db.fitnessLibrary = F.normalizeLibrary(list); saveDb(); renderPane(); toast('Đã lưu bài tập'); return res.id;
   });
 }
@@ -311,7 +312,7 @@ function renderPane() {
     return `<div class="lib-card fx-tpl"><div class="lib-card-head"><div class="lib-card-title">${esc(e.name)}</div><span class="lib-type-badge">${e.builtin ? 'Dựng sẵn' : 'Của bạn'}</span></div><div class="lib-meta2">${e.count} bài${e.minutes ? ' · ' + esc(e.minutes) + ' phút' : ''}</div><ol class="fx-mini">${sess.exercises.slice(0, 6).map(x => `<li>${esc(x.name)}</li>`).join('')}${sess.exercises.length > 6 ? `<li class="more">+${sess.exercises.length - 6} bài</li>` : ''}</ol><div class="lib-actions2"><button type="button" class="primary" data-fx-assign="${esc(e.key)}">📅 Giao bài</button>${e.builtin ? '' : `<button type="button" data-fx-tpl-edit="${esc(e.key)}">✎ Sửa</button>`}<button type="button" data-fx-tpl-dup="${esc(e.key)}">⧉ Nhân bản</button>${e.builtin ? '' : `<button type="button" class="danger" data-fx-tpl-del="${esc(e.key)}">Xóa</button>`}</div></div>`;
   }).join('') || '<div class="lib-empty">Không có mẫu buổi nào khớp.</div>';
   host.querySelector('[data-fx-count]').textContent = `${ex.length} / ${lib.length} bài`;
-  host.querySelector('[data-fx-ex]').innerHTML = ex.map(x => `<div class="lib-card fx-exc">${x.imageData ? `<img class="fx-thumb" src="${x.imageData}" alt="">` : ''}<div class="lib-card-head"><div class="lib-card-title">${esc(x.name)}</div><span class="lib-type-badge">${x.builtin ? 'Dựng sẵn' : 'Của bạn'}</span></div><div class="lib-meta2">${esc(x.category || 'Chưa phân nhóm')} · ${esc(x.plan || '—')}${x.met ? ` · MET ${x.met}` : ''}</div>${x.cue ? `<div class="fx-cue">${esc(x.cue)}</div>` : ''}<div class="lib-actions2"><button type="button" data-fx-ex-edit="${esc(x.id)}">${x.builtin ? '🖼 Ảnh / MET' : '✎ Sửa'}</button><button type="button" data-fx-ex-dup="${esc(x.id)}">⧉ Nhân bản</button>${x.builtin ? '' : `<button type="button" class="danger" data-fx-ex-del="${esc(x.id)}">Xóa</button>`}</div></div>`).join('') || '<div class="lib-empty">Không có bài nào khớp.</div>';
+  host.querySelector('[data-fx-ex]').innerHTML = ex.map(x => `<div class="lib-card fx-exc">${x.imageData ? `<img class="fx-thumb" src="${x.imageData}" alt="">` : ''}<div class="lib-card-head"><div class="lib-card-title">${esc(x.name)}</div><span class="lib-type-badge">${x.builtin ? 'Dựng sẵn' : 'Của bạn'}</span>${x.unconfirmed ? '<span class="lib-type-badge fx-unconf" title="Bài được thêm khi nhập file app fitness — kiểm tra rồi bấm Xác nhận">Chưa xác nhận</span>' : ''}</div><div class="lib-meta2">${esc(x.category || 'Chưa phân nhóm')} · ${esc(x.plan || '—')}${x.met ? ` · MET ${x.met}` : ''}</div>${x.cue ? `<div class="fx-cue">${esc(x.cue)}</div>` : ''}<div class="lib-actions2"><button type="button" data-fx-ex-edit="${esc(x.id)}">${x.builtin ? '🖼 Ảnh / MET' : '✎ Sửa'}</button>${x.unconfirmed ? `<button type="button" class="primary" data-fx-ex-ok="${esc(x.id)}">✓ Xác nhận</button>` : ''}<button type="button" data-fx-ex-dup="${esc(x.id)}">⧉ Nhân bản</button>${x.builtin ? '' : `<button type="button" class="danger" data-fx-ex-del="${esc(x.id)}">Xóa</button>`}</div></div>`).join('') || '<div class="lib-empty">Không có bài nào khớp.</div>';
 }
 function setLibraryTab(tab) {
   const fit = tab === 'fitness';
@@ -334,6 +335,7 @@ function init() {
     else if (ds.fxExEdit) editExercise(ds.fxExEdit);
     else if (ds.fxExDup) editExercise(ds.fxExDup, { duplicate: true });
     else if (ds.fxExDel) deleteExercise(ds.fxExDel);
+    else if (ds.fxExOk) { const x = ensureLibrary().find(e => e.id === ds.fxExOk); if (x) { delete x.unconfirmed; saveDb(); renderPane(); toast('Đã xác nhận bài tập'); } }
     else if (ds.fxNewEx != null) editExercise('');
     else if (ds.fxNewTpl != null) editTemplate('');
     else if (ds.fxAssignAny != null) assignDialog('');

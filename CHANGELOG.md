@@ -1,6 +1,19 @@
 # Changelog
 
-## Chưa phát hành — Fitness, lượt 2 (thư viện, giao bài, nhập kết quả)
+## 2.3.0 — 2026-11-09 (Fitness)
+
+Gói: `261109_T17_runtracker_v2.3.0.zip`. Dữ liệu cũ (RunPlan, T17 2.0–2.2, nhiều người dùng) mở được nguyên vẹn; file của bản 2.3 vẫn mở được bằng bản 2.2.0 (có test so với mã nguyên văn của 2.2.0).
+
+### Nhập buổi tập từ app mobile *T17 Run Training* (lượt 3)
+- **Tự nhận diện** file của app fitness ở mọi nút nhập sẵn có: *Nhập bài tập / Training Log* (nay chọn được nhiều file, cả ZIP và Excel), *Import FIT*, *Import Excel*, *Khôi phục*. Nhận JSON v1 / v2 / v3, Excel 4 sheet (`Session`, `Workout Log`, `Guide`, `Library`) và ZIP chứa chúng. Excel kế hoạch của T17 vẫn đi luồng cũ, không nhầm.
+- **Hộp xem trước** trước khi ghi: tên người dùng đang chọn; từng buổi (ngày, tên, số bài / số bài xong, phút, RPE, kcal, tên file); trạng thái *Gắn vào buổi đã giao* / *Buổi mới* / *Đã có* / *Đã có — nội dung khác*; chọn gắn / tạo mới / bỏ qua / ghi đè; file lỗi được liệt kê riêng.
+- **Gắn kết quả vào buổi đã giao** cùng ngày: theo mã buổi (file đi khứ hồi T17 → app mobile → T17), rồi theo mẫu buổi, rồi theo tên. Hai buổi cùng ngày ở hai file thành hai buổi. Buổi được giao ngày khác → cảnh báo, kết quả thành buổi mới vào ngày tập.
+- **Nhận diện bài tập**: trùng `libraryId` → trùng tên đã chuẩn hoá (bỏ dấu, chữ thường, bỏ ký tự lạ) → giống ≥ 85% thì **gợi ý** để bạn chọn → còn lại thêm vào thư viện, đánh dấu **Chưa xác nhận** (có nút *Xác nhận* trong Thư viện → Fitness).
+- **Chống trùng**: nhập lại cùng file chỉ báo “đã có”, không nhân đôi; JSON và Excel của cùng một buổi trong một lần nhập chỉ tính một lần.
+- **Tự sao lưu trước khi gộp**: bản exe ghi `data\backups\<người dùng>-truoc-nhap-fitness-YYYYMMDD-HHMMSS.json` (giữ 10 bản); bản web giữ một bản trong trình duyệt.
+- **Ngày theo giờ địa phương**: thời điểm có múi giờ (vd. `2026-11-07T17:30Z`) được đổi sang giờ máy, không lệch một ngày. Calo, RPE, thời lượng trong file vào kết quả buổi.
+
+### Lượt 2 — thư viện, giao bài, nhập kết quả
 
 - **Thư viện → tab Fitness**: 15 bài dựng sẵn + 2 mẫu buổi (từ app mobile *T17 Run Training*); tìm kiếm; tạo / sửa / nhân bản / xoá bài tự tạo (tên, nhóm cơ, prescription, cách tập, chú ý, dòng mẫu set·rep·thời gian·kg, MET tuỳ chọn). Mỗi bài 1 ảnh, **tự thu nhỏ và nén ≤ 60 KB** (báo rõ nếu không nén được). Bài dựng sẵn không xoá/sửa nội dung, chỉ gắn ảnh/MET hoặc nhân bản.
 - **Mẫu buổi** của người dùng (danh sách bài, thời lượng, ghi chú, RPE dự kiến) lưu trong `templates` cùng chỗ với mẫu bài chạy; tab Bài chạy không hiện mẫu fitness.
@@ -12,9 +25,8 @@
 - **Excel**: lưới tuần có thêm hàng *Mã buổi fitness* và cuối sheet có khối *FITNESS — CHI TIẾT BÀI TẬP* (mỗi bài × mỗi dòng set một hàng, cả KH và TT). Nhập lại đọc đủ bài; bản cũ bỏ qua hai phần này.
 - FIT chạy bộ không còn bị tự ghép nhầm vào buổi fitness.
 
-## Chưa phát hành — Fitness, lượt 1 (lớp dữ liệu)
+### Lượt 1 — lớp dữ liệu
 
-Chưa có giao diện fitness; bản này chỉ chuẩn bị dữ liệu và kiểm chứng tương thích.
 
 - `src/core/fitness.js`: thư viện 15 bài + 2 mẫu buổi trích nguyên văn từ app mobile *T17 Run Training*; đọc file JSON v3 và JSON đời cũ (`T17_RUN_BASIC_1_V1`) của app mobile; tóm tắt chữ, tổng khối lượng (set/rep/kg), mã băm nội dung chống trùng.
 - Mô hình dữ liệu: `workoutType: "Fitness"`, `workout.fitness` (kế hoạch), `actual.fitness` (thực tế), `db.fitnessLibrary`, `db.features` — đều cộng thêm, tuỳ chọn. Giữ `schemaVersion: 2` (lý do trong `docs/DATA_FORMAT.md`).
