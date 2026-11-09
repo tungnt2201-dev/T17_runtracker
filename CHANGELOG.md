@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.5.2 — 2026-11-09 (Hướng dẫn sử dụng cho bản mới — lượt 8)
+
+Gói: `261109_T17_runtracker_v2.5.2.zip`. **Không đổi mã ứng dụng, không đổi định dạng dữ liệu** — chỉ cập nhật tài liệu đi kèm gói.
+
+- **Hướng dẫn sử dụng (Word)** `docs/Huong_dan_su_dung_T17_RunTracker.docx` viết lại cho bản 2.5, 59 trang, 52 hình chụp từ **dữ liệu mẫu hư cấu** (không dùng dữ liệu thật); mục lục cập nhật.
+- Chương mới: **7. Nhiều người dùng và hồ sơ cá nhân**; **8. Fitness** (thư viện, giao bài, nhập kết quả, nhập / xuất app mobile); **9. Chỉ số cơ thể** (nhập, CSV, so sánh, biểu đồ); **10. Calo trong ngày** (công thức, cách sửa); **15. Giới hạn và điều cần lưu ý**.
+- Cập nhật chương cũ: giới thiệu, thư mục dữ liệu, giao diện, Analytics (tab Cơ thể, biểu đồ calo), quản lý dữ liệu (bản dự phòng, cảnh báo dung lượng bản web), câu hỏi thường gặp, thuật ngữ. Toàn bộ ảnh cũ chụp lại trên bản 2.5.
+- Ghi rõ giới hạn: calo ước tính sai số khoảng ±10–15%; các tính năng mới **chưa được chạy thử trên Windows thật** (chỉ trên exe Linux); bản web ~5 MB.
+
 ## 2.5.1 — 2026-11-09 (Rà soát tương thích, hiệu năng, chất lượng — lượt 7)
 
 Gói: `261109_T17_runtracker_v2.5.1.zip`. Không thêm tính năng; dữ liệu và kết quả chạy bộ không đổi.

@@ -18,7 +18,7 @@
 ## v2.2.0 — Nhiều người dùng ✅
 - Mỗi người dùng một kho dữ liệu riêng, hồ sơ cá nhân đầy đủ nhập dần, nút chuyển người dùng.
 
-## v2.3–v2.5 — Fitness, chỉ số cơ thể, calo (8 lượt) — v2.3.0, v2.4.0, v2.5.0 đã phát hành
+## v2.3–v2.5 — Fitness, chỉ số cơ thể, calo (8 lượt) — đã phát hành đến v2.5.2
 - ✅ Lượt 1: lớp dữ liệu fitness, đọc file app mobile, test tương thích hai chiều với v2.2.0.
 - ✅ Lượt 2: thư viện Fitness, mẫu buổi, giao bài, thẻ lịch, nhập kết quả tay, điểm tải RPE × phút, xuất cho app mobile, Excel.
 - ✅ Lượt 3: nhập file app mobile tự nhận diện, hộp xem trước, chống trùng — **v2.3.0**.
@@ -26,7 +26,7 @@
 - ✅ Lượt 5: biểu đồ chỉ số cơ thể, tải tuần cùng trục, so sánh hai mốc — **v2.4.0**.
 - ✅ Lượt 6: calo trong ngày (nền + tập, sửa được, biểu đồ) — **v2.5.0**.
 - ✅ Lượt 7: rà soát tương thích (ma trận 5 phiên bản), fuzz, hiệu năng 3 năm, E2E exe — **v2.5.1**.
-- Lượt 8: cập nhật hướng dẫn Word.
+- ✅ Lượt 8: cập nhật hướng dẫn Word (4 chương mới, ảnh từ dữ liệu mẫu, mục giới hạn) — **v2.5.2**.
 
 ## P2 — Thành tích & thiết bị
 - Tự phát hiện best efforts / PR (1 km, 5 km, 10 km, HM, FM) từ bản ghi FIT.
