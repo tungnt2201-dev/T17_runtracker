@@ -30,8 +30,13 @@ jobs:
       - name: Test (bao gồm đọc dữ liệu JSON đời cũ)
         run: npm test
 
-      - name: Tải Neutralino binaries
-        run: npx neu update
+      - name: Tải Neutralino binaries (thử lại khi máy chủ tải lỗi tạm thời)
+        run: |
+          for i in 1 2 3 4 5; do
+            npx neu update && exit 0
+            echo "neu update lỗi (lần $i) — thử lại sau $((i*20)) giây"; sleep $((i*20))
+          done
+          exit 1
 
       - name: Đóng gói yymmdd_T17_runtracker_vX.Y.Z.zip
         id: pack
