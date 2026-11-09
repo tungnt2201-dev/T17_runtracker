@@ -31,6 +31,7 @@ const MODULES = [
   'src/app/fit-ui.js',
   'src/app/analytics.js',
   'src/app/profile.js',
+  'src/app/fitness-ui.js',
   'src/app/users-ui.js',
 ];
 

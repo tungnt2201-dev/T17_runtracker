@@ -109,7 +109,7 @@ $('fitSavedOpenNow').addEventListener('click',()=>{const details=$('fitSavedDeta
 $('fitSavedRemap').addEventListener('click',()=>$('fitImportInActual').click());
 window.RunPlanSavedFIT={show:fitShowSavedDashboard};
 function fitDuplicate(f){return fitAllWorkouts().find(x=>x.item.actual?.fitImport?.id===f.id)||null}
-function fitListForDate(date){const found=locateDate(date);return found?.d?.workouts||[]}
+function fitListForDate(date){const found=locateDate(date);return(found?.d?.workouts||[]).filter(w=>!T17Fitness.isFitnessWorkout(w))}// FIT chạy bộ không ghép vào buổi fitness
 function fitPlanScore(w,f){const pmin=+w.planMinutes||0,pkm=+w.planKm||0;let s=0;if(w.actual)s+=15;if(pmin&&f.durationSec)s+=Math.abs(pmin-f.durationSec/60)/(pmin||1)*25;if(pkm&&f.distanceM)s+=Math.abs(pkm-f.distanceM/1000)/(pkm||1)*25;return s}
 function fitRefreshTarget(){if(!fitPending)return;const options=fitListForDate(fitDate.value);
  fitTarget.innerHTML='<option value="__new__">＋ Đưa FIT vào lịch đúng ngày (thẻ riêng, kéo để ghép)</option>'+options.map(w=>`<option value="${escapeHtml(w.id)}">${escapeHtml(w.workoutName||'Bài chạy')}${w.actual?' · ĐÃ CÓ KẾT QUẢ':''}${w.planKm?' · '+escapeHtml(w.planKm)+'km':''}</option>`).join('');
@@ -342,7 +342,7 @@ async function fitImportBatch(entries,bad=[]){
  const original=JSON.stringify(db);
  try{
   for(const [date,group] of groups){
-   const loc=ensureDate(date),available=(loc.d.workouts||[]).filter(w=>!w.fitStandalone&&!w.actual);
+   const loc=ensureDate(date),available=(loc.d.workouts||[]).filter(w=>!w.fitStandalone&&!w.actual&&!T17Fitness.isFitnessWorkout(w));
    const assignment=fitBatchMatch(group,available);
    for(const entry of group){
     const target=assignment.get(entry);

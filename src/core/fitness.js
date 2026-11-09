@@ -151,15 +151,20 @@ function rangeText(values) {
   if (u.length > 1 && nums.every(Number.isFinite)) { const a = Math.min(...nums), b = Math.max(...nums); return a === b ? String(a) : `${a}–${b}`; }
   return u.join('/');
 }
-function exerciseLine(e) {
-  const rows = (e.rows || []).filter(rowHasContent); const parts = [];
+/** Phần số liệu của một bài: "2 set × 10–12 (mỗi chân) · 20–30 kg"; không có dòng → prescription. */
+function exerciseBrief(e) {
+  const rows = (e?.rows || []).filter(rowHasContent); const parts = [];
   if (rows.length) {
     const reps = rangeText(rows.map(r => r.reps)), time = rangeText(rows.map(r => r.time)), kg = rangeText(rows.map(r => r.weight)), grp = rangeText(rows.map(r => r.group));
     let s = `${rows.length} set`; if (reps) s += ` × ${reps}`; if (time) s += ` × ${time}`; if (grp) s += ` (${grp})`;
     parts.push(s); if (kg) parts.push(`${kg} kg`);
-  } else if (e.plan) parts.push(e.plan);
+  } else if (e?.plan) parts.push(e.plan);
+  return parts.join(' · ');
+}
+function exerciseLine(e) {
+  const brief = exerciseBrief(e);
   const mark = e.done === true ? '✓ ' : e.done === false ? '✗ ' : '';
-  return `• ${mark}${e.name || 'Bài tập'}${parts.length ? ' — ' + parts.join(' · ') : ''}`;
+  return `• ${mark}${e.name || 'Bài tập'}${brief ? ' — ' + brief : ''}`;
 }
 /** Bản tóm tắt chữ cho trường description (workout, khối fitness hoặc mảng bài). */
 function summaryText(x) {
@@ -233,7 +238,104 @@ function toWorkout(session, opts = {}) {
   return w;
 }
 
-const api = { FITNESS_SCHEMA, FITNESS_TYPE, ROW_KEYS, BUILTIN_LIBRARY, BUILTIN_TEMPLATES, newSessionId, newInstanceId, normalizeRows, normalizeLibrary, customItems, normalizeExercise, normalizeFitnessBlock, isFitnessWorkout, hasFitnessContent, sessionVolume, summaryText, contentHash, mobileKind, templateSession, fromMobile, toWorkout };
+/* ================= v2.3 lượt 2: giao bài, mẫu buổi, hoàn thành, xuất cho app mobile ================= */
+const DEFAULT_RPE = 5;                 // RPE mặc định của buổi fitness khi chưa nhập (dùng cho điểm tải)
+const IMAGE_MAX_BYTES = 60 * 1024;     // ảnh minh hoạ mỗi bài sau khi nén
+
+/** instanceId của bài trong buổi do T17 tạo = "<sessionId>:<k>". App mobile GIỮ NGUYÊN instanceId khi nạp/xuất
+ *  (nhưng bỏ mọi field lạ ở cấp session), nên đây là chỗ mang mã buổi đi khứ hồi qua app mobile. */
+function prefixInstances(exercises, sessionId) { return (exercises || []).map((e, i) => ({ ...e, instanceId: `${sessionId}:${i + 1}` })); }
+/** Mã buổi T17 suy từ instanceId (đa số bài mang cùng tiền tố). '' nếu không phải buổi do T17 giao. */
+function sessionIdFromInstances(exercises) {
+  const cnt = new Map();
+  for (const e of exercises || []) { const m = /^(fs-[a-z0-9-]+):\d+$/i.exec(str(e && e.instanceId)); if (m) cnt.set(m[1], (cnt.get(m[1]) || 0) + 1); }
+  let best = '', n = 0; for (const [k, v] of cnt) if (v > n) { best = k; n = v; }
+  return n * 2 >= (exercises || []).length && n > 0 ? best : '';
+}
+/** Bản sao khối kế hoạch với mã buổi mới (copy bài, thêm từ mẫu). */
+function withNewSessionId(block) {
+  if (!isObj(block)) return block;
+  const sid = newSessionId();
+  const c = JSON.parse(JSON.stringify(block));
+  return { ...c, sessionId: sid, exercises: prefixInstances(c.exercises, sid) };
+}
+
+/** Mẫu buổi → buổi kế hoạch chuẩn. Nhận mẫu dựng sẵn ({id,name,duration,note,items}) hoặc mẫu người dùng
+ *  (phần tử db.templates có workoutType 'Fitness' và khối fitness). `library` = thư viện người dùng (để lấy dòng mẫu). */
+function templateToSession(tpl, library) {
+  if (!isObj(tpl)) throw new Error('Mẫu buổi không hợp lệ.');
+  const lib = new Map(normalizeLibrary(library).map(x => [x.id, x]));
+  if (Array.isArray(tpl.items)) {
+    return { workoutName: str(tpl.name) || 'Fitness', templateId: str(tpl.id), duration: toNumOrEmpty(tpl.duration), workoutNote: str(tpl.note),
+      exercises: tpl.items.map(id => lib.get(id)).filter(Boolean).map(x => ({ instanceId: '', libraryId: x.id, name: x.name, category: x.category, plan: x.plan, rows: normalizeRows(x.defaultRows) })) };
+  }
+  const f = normalizeFitnessBlock(tpl.fitness || {}) || { exercises: [] };
+  return { workoutName: str(tpl.name) || 'Fitness', templateId: str(tpl.id || f.templateId), duration: toNumOrEmpty(tpl.planMinutes), workoutNote: str(f.workoutNote ?? tpl.planNote),
+    exercises: f.exercises.map(e => ({ ...e })) };
+}
+/** Mẫu buổi → workout kế hoạch (chưa có id). Mỗi lần gọi là một buổi mới (sessionId mới). */
+function planFromTemplate(tpl, library) {
+  const s = templateToSession(tpl, library);
+  const sid = newSessionId();
+  const w = toWorkout({ ...s, schema: FITNESS_SCHEMA, sessionId: sid, exercises: prefixInstances(s.exercises, sid), date: '', calories: '', rpe: '', sessionNote: '' }, { status: 'plan' });
+  return w;
+}
+/** Mẫu người dùng (lưu trong db.templates) từ một buổi kế hoạch. */
+function templateFromSession(s) {
+  const exercises = (s.exercises || []).map(e => { const o = normalizeExercise(e); o.instanceId = ''; return o; });
+  return { name: str(s.workoutName).trim() || 'Buổi fitness', workoutType: FITNESS_TYPE, planKm: '', planMinutes: toNumOrEmpty(s.duration), description: summaryText(exercises), planNote: str(s.workoutNote), workoutStructure: null,
+    fitness: { schema: FITNESS_SCHEMA, sessionId: '', templateId: str(s.templateId), workoutNote: str(s.workoutNote), exercises } };
+}
+
+/** Các ngày lặp theo thứ trong tuần. weekdays: 0 = thứ Hai … 6 = Chủ nhật. Bắt đầu từ `start` (tính cả ngày đó), trong `weeks` tuần. */
+function repeatDates(start, weekdays, weeks) {
+  if (!isYmd(start)) return [];
+  const want = new Set((weekdays || []).map(Number).filter(n => n >= 0 && n <= 6)); const nWeeks = Math.max(0, Math.min(52, Math.floor(Number(weeks) || 0)));
+  const out = []; const d0 = new Date(start + 'T00:00:00Z');
+  for (let i = 0; i < nWeeks * 7; i++) { const d = new Date(d0.getTime() + i * 86400000); const dow = (d.getUTCDay() + 6) % 7; if (want.has(dow)) out.push(d.toISOString().slice(0, 10)); }
+  return out;
+}
+
+/** Mức hoàn thành của buổi: số bài done / tổng bài (theo actual.fitness). null nếu chưa có kết quả fitness. */
+function completion(item) {
+  const ex = item?.actual?.fitness?.exercises; if (!item?.actual || item.actual.status === 'missed' || !Array.isArray(ex)) return null;
+  const total = ex.length, done = ex.filter(e => e.done).length;
+  return { done, total, ratio: total ? done / total : 0 };
+}
+
+/** Kết quả buổi từ dữ liệu form (bản ghi actual hoàn chỉnh, giữ field lạ của actual cũ). */
+function buildActual(prev, form, item) {
+  const p = isObj(prev) ? prev : {};
+  const exercises = (form.exercises || []).map(e => normalizeExercise({ ...e, done: !!e.done }, { withDone: true }));
+  const status = form.status === 'missed' ? 'missed' : 'done';
+  const sid = item?.fitness?.sessionId || p.fitness?.sessionId || '';
+  const out = { ...p, status, km: '', minutes: toNumOrEmpty(form.minutes), fatigue: toNumOrEmpty(form.rpe), calories: toNumOrEmpty(form.calories), note: str(form.note), segments: Array.isArray(p.segments) ? p.segments : [], source: p.source || 'manual',
+    fitness: { ...(isObj(p.fitness) ? p.fitness : {}), schema: FITNESS_SCHEMA, sessionId: sid, exercises } };
+  out.fitness.contentHash = contentHash({ date: form.date || '', workoutName: item?.workoutName || '', exercises });
+  return out;
+}
+
+/** Workout fitness → dữ liệu JSON v3 của app mobile (nạp bằng nút "Nhập file" của app).
+ *  library: thư viện của người dùng T17 — app mobile THAY thư viện của nó bằng thư viện trong file, nên gửi đủ. */
+function toMobileData(item, date, library, opts = {}) {
+  if (!isFitnessWorkout(item)) throw new Error('Bài này không phải buổi fitness.');
+  const lib = normalizeLibrary(library);
+  const sid = item.fitness?.sessionId || newSessionId();
+  const libById = new Map(lib.map(x => [x.id, x]));
+  const exercises = (item.fitness?.exercises || []).map((e, i) => { const l = libById.get(e.libraryId);
+    return { instanceId: `${sid}:${i + 1}`, libraryId: str(e.libraryId), name: str(e.name), category: str(e.category), plan: str(e.plan), cue: l ? l.cue : '', caution: l ? l.caution : '', imageData: '', imageName: '', done: false, rows: normalizeRows(e.rows).length ? normalizeRows(e.rows) : [row({ set: '1' })] }; });
+  const meta = { app: 'T17_runtracker', sessionId: sid, workoutId: str(item.id), exportedAt: opts.now || new Date().toISOString() };
+  return { version: 3, library: lib, exportedAt: meta.exportedAt, t17: meta,
+    session: { workoutName: str(item.workoutName) || 'Fitness', templateId: str(item.fitness?.templateId), date: toDate(date), calories: '', duration: str(item.planMinutes ?? ''), rpe: '', sessionNote: '', workoutNote: str(item.fitness?.workoutNote ?? item.planNote), exercises, t17: meta } };
+}
+/** Tên file an toàn cho Windows, không dấu. */
+function safeFileName(name) { return str(name).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'fitness'; }
+function mobileFileName(date, name) { return `${toDate(date) || 'ngay'}_${safeFileName(name)}.json`; }
+/** Kích thước thật (byte) của data URL base64. */
+function dataUrlBytes(url) { const i = str(url).indexOf(','); if (i < 0) return 0; const b64 = str(url).slice(i + 1).replace(/\s/g, ''); return Math.floor(b64.length * 3 / 4) - (b64.endsWith('==') ? 2 : b64.endsWith('=') ? 1 : 0); }
+
+const api = { FITNESS_SCHEMA, FITNESS_TYPE, ROW_KEYS, BUILTIN_LIBRARY, BUILTIN_TEMPLATES, newSessionId, newInstanceId, normalizeRows, normalizeLibrary, customItems, normalizeExercise, normalizeFitnessBlock, isFitnessWorkout, hasFitnessContent, sessionVolume, summaryText, contentHash, mobileKind, templateSession, fromMobile, toWorkout,
+  DEFAULT_RPE, IMAGE_MAX_BYTES, exerciseBrief, prefixInstances, sessionIdFromInstances, withNewSessionId, templateToSession, planFromTemplate, templateFromSession, repeatDates, completion, buildActual, toMobileData, safeFileName, mobileFileName, dataUrlBytes };
 root.T17Fitness = api;
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

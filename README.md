@@ -49,7 +49,7 @@ Bản sao lưu của T17 vẫn giữ mảng `weeks` ở cấp cao nhất nên **
 
 ```bash
 npm install
-npm test              # build + 64 test (FIT decoder, dữ liệu cũ, Excel, chạy thử app trong jsdom)
+npm test              # build + 75 test (FIT decoder, dữ liệu cũ, Excel, chạy thử app trong jsdom)
 npm run build         # dist/web/T17_runtracker.html + resources/ cho Neutralino
 npm run dev           # chạy cửa sổ desktop (neu run) để thử
 npm run exe           # tải Neutralino 6.10 + đóng gói release/yymmdd_T17_runtracker_vX.Y.Z.zip
@@ -64,7 +64,7 @@ src/
   lib/         xlsx.js (đọc/ghi .xlsx không cần thư viện) · fit-decoder.js (Garmin FIT)
   platform/    platform.js (lưu file cạnh exe / localStorage, Save As, sao lưu tự động)
   app/         app.js (lịch, builder, thư viện, nhập kết quả, log) · fit-ui.js (nhập FIT)
-               analytics.js (tab Analytics) · profile.js (hồ sơ) · users-ui.js (chuyển người dùng) · dialogs.js (hộp thoại trong app)
+               analytics.js (tab Analytics) · profile.js (hồ sơ) · users-ui.js (chuyển người dùng) · fitness-ui.js (thư viện, giao bài, kết quả fitness) · dialogs.js (hộp thoại trong app)
   styles/      app.css
   body.html, index.template.html
 scripts/       build.mjs · check-syntax.mjs · package-win.mjs

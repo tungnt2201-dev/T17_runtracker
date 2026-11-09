@@ -21,7 +21,7 @@ function defaultTemplates(){
 }
 /** Chuẩn hoá dữ liệu nạp từ file/localStorage (mọi phiên bản cũ) rồi gieo thư viện mẫu mặc định nếu chưa có. */
 function loadDbFrom(raw){const {db:out,report}=T17Legacy.normalizeDb(raw||{weeks:[]});if(!out.templatesSeeded){const have=new Set((out.templates||[]).map(t=>norm(t.name)));out.templates=(out.templates||[]).concat(defaultTemplates().filter(t=>!have.has(norm(t.name))));out.templatesSeeded=true}return{db:out,report}}
-function saveDb(){return T17Platform.save(db)}
+function saveDb(){const f=T17Legacy.featuresOf(db);if(f)db.features=f;return T17Platform.save(db)}// features: đánh dấu phần mở rộng (fitness…) để bản sau nhận biết
 /** Tìm lại vị trí bài theo id (chỉ số wi/di/ii có thể lệch sau khi lịch được sắp xếp lại). */
 function resolveRef(ref){if(!ref)return null;const cur=db.weeks[ref.wi]?.days?.[ref.di]?.workouts?.[ref.ii];if(cur&&(!ref.id||cur.id===ref.id))return ref;if(!ref.id)return null;for(let wi=0;wi<db.weeks.length;wi++)for(let di=0;di<db.weeks[wi].days.length;di++){const ii=(db.weeks[wi].days[di].workouts||[]).findIndex(x=>x.id===ref.id);if(ii>=0)return{wi,di,ii,id:ref.id}}return null}
 function toast(t){const x=$('toast');x.textContent=t;x.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>x.classList.remove('show'),2400)}
@@ -32,7 +32,7 @@ function actualDurationLabel(minutes){const x=formatDurationClock(minutes);retur
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function readFileArrayBuffer(file){return new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=()=>reject(fr.error||new Error('Không đọc được file.'));fr.readAsArrayBuffer(file)})}
 function readFileText(file){return new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=()=>reject(fr.error||new Error('Không đọc được file.'));fr.readAsText(file,'utf-8')})}
-function addWorkoutFromRecord(dst,src){dst.workouts=dst.workouts||[];const rec={id:genId(),...T17Legacy.planRecord(src),actual:null};if(rec.fitness)rec.fitness.sessionId=T17Fitness.newSessionId();dst.workouts.push(rec)}
+function addWorkoutFromRecord(dst,src){dst.workouts=dst.workouts||[];const rec={id:genId(),...T17Legacy.planRecord(src),actual:null};if(rec.fitness)rec.fitness=T17Fitness.withNewSessionId(rec.fitness);dst.workouts.push(rec)}
 async function importExcel(file){
  if(!file)return;if(!/\.xlsx$/i.test(file.name))throw new Error('Bản này hỗ trợ file .xlsx. Nếu đang dùng .xls, hãy Save As thành .xlsx trước.');if(!window.RunPlanXLSX)throw new Error('Bộ đọc Excel nội bộ chưa tải được.');
  const data=await readFileArrayBuffer(file);const rows=await RunPlanXLSX.readFirstSheet(data);const imported=parseWorkbookRows(rows);
@@ -47,6 +47,7 @@ function primaryWorkout(d){return(d.workouts&&d.workouts[0])||null}
 function valueEntered(v){return v!==''&&v!=null&&Number.isFinite(+v)}
 function completionVariance(d){
  const a=d.actual;if(!a||a.status==='missed')return null;
+ if(T17Fitness.isFitnessWorkout(d))return fitnessVariance(d);
  const metrics=[];const pkm=+d.planKm||0,pmin=+d.planMinutes||0;
  if(pkm>0&&valueEntered(a.km)){const signed=((+a.km)-pkm)/pkm;metrics.push({key:'km',label:'Cự ly',signed,abs:Math.abs(signed),actual:+a.km,plan:pkm,unit:'km'})}
  if(pmin>0&&valueEntered(a.minutes)){const signed=((+a.minutes)-pmin)/pmin;metrics.push({key:'time',label:'Thời gian',signed,abs:Math.abs(signed),actual:+a.minutes,plan:pmin,unit:'phút'})}
@@ -60,10 +61,12 @@ function completionVariance(d){
  const bits=metrics.map(m=>`${m.label} ${m.signed>=0?'+':''}${Math.round(m.signed*100)}%`).join(' · ');
  return{level,className,label,maxDeviation:x,metrics,worst,message:bits};
 }
+/** Fitness: mức hoàn thành theo số bài done / tổng bài, dùng cùng thang màu với chạy bộ (lệch = 1 − tỉ lệ). */
+function fitnessVariance(d){const c=T17Fitness.completion(d);if(!c||!c.total)return{level:'done',className:'done',maxDeviation:0,metrics:[],message:'Chưa có danh sách bài.'};const x=1-c.ratio;let className='done',label='Hoàn thành đủ bài';if(x>0.80){className='varianceOver';label='Gần như không tập'}else if(x>0.50){className='variance80';label='Thiếu nhiều bài'}else if(x>0.30){className='variance50';label='Thiếu vừa'}else if(x>0.10){className='variance30';label='Thiếu ít bài'}return{level:className,className,label,maxDeviation:x,metrics:[],fitness:c,message:`${c.done}/${c.total} bài`}}
 function varianceNotice(d){const v=completionVariance(d);if(!v||v.className==='done')return'';return `<div class="variance-notice ${v.className}">⚠ <b>${escapeHtml(v.label)}:</b> ${escapeHtml(v.message)} · lấy mức lệch lớn hơn giữa cự ly và thời gian.</div>`}
 function getStatus(item,date){
  if(item.actual?.status==='missed')return['Không tập','skipped'];
- if(item.actual){const v=completionVariance(item);if(!v||v.className==='done')return['Đạt kế hoạch · ±10%','done'];return[v.label,v.className]}
+ if(item.actual){const v=completionVariance(item);if(v?.fitness)return[`${v.label} · ${v.message}`,v.className];if(!v||v.className==='done')return['Đạt kế hoạch · ±10%','done'];return[v.label,v.className]}
  const today=ymd(new Date());if(date&&date<today)return['Quá hạn · chưa nhập','overdue'];return['Kế hoạch','planned'];
 }
 function average(arr){const v=arr.filter(x=>Number.isFinite(+x)&&+x>0).map(Number);return v.length?v.reduce((a,b)=>a+b,0)/v.length:0}
@@ -221,7 +224,7 @@ function copyWorkoutToDate(item,newDate){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(newDate))return null;
  const target=ensureDate(newDate);
  target.d.workouts=target.d.workouts||[];
- const copy={...deepClone(item),id:genId(),actual:null};if(copy.fitness)copy.fitness.sessionId=T17Fitness.newSessionId();// bản sao là buổi mới
+ const copy={...deepClone(item),id:genId(),actual:null};if(copy.fitness)copy.fitness=T17Fitness.withNewSessionId(copy.fitness);// bản sao là buổi mới
  target.d.workouts.push(copy);
  return target.wi;
 }
@@ -257,9 +260,9 @@ function addTemplateToDate(t,date){
 }
 function renderLibrary(){
  const list=$('libraryList');const templates=db.templates||[];const q=norm(librarySearch?.value||'');const type=libraryType?.value||'';
- const rows=templates.map((t,ti)=>({t,ti})).filter(({t})=>{if(type&&(t.workoutType||'Custom')!==type)return false;if(q){const hay=norm((t.name||'')+' '+(t.workoutType||'')+' '+(t.description||'')+' '+(t.planNote||''));if(!hay.includes(q))return false}return true});
- if(libraryCount)libraryCount.textContent=`${rows.length} / ${templates.length} mẫu`;
- if(!rows.length){list.innerHTML=`<div class="lib-empty" style="grid-column:1/-1">${templates.length?'Không có mẫu nào khớp bộ lọc.':'Chưa có mẫu bài tập nào. Tạo bài tập rồi bấm “💾 Lưu làm mẫu” để thêm vào đây.'}</div>`;return}
+ const rows=templates.map((t,ti)=>({t,ti})).filter(({t})=>{if(t.workoutType===T17Fitness.FITNESS_TYPE)return false;if(type&&(t.workoutType||'Custom')!==type)return false;if(q){const hay=norm((t.name||'')+' '+(t.workoutType||'')+' '+(t.description||'')+' '+(t.planNote||''));if(!hay.includes(q))return false}return true});
+ const runCount=templates.filter(t=>t.workoutType!==T17Fitness.FITNESS_TYPE).length;if(libraryCount)libraryCount.textContent=`${rows.length} / ${runCount} mẫu`;
+ if(!rows.length){list.innerHTML=`<div class="lib-empty" style="grid-column:1/-1">${runCount?'Không có mẫu nào khớp bộ lọc.':'Chưa có mẫu bài tập nào. Tạo bài tập rồi bấm “💾 Lưu làm mẫu” để thêm vào đây.'}</div>`;return}
  list.innerHTML=rows.map(({t,ti})=>{const plan=templateToPlan(t);return `<div class="lib-card"><div class="lib-card-head"><div class="lib-card-title">${escapeHtml(t.name)}</div><span class="lib-type-badge">${escapeHtml(t.workoutType||'Custom')}</span></div><div class="lib-meta2">${escapeHtml(templateSummary(t))}${t.savedAt?` · lưu ${escapeHtml(fmtDate(String(t.savedAt).slice(0,10),true))}`:''}</div><div class="lib-profile">${chartHtml(plan)}</div><div class="lib-preview">${richWorkoutDescriptionHtml(plan)}</div><div class="lib-actions2"><button type="button" class="primary" data-add-tpl="${ti}">＋ Thêm vào lịch</button><button type="button" data-use-tpl="${ti}">✎ Chỉnh trước khi dùng</button><button type="button" data-rename-tpl="${ti}">Đổi tên</button><button type="button" class="danger" data-del-tpl="${ti}">Xóa</button></div></div>`}).join('');
  list.querySelectorAll('[data-add-tpl]').forEach(x=>x.onclick=()=>{const t=templates[+x.dataset.addTpl];if(t)addTemplateToDate(t,libraryDate?.value||ymd(new Date()))});
  list.querySelectorAll('[data-use-tpl]').forEach(x=>x.onclick=()=>{const t=templates[+x.dataset.useTpl];if(!t)return;const dt=libraryDate?.value||ymd(new Date());closeLibraryModal();openBuilder(dt,null,t)});
@@ -288,6 +291,7 @@ async function exportGarminWorkout(name,structure){
  if(p)toast('Đã xuất '+file+' — cắm đồng hồ qua USB, copy file vào thư mục GARMIN\\NewFiles');
 }
 function workoutCardHtml(item,date,wi,di,ii){
+ if(T17Fitness.isFitnessWorkout(item)&&!item.fitStandalone)return T17FitnessUI.cardHtml(item,date,wi,di,ii);
  const [baseStatus,cls]=getStatus(item,date),a=item.actual;
  const st=item.fitStandalone&&a?'KẾT QUẢ CHƯA GHÉP — KÉO VÀO BÀI KH':baseStatus;
  const metric=a&&a.status!=='missed'
@@ -332,12 +336,12 @@ function updateWeekSummary(w){
  [['Km KH',pkm.toFixed(2)],['Km thực tế',akm.toFixed(2)],['Phút KH',Math.round(pmin)],['Phút thực tế',Math.round(amin)],['HR TB',hr?Math.round(hr):'—'],['RPE TB',rpe?rpe.toFixed(1):'—'],['Lệch KH',warnings],['Không tập',skipped],['Quá hạn',overdue],['Pace TT',pace(akm,amin)||'—'],['Tải TT',Math.round(allItems.reduce((s,it)=>s+T17Load.actualLoad(it,db.profile).load,0))||'—'],['Tải KH',Math.round(allItems.filter(it=>!it.fitStandalone).reduce((s,it)=>s+T17Load.plannedLoad(it,db.profile),0))||'—']].forEach(([a,b])=>m.insertAdjacentHTML('beforeend',`<div class="sum-item"><span>${a}</span><b>${b}</b></div>`));
 }
 function render(opts={}){const cal=$('calendarWrap'),oldScroll=opts.preserveScroll?cal.scrollTop:0;ensureVisibleWeeks();const box=$('days'),heads=$('dayHeads');box.innerHTML='';heads.innerHTML=DAYS.map(x=>`<div class="day-head"><div><span class="dow">${x}</span></div></div>`).join('');currentWeek=Math.max(0,Math.min(currentWeek,db.weeks.length-1));updateWeekSummary(db.weeks[currentWeek]);const end=Math.min(db.weeks.length,currentWeek+visibleWeekCount);for(let wi=currentWeek;wi<end;wi++){const w=db.weeks[wi],dates=w.days.filter(d=>d.date);const block=document.createElement('div');block.className='week-block';block.dataset.weekIndex=wi;block.innerHTML=`<div class="week-bar ${wi===currentWeek?'selected':''}"><strong>Tuần ${escapeHtml(w.label)}</strong><span class="week-range">${dates.length?`${fmtDate(dates[0].date)} – ${fmtDate(dates[dates.length-1].date)}`:''}</span><button type="button" data-select-week="${wi}">${wi===currentWeek?'Đang tổng hợp':'Xem tổng quan'}</button></div><div class="week-row">${w.days.map((d,di)=>renderDayCard(d,wi,di)).join('')}</div>`;box.appendChild(block)}box.insertAdjacentHTML('beforeend','<div class="load-sentinel">Kéo xuống để tải thêm <b>4 tuần kế tiếp</b></div>');
- box.querySelectorAll('[data-open-wi]').forEach(x=>x.addEventListener('click',e=>{if(e.target.closest('[data-menu-wi]')||e.target.closest('[data-edit-wi]')||e.target.closest('[data-del-wi]')||e.target.closest('[data-copy-wi]')||e.target.closest('[data-garmin-wi]')||e.target.closest('[data-fit-attach-wi]'))return;openModal(+x.dataset.openWi,+x.dataset.openDi,+x.dataset.openIi)}));
- box.querySelectorAll('[data-menu-wi]').forEach(x=>x.onclick=e=>{e.stopPropagation();openModal(+x.dataset.menuWi,+x.dataset.menuDi,+x.dataset.menuIi)});
- box.querySelectorAll('[data-edit-wi]').forEach(x=>x.onclick=e=>{e.stopPropagation();const wi=+x.dataset.editWi,di=+x.dataset.editDi,ii=+x.dataset.editIi;const day=db.weeks[wi]?.days?.[di];if(day)openBuilder(day.date,{wi,di,ii})});
+ box.querySelectorAll('[data-open-wi]').forEach(x=>x.addEventListener('click',e=>{if(e.target.closest('[data-menu-wi]')||e.target.closest('[data-edit-wi]')||e.target.closest('[data-del-wi]')||e.target.closest('[data-copy-wi]')||e.target.closest('[data-garmin-wi]')||e.target.closest('[data-fit-attach-wi]')||e.target.closest('[data-mobile-wi]'))return;openWorkout(+x.dataset.openWi,+x.dataset.openDi,+x.dataset.openIi)}));
+ box.querySelectorAll('[data-menu-wi]').forEach(x=>x.onclick=e=>{e.stopPropagation();openWorkout(+x.dataset.menuWi,+x.dataset.menuDi,+x.dataset.menuIi)});
+ box.querySelectorAll('[data-edit-wi]').forEach(x=>x.onclick=e=>{e.stopPropagation();const wi=+x.dataset.editWi,di=+x.dataset.editDi,ii=+x.dataset.editIi;const day=db.weeks[wi]?.days?.[di];if(!day)return;if(T17Fitness.isFitnessWorkout(day.workouts?.[ii]))return T17FitnessUI.openPlanEditor({wi,di,ii});openBuilder(day.date,{wi,di,ii})});
  box.querySelectorAll('[data-del-wi]').forEach(x=>x.onclick=e=>{e.stopPropagation();deletePlanByRef({wi:+x.dataset.delWi,di:+x.dataset.delDi,ii:+x.dataset.delIi})});
  box.querySelectorAll('[data-copy-wi]').forEach(x=>x.onclick=async e=>{e.stopPropagation();const wi=+x.dataset.copyWi,di=+x.dataset.copyDi,ii=+x.dataset.copyIi;const day=db.weeks[wi]?.days?.[di];const item=day?.workouts?.[ii];if(!day||!item)return;const dates=await T17UI.uiDates({title:`Copy “${item.workoutName||'bài tập'}”`,message:`Từ ngày ${fmtDate(day.date)} sang các ngày được chọn (chỉ copy kế hoạch, không copy kết quả)`,suggestions:[addDaysYmd(day.date,7)]});if(!dates)return;const count=copyWorkoutToDates(item,dates);if(count){render();refreshViews();toast(`Đã copy sang ${count} ngày`)}else toast('Không có ngày hợp lệ (định dạng YYYY-MM-DD)')});
- box.querySelectorAll('[data-fit-attach-wi]').forEach(b=>b.onclick=async e=>{e.stopPropagation();const wi=+b.dataset.fitAttachWi,di=+b.dataset.fitAttachDi,ii=+b.dataset.fitAttachIi;const src=db.weeks[wi]?.days?.[di]?.workouts?.[ii],date=db.weeks[wi]?.days?.[di]?.date;if(!src||!date)return;const candidates=(db.weeks[wi].days[di].workouts||[]).filter(x=>x!==src&&!x.fitStandalone);if(!candidates.length)return alert('Ngày này chưa có bài kế hoạch. Hãy tạo hoặc nhập bài kế hoạch trước khi ghép FIT.');const dst=await chooseFitTarget(candidates,date);if(!dst)return;window.RunPlanFITLinkStandalone?.({wi,di,ii},dst.id,date)});
+ box.querySelectorAll('[data-fit-attach-wi]').forEach(b=>b.onclick=async e=>{e.stopPropagation();const wi=+b.dataset.fitAttachWi,di=+b.dataset.fitAttachDi,ii=+b.dataset.fitAttachIi;const src=db.weeks[wi]?.days?.[di]?.workouts?.[ii],date=db.weeks[wi]?.days?.[di]?.date;if(!src||!date)return;const candidates=(db.weeks[wi].days[di].workouts||[]).filter(x=>x!==src&&!x.fitStandalone&&!T17Fitness.isFitnessWorkout(x));if(!candidates.length)return alert('Ngày này chưa có bài kế hoạch. Hãy tạo hoặc nhập bài kế hoạch trước khi ghép FIT.');const dst=await chooseFitTarget(candidates,date);if(!dst)return;window.RunPlanFITLinkStandalone?.({wi,di,ii},dst.id,date)});
  box.querySelectorAll('[data-garmin-wi]').forEach(x=>x.onclick=e=>{e.stopPropagation();const it=db.weeks[+x.dataset.garminWi]?.days?.[+x.dataset.garminDi]?.workouts?.[+x.dataset.garminIi];if(it)exportGarminWorkout(it.workoutName,it.workoutStructure)});
  box.querySelectorAll('[data-create-date]').forEach(x=>x.onclick=e=>{e.stopPropagation();openBuilder(x.dataset.createDate)});
  box.querySelectorAll('[data-library-date]').forEach(x=>x.onclick=e=>{e.stopPropagation();openLibraryModal(x.dataset.libraryDate)});
@@ -422,6 +426,8 @@ function collectActualSections(item){const host=$('actualSectionsBody'),plans=ho
 function sectionActualSummaryHtml(item){const s=item?.actual?.segments;if(!Array.isArray(s)||!s.length)return'';const filled=s.filter(x=>+x.actualMinutes>0||+x.actualKm>0||x.actualPace).length;if(!filled)return'';return `<div class="section-actual-note">▦ <b>${filled}/${s.length} section</b> đã có kết quả chi tiết</div>`}
 
 function openModal(wi,di,ii){editingKey={wi,di,ii,id:db.weeks[wi]?.days?.[di]?.workouts?.[ii]?.id};sectionTotalsActive=false;const d=db.weeks[wi].days[di],item=d.workouts[ii],a=item.actual||{};$('modalMeta').textContent=`${d.dow}, ${fmtDate(d.date)}${item.workoutName?' • '+item.workoutName:''} • KH ${item.planKm||'—'} km / ${item.planMinutes||'—'} phút`;actualKm.value=a.km??'';actualMinutes.value=(a.minutes===''||a.minutes==null)?'':formatDurationClock(a.minutes);manualTopKmSnapshot=actualKm.value;manualTopMinutesSnapshot=actualMinutes.value;fatigue.value=a.fatigue??'';calories.value=a.calories??'';avgHr.value=a.avgHr??'';actualNote.value=a.note??'';workoutStatus.value=a.status==='missed'?'missed':'done';actualKm.readOnly=false;actualMinutes.readOnly=false;actualKm.classList.remove('section-total-locked');actualMinutes.classList.remove('section-total-locked');actualMinutes.classList.remove('input-error','input-ok');actualMinutes.removeAttribute('title');renderActualSections(item);calcPace();$('detachActual').hidden=!item.actual||!!item.fitStandalone;modal.classList.add('show');if(window.RunPlanSavedFIT)window.RunPlanSavedFIT.show(item)}
+/** Mở thẻ bài: fitness → hộp nhập kết quả fitness, còn lại → hộp nhập kết quả chạy bộ như cũ. */
+function openWorkout(wi,di,ii){const it=db.weeks[wi]?.days?.[di]?.workouts?.[ii];if(T17Fitness.isFitnessWorkout(it)&&!it.fitStandalone)return T17FitnessUI.openResult({wi,di,ii});openModal(wi,di,ii)}
 function closeModal(){modal.classList.remove('show');editingKey=null;modal.querySelector('.actual-sheet')?.classList.remove('with-fit-data')}
 function calcPace(){const parsed=parseDurationInput(actualMinutes.value);actualMinutes.classList.toggle('input-error',!parsed.ok);actualMinutes.classList.toggle('input-ok',parsed.ok&&actualMinutes.value.trim()!=='');if(!parsed.ok){actualMinutes.title=parsed.error||'Thời gian không hợp lệ';paceOut.value='Sai định dạng';return}actualMinutes.removeAttribute('title');paceOut.value=pace(actualKm.value,parsed.minutes)}actualKm.oninput=actualMinutes.oninput=calcPace;
 function insertTimeToken(token){
@@ -478,7 +484,7 @@ async function exportExcel(){const EXPORT_TITLE='Xuất Excel';
  const weeks=db.weeks.filter(w=>w.days.some(d=>inRange(d)&&(d.workouts||[]).length>0));
  if(!weeks.length)return toast('Không có dữ liệu trong khoảng ngày đã chọn');
  const aoa=[['Tuần \\ Thứ',...DAYS]];
- const blocks=[];
+ const blocks=[],fitEntries=[];
  // v2.0: ngày có nhiều bài → thêm khối "Tuần N - bài k". Import Excel đọc lại được đủ các bài.
  for(const w of weeks){const maxN=Math.max(1,...w.days.map(d=>inRange(d)?(d.workouts||[]).length:0));for(let k=0;k<maxN;k++)blocks.push({w,k})}
  blocks.forEach(({w,k},bi)=>{
@@ -491,6 +497,7 @@ async function exportExcel(){const EXPORT_TITLE='Xuất Excel';
    aoa.push(['Số phút dự kiến',...w.days.map(d=>v(d)?(pw(d).planMinutes??''):'')]);
    aoa.push(['Ghi chú kế hoạch',...w.days.map(d=>v(d)?(pw(d).planNote||''):'')]);
    aoa.push(['Cấu trúc bài tập JSON',...w.days.map(d=>v(d)&&pw(d).workoutStructure?JSON.stringify(pw(d).workoutStructure):'')]);
+   if(w.days.some(d=>v(d)&&T17Fitness.isFitnessWorkout(pw(d)))){aoa.push([T17ExcelPlan.FIT_GRID_LABEL,...w.days.map(d=>v(d)&&T17Fitness.isFitnessWorkout(pw(d))?T17ExcelPlan.fitnessKeyOf(pw(d)):'')]);fitEntries.push(...w.days.filter(d=>v(d)&&T17Fitness.isFitnessWorkout(pw(d))).map(d=>({date:dateForExcel(d.date),item:pw(d)})))}
    aoa.push(['Số bài trong ngày',...w.days.map(d=>inRange(d)&&k===0?String((d.workouts||[]).length||''):'')]);
    aoa.push(['Trạng thái thực tế',...w.days.map(d=>v(d)?(pw(d).actual?.status==='missed'?'Không hoàn thành':pw(d).actual?'Hoàn thành':''):'')]);
    aoa.push(['Số km thực tế',...w.days.map(d=>v(d)?(pw(d).actual?.km??''):'')]);
@@ -502,6 +509,7 @@ async function exportExcel(){const EXPORT_TITLE='Xuất Excel';
    aoa.push(['Pace thực tế',...w.days.map(d=>v(d)?pace(pw(d).actual?.km,pw(d).actual?.minutes):'')]);
    if(bi<blocks.length-1)aoa.push([]);
  });
+ const fitAoa=T17ExcelPlan.fitnessSectionAoa(fitEntries);if(fitAoa.length)aoa.push([],...fitAoa);// v2.3: khối chi tiết fitness (bản cũ bỏ qua)
  const blob=RunPlanXLSX.buildXlsxBlob(aoa,'Run tracker');
  saveBlob(blob,`T17_RunTracker_${from||'start'}_${to||'end'}.xlsx`);
  if(!T17Platform.isDesktop)toast('Đã tạo file Excel (đủ mọi bài trong ngày)');
@@ -614,7 +622,7 @@ daysBox.addEventListener('drop',async e=>{
  const day=db.weeks[ref.wi]?.days?.[ref.di];const item=day?.workouts?.[ref.ii];
  if(!day||!item)return;
  if(item.fitStandalone&&item.actual){
-    const candidates=(fitDate=>locateDate(fitDate)?.d?.workouts||[])(newDate).filter(x=>x!==item&&!x.fitStandalone);
+    const candidates=(fitDate=>locateDate(fitDate)?.d?.workouts||[])(newDate).filter(x=>x!==item&&!x.fitStandalone&&!T17Fitness.isFitnessWorkout(x));
     let target=null;
     if(dropCard){const twi=+dropCard.dataset.openWi,tdi=+dropCard.dataset.openDi,tii=+dropCard.dataset.openIi;target=db.weeks[twi]?.days?.[tdi]?.workouts?.[tii];}
     if(!target&&candidates.length)target=await chooseFitTarget(candidates,newDate);
@@ -723,7 +731,7 @@ async function boot(){
  // Lần đầu (hoặc dữ liệu được nâng cấp từ định dạng cũ) → ghi lại theo schema mới.
  if(raw&&(!raw.schemaVersion||raw.schemaVersion<T17Legacy.SCHEMA_VERSION||report.legacyDaysConverted||report.weeksRealigned||report.idsFixed))saveDb();
  else if(!raw)saveDb();
- T17Analytics.init();T17Profile.init();T17UserUI.init();T17UserUI.syncName();
+ T17Analytics.init();T17Profile.init();T17FitnessUI.init();T17UserUI.init();T17UserUI.syncName();
  currentWeek=findCurrentWeek();render();initEnvironment();
  booted=true;if(warnings.length)showSupport('warn',warnings.join(' '));
  if(loadError)showSupport('bad','Không mở được kho dữ liệu: '+loadError+'. Dữ liệu tạm thời chỉ nằm trong phiên này — hãy Sao lưu JSON.');

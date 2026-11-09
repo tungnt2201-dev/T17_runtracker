@@ -229,6 +229,8 @@
   <div class="sheet library-sheet">
     <div class="sheet-head"><h2>Thư viện bài tập mẫu</h2><div class="meta">Tìm nhanh, xem cấu trúc bài, chọn ngày và thêm thẳng vào lịch hoặc chỉnh trước khi dùng</div></div>
     <div class="sheet-body">
+      <div class="lib-tabs"><button type="button" class="active" data-libtab="run">🏃 Bài chạy</button><button type="button" data-libtab="fitness">🏋 Fitness</button></div>
+      <div id="libRunPane">
       <div class="library-toolbar">
         <div class="field"><label>Tìm mẫu</label><input id="librarySearch" placeholder="Tên bài, loại bài, nội dung..." /></div>
         <div class="field"><label>Loại bài</label><select id="libraryType"><option value="">Tất cả</option><option>Easy</option><option>Recovery</option><option>Long run</option><option>Tempo</option><option>Threshold</option><option>Interval</option><option>VO2max</option><option>Custom</option></select></div>
@@ -237,6 +239,13 @@
       </div>
       <div class="library-tip">Mỗi mẫu hiển thị luôn workout profile và cấu trúc chính. “Thêm vào lịch” giữ nguyên mẫu; “Chỉnh trước khi dùng” mở Workout Builder để bạn thay pace, số lần lặp hoặc ghi chú trước khi lưu.</div>
       <div id="libraryList" class="lib-grid"></div>
+      </div>
+      <div id="libFitPane" hidden>
+        <div class="fx-toolbar"><div class="field"><label>Tìm bài / mẫu buổi</label><input data-fx-search placeholder="Tên bài, nhóm cơ, prescription…" /></div><button type="button" class="primary" data-fx-assign-any>📅 Giao bài…</button><button type="button" data-fx-new-tpl>＋ Mẫu buổi mới</button><button type="button" data-fx-new-ex>＋ Bài tập mới</button></div>
+        <div class="library-tip">“Giao bài” tạo buổi Fitness kế hoạch vào các ngày được chọn (lặp theo thứ trong tuần hoặc chọn từng ngày). Bài dựng sẵn lấy từ app mobile <b>T17 Run Training</b>: không xoá được, chỉ nhân bản; vẫn gắn được ảnh và MET.</div>
+        <h3 class="fx-h">Mẫu buổi</h3><div class="lib-grid" data-fx-tpls></div>
+        <h3 class="fx-h">Bài tập <span class="library-count" data-fx-count></span></h3><div class="lib-grid" data-fx-ex></div>
+      </div>
       <div class="sheetactions"><button type="button" id="libraryCreateBtn">＋ Tạo bài mới</button><button type="button" id="closeLibrary">Đóng</button></div>
     </div>
   </div>

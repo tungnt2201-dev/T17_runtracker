@@ -7,6 +7,8 @@
   - Thay đổi **cộng thêm, tuỳ chọn** → KHÔNG tăng `SCHEMA_VERSION` (bản cũ tự ghi đè về 2); đánh dấu bằng `db.features` (`featuresOf`). Chỉ tăng khi thay đổi không cộng thêm.
   - File chỉ có chạy bộ không được thêm field mới; bản ghi chạy bộ khi xuất giữ đúng bộ trường cũ (`planRecord`).
   - `tests/compat.test.js` so với lõi nguyên văn `tests/compat/v2.2.0/` (không sửa thư mục đó) — phải luôn xanh.
+- Fitness UI ở `src/app/fitness-ui.js` (`T17FitnessUI`); thẻ, nút ✎ và ⋮ của bài fitness phải đi qua `T17FitnessUI` (không mở Workout Builder / hộp kết quả chạy bộ). FIT chạy bộ không được ghép vào bài fitness (`isFitnessWorkout`). Mẫu fitness nằm trong `db.templates` (`workoutType: 'Fitness'`) — tab Bài chạy phải lọc ra.
+- `instanceId` bài trong buổi T17 = `<sessionId>:<k>` — không đổi quy ước này (app mobile chỉ giữ instanceId).
 - Fitness: logic trong `src/core/fitness.js`; bài fitness có `description` = `summaryText` để bản cũ đọc được; ảnh/hướng dẫn chỉ nằm trong `fitnessLibrary`. Copy/thêm từ mẫu phải cấp `sessionId` mới.
 - Lưu dữ liệu chỉ qua `saveDb()` → `T17Platform.save()`; tham chiếu bài theo `id` (`resolveRef`), không tin chỉ số `wi/di/ii`.
 - Giữ exe nhỏ: không dùng Electron hay thư viện UI nặng.

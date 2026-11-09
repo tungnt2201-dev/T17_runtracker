@@ -72,6 +72,16 @@ Logic: `src/core/fitness.js` (`T17Fitness`), chuẩn hoá trong `src/core/legacy
 - Gộp Xuất bài tập / Training Log: bài fitness chỉ coi là trùng khi cả tóm tắt lẫn danh sách bài trùng; hai buổi fitness
   cùng ngày, cùng thời lượng nhưng khác nội dung **không** bị bỏ (trước đây so km/phút sẽ gộp nhầm).
 
+### Lượt 2: mẫu buổi, kết quả, Excel, file gửi app mobile
+
+- Mẫu buổi của người dùng nằm trong `templates` (cùng mảng với mẫu chạy bộ): `{ id, name, workoutType:"Fitness", planMinutes, description, planNote, workoutStructure:null, fitness:{ schema, sessionId:"", templateId, workoutNote, plannedRpe?, exercises } }`. Bản cũ thấy nó như một mẫu bình thường (tên + mô tả).
+- `fitness.plannedRpe` (tuỳ chọn): RPE dự kiến của buổi, dùng tính tải kế hoạch.
+- Kết quả tay: `actual = { status, km:"", minutes, fatigue (RPE), calories, note, segments:[], source:"manual", fitness:{ schema, sessionId, contentHash, exercises[{…, done, rows}] } }`.
+- `instanceId` của bài trong buổi do T17 tạo có dạng `<sessionId>:<k>` (k từ 1). Lý do: app mobile bỏ mọi field lạ ở cấp `session` nhưng giữ nguyên `instanceId` khi nạp và xuất lại, nên đây là cách mang mã buổi đi khứ hồi (`sessionIdFromInstances`). File gửi app mobile vẫn có thêm `t17:{ sessionId, workoutId }` ở cấp gốc và trong `session` (app bỏ qua).
+- File gửi app mobile chứa **toàn bộ thư viện fitness** của người dùng, vì app mobile thay thư viện của nó bằng thư viện trong file khi nhập.
+- `db.features` được ghi mỗi lần lưu khi dữ liệu có fitness (`featuresOf`), dữ liệu chỉ có chạy bộ thì không.
+- Excel: hàng `Mã buổi fitness` trong lưới tuần (chỉ khi có buổi fitness) nối với khối `FITNESS — CHI TIẾT BÀI TẬP` cuối sheet, cột: `Fitness · mã buổi, Ngày, Buổi, KH/TT, Thứ tự, Library ID, Bài, Nhóm, Prescription, Set, Rep / nhóm, Số rep, Thời gian / quãng đường, Trọng lượng (kg), Ghi chú, Hoàn tất`. Bản v2.2.0 đọc cùng file ra đúng bài chạy và thấy buổi fitness như bài có tên / mô tả / phút (có test).
+
 ### Vì sao giữ `schemaVersion = 2` và thêm `features`
 
 Đã thử bằng `git worktree` của tag `v2.2.0` (chạy cả lõi lẫn app hoàn chỉnh trong jsdom) và RunPlan v1.8.9:

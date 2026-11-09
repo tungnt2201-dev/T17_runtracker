@@ -10,11 +10,11 @@
 const q = (f, n) => f.querySelector(`[name="${n}"]`);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-function open({ title, message = '', body, okLabel = 'Đồng ý', wide = false, collect, onReady }) {
+function open({ title, message = '', body, okLabel = 'Đồng ý', wide = false, collect, onReady, cls = '' }) {
   return new Promise(resolve => {
     const wrap = document.createElement('div');
     wrap.className = 'modal show ui-dialog';
-    wrap.innerHTML = `<div class="sheet ui-dialog-sheet${wide ? ' wide' : ''}" role="dialog" aria-modal="true"><div class="sheet-head"><h2>${esc(title)}</h2>${message ? `<div class="meta">${esc(message)}</div>` : ''}</div><form class="sheet-body">${body}<div class="ui-dialog-error" hidden></div><div class="sheetactions"><button type="button" data-ui-cancel>Huỷ</button><button type="submit" class="primary">${esc(okLabel)}</button></div></form></div>`;
+    wrap.innerHTML = `<div class="sheet ui-dialog-sheet${wide ? ' wide' : ''}${cls ? ' ' + cls : ''}" role="dialog" aria-modal="true"><div class="sheet-head"><h2>${esc(title)}</h2>${message ? `<div class="meta">${esc(message)}</div>` : ''}</div><form class="sheet-body">${body}<div class="ui-dialog-error" hidden></div><div class="sheetactions"><button type="button" data-ui-cancel>Huỷ</button><button type="submit" class="primary">${esc(okLabel)}</button></div></form></div>`;
     document.body.appendChild(wrap);
     const form = wrap.querySelector('form'), err = wrap.querySelector('.ui-dialog-error');
     const done = v => { document.removeEventListener('keydown', onKey, true); wrap.remove(); resolve(v); };
@@ -66,5 +66,7 @@ function uiDates({ title, message, suggestions = [], okLabel = 'Copy' } = {}) {
     collect: () => { if (!chips.size) throw new Error('Hãy chọn ít nhất một ngày.'); return [...chips].sort(); } });
 }
 
-root.T17UI = { uiPrompt, uiDateRange, uiChoose, uiDates };
+/** Hộp thoại tuỳ biến: body HTML, collect(form) → giá trị (throw Error để báo lỗi), onReady(form, done). */
+const uiForm = opts => open(opts);
+root.T17UI = { uiPrompt, uiDateRange, uiChoose, uiDates, uiForm };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

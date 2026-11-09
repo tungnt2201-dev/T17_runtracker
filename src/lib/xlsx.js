@@ -101,6 +101,6 @@ function buildXlsxBlob(aoa,sheetName='Run tracker'){
   ];
   return new Blob([zipStore(files)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 }
-root.RunPlanXLSX={readFirstSheet,buildXlsxBlob,unzip,parseSheet,parseSharedStrings};
+root.RunPlanXLSX={readFirstSheet,buildXlsxBlob,unzip,parseSheet,parseSharedStrings,zipStore};
 if(typeof module!=='undefined'&&module.exports)module.exports=root.RunPlanXLSX;
 })(typeof globalThis!=='undefined'?globalThis:this);

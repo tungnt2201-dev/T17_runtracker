@@ -7,17 +7,22 @@
  *   3. pace      : rTSS = giờ × IF² × 100, IF = pace ngưỡng / pace thực tế (không hiệu chỉnh dốc)
  *   4. rpe       : IF suy từ cảm nhận RPE 1–10
  *   5. type      : IF mặc định theo loại bài (ước tính thô)
+ * Buổi FITNESS (v2.3): session-RPE (Foster) quy về thang TSS: tải = RPE × phút × 100 / 480
+ *   (RPE 8 — "khó, sát ngưỡng" — trong 60 phút = 100, ngang 60 phút chạy đúng ngưỡng). Thiếu RPE → RPE mặc định 5.
+ *   Không dùng nhịp tim cho fitness (TRIMP đánh giá thấp bài sức mạnh). Bài chạy bộ KHÔNG đổi cách tính.
  * CTL (thể lực) = EWMA 42 ngày, ATL (mệt mỏi) = EWMA 7 ngày, TSB (độ tươi) = CTL − ATL của hôm trước.
  */
 (function (root) {
 'use strict';
 const C = root.T17Core || (typeof require === 'function' ? require('./utils.js') : null);
 const A = root.T17Athlete || (typeof require === 'function' ? require('./athlete.js') : null);
+const F = root.T17Fitness || (typeof require === 'function' ? require('./fitness.js') : null);
 const { paceToSec, flattenStructuredSegments, stepEstimate, addDaysYmd, mondayYmd } = C;
+const SRPE_PER_TSS = 4.8; // RPE × phút ÷ 4,8 = điểm tải
 
 const TYPE_IF = { Easy: 0.70, Recovery: 0.62, 'Long run': 0.74, Tempo: 0.86, Threshold: 0.92, Interval: 0.88, VO2max: 0.90, Custom: 0.72, '': 0.72 };
 const RPE_IF = [0, 0.50, 0.55, 0.60, 0.66, 0.72, 0.78, 0.84, 0.90, 0.97, 1.05];
-const METHOD_LABEL = { 'hr-stream': 'nhịp tim FIT', 'hr-avg': 'nhịp tim TB', pace: 'pace', rpe: 'RPE', type: 'ước tính theo loại bài', plan: 'kế hoạch' };
+const METHOD_LABEL = { srpe: 'RPE × phút', 'srpe-default': 'RPE mặc định × phút', 'hr-stream': 'nhịp tim FIT', 'hr-avg': 'nhịp tim TB', pace: 'pace', rpe: 'RPE', type: 'ước tính theo loại bài', plan: 'kế hoạch' };
 
 function trimpCoeff(sex) { return sex === 'female' ? 1.67 : 1.92; }
 function trimpRate(hr, P) { const hrr = Math.max(0, Math.min(1.1, (hr - P.hrRest) / (P.hrMax - P.hrRest))); return hrr * 0.64 * Math.exp(trimpCoeff(P.sex) * hrr); }
@@ -38,10 +43,16 @@ function loadFromHrStream(points, P) {
 function loadFromIF(minutes, IF) { return minutes / 60 * IF * IF * 100; }
 
 function isDone(item) { return !!item?.actual && item.actual.status !== 'missed'; }
+function srpeLoad(minutes, rpe) { return minutes > 0 && rpe > 0 ? rpe * minutes / SRPE_PER_TSS : 0; }
 
 /** Điểm tải thực tế của một bài đã hoàn thành. */
 function actualLoad(item, profile) {
   const a = item?.actual; if (!isDone(item)) return { load: 0, method: null };
+  if (F && F.isFitnessWorkout(item)) {
+    const min = Number(a.minutes) || Number(item.planMinutes) || 0, rpe = Number(a.fatigue) || 0;
+    if (rpe >= 1 && rpe <= 10) return { load: srpeLoad(min, rpe), method: min ? 'srpe' : null };
+    return min ? { load: srpeLoad(min, F.DEFAULT_RPE), method: 'srpe-default' } : { load: 0, method: null };
+  }
   const P = A.resolveProfile(profile);
   const minutes = Number(a.minutes) || 0, km = Number(a.km) || 0;
   const stream = a.fitImport?.sectionSource?.hr;
@@ -63,6 +74,7 @@ function actualLoad(item, profile) {
 
 /** Điểm tải dự kiến của bài kế hoạch, theo pace/HR mục tiêu từng đoạn nếu có. */
 function plannedLoad(item, profile) {
+  if (F && F.isFitnessWorkout(item)) { const rpe = Number(item.fitness?.plannedRpe) || F.DEFAULT_RPE; return srpeLoad(Number(item.planMinutes) || 0, rpe); }
   const P = A.resolveProfile(profile);
   const segs = flattenStructuredSegments(item?.workoutStructure);
   let load = 0;
@@ -149,7 +161,7 @@ function weeklySummary(rows) {
 function rampWarning(ctlPerWeek) { if (ctlPerWeek > 8) return 'Tăng tải quá nhanh (>8 CTL/tuần) — nguy cơ chấn thương'; if (ctlPerWeek > 5) return 'Tăng tải khá nhanh'; if (ctlPerWeek < -5) return 'Đang giảm tải / nghỉ'; return ''; }
 function tsbLabel(tsb) { if (tsb > 25) return 'Quá nghỉ — thể lực có thể giảm'; if (tsb > 5) return 'Tươi — hợp thi đấu'; if (tsb >= -10) return 'Cân bằng'; if (tsb >= -30) return 'Đang tích luỹ tải (tối ưu)'; return 'Quá tải — cần hồi phục'; }
 
-const api = { TYPE_IF, RPE_IF, METHOD_LABEL, trimpRate, loadFromHrStream, actualLoad, plannedLoad, hrZoneMinutes, collect, pmcSeries, weeklySummary, rampWarning, tsbLabel };
+const api = { SRPE_PER_TSS, srpeLoad, TYPE_IF, RPE_IF, METHOD_LABEL, trimpRate, loadFromHrStream, actualLoad, plannedLoad, hrZoneMinutes, collect, pmcSeries, weeklySummary, rampWarning, tsbLabel };
 root.T17Load = api;
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

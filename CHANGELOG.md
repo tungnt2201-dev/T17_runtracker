@@ -1,5 +1,17 @@
 # Changelog
 
+## Chưa phát hành — Fitness, lượt 2 (thư viện, giao bài, nhập kết quả)
+
+- **Thư viện → tab Fitness**: 15 bài dựng sẵn + 2 mẫu buổi (từ app mobile *T17 Run Training*); tìm kiếm; tạo / sửa / nhân bản / xoá bài tự tạo (tên, nhóm cơ, prescription, cách tập, chú ý, dòng mẫu set·rep·thời gian·kg, MET tuỳ chọn). Mỗi bài 1 ảnh, **tự thu nhỏ và nén ≤ 60 KB** (báo rõ nếu không nén được). Bài dựng sẵn không xoá/sửa nội dung, chỉ gắn ảnh/MET hoặc nhân bản.
+- **Mẫu buổi** của người dùng (danh sách bài, thời lượng, ghi chú, RPE dự kiến) lưu trong `templates` cùng chỗ với mẫu bài chạy; tab Bài chạy không hiện mẫu fitness.
+- **Giao bài**: chọn mẫu → lặp theo thứ trong tuần trong N tuần, hoặc chọn từng ngày. Tạo buổi kế hoạch mới, không ghi đè; ngày đã có buổi chưa tập của cùng mẫu thì bỏ qua.
+- **Thẻ Fitness trên lịch** (🏋): số bài, thời lượng, số set/kg, chấm màu tải dự kiến, danh sách bài (✓ / gạch bỏ khi đã nhập kết quả). Nút ✎ sửa danh sách bài **của riêng buổi đó** (thêm, bớt, đổi thứ tự, đổi set/rep/kg); ⋮ hoặc bấm thẻ để nhập kết quả.
+- **Nhập kết quả tay**: tick xong từng bài, sửa dòng thực tế, thời lượng, calo, RPE, ghi chú; xoá kết quả. Màu thẻ theo tỉ lệ bài xong / tổng bài, cùng thang màu với bài chạy (≥ 90% đạt · 70–90% · 50–70% · 20–50% · < 20%).
+- **Điểm tải fitness = RPE × phút ÷ 4,8** (session-RPE của Foster quy về thang TSS: RPE 8 trong 60 phút = 100, ngang 60 phút chạy đúng ngưỡng). Thiếu RPE → RPE mặc định 5 (hoặc RPE dự kiến của mẫu). Bài chạy bộ không đổi cách tính.
+- **Xuất cho app mobile** (nút 📱): một buổi → file JSON v3 của app; nhiều buổi trong khoảng ngày → ZIP, mỗi buổi `YYYY-MM-DD_tên-buổi.json`. Mã buổi T17 được gửi trong `instanceId` của từng bài (`<mã buổi>:<k>`) — chỗ duy nhất app mobile giữ nguyên khi nạp và xuất lại.
+- **Excel**: lưới tuần có thêm hàng *Mã buổi fitness* và cuối sheet có khối *FITNESS — CHI TIẾT BÀI TẬP* (mỗi bài × mỗi dòng set một hàng, cả KH và TT). Nhập lại đọc đủ bài; bản cũ bỏ qua hai phần này.
+- FIT chạy bộ không còn bị tự ghép nhầm vào buổi fitness.
+
 ## Chưa phát hành — Fitness, lượt 1 (lớp dữ liệu)
 
 Chưa có giao diện fitness; bản này chỉ chuẩn bị dữ liệu và kiểm chứng tương thích.

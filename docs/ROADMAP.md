@@ -20,6 +20,7 @@
 
 ## v2.3–v2.5 — Fitness, chỉ số cơ thể, calo (đang làm theo 8 lượt)
 - ✅ Lượt 1: lớp dữ liệu fitness, đọc file app mobile, test tương thích hai chiều với v2.2.0.
+- ✅ Lượt 2: thư viện Fitness, mẫu buổi, giao bài, thẻ lịch, nhập kết quả tay, điểm tải RPE × phút, xuất cho app mobile, Excel.
 - Lượt 2–3: thư viện + giao bài + nhập tự động nhận diện (v2.3.0). Lượt 4–5: chỉ số cơ thể + biểu đồ (v2.4.0). Lượt 6: calo trong ngày (v2.5.0). Lượt 7–8: rà soát + hướng dẫn.
 
 ## P2 — Thành tích & thiết bị
