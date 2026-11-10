@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.6.1 — 2026-11-10 (Ghép hoạt động đã tập vào buổi fitness kế hoạch)
+
+Gói: `261110_T17_runtracker_v2.6.1.zip`. Định dạng dữ liệu không đổi (dùng lại `actual` + `actual.fitness` + `actual.fitImport` sẵn có).
+
+- Sửa: kéo **thẻ FIT đã tập chưa ghép** (thẻ tím) vào **thẻ buổi fitness kế hoạch** trước đây không được (chỉ ghép được vào bài chạy). Nay thẻ fitness được tô viền khi kéo qua và nhận ghép: giữ số liệu đo (phút, calo, HR, dữ liệu FIT), bài trong buổi lấy theo kế hoạch và đánh dấu đã tập hết — bấm thẻ để bỏ tick bài chưa tập. Buổi đã có kết quả sẽ hỏi trước khi ghi đè.
+- Nút “Ghép vào bài KH” trên thẻ FIT và hộp chọn khi thả vào khung ngày cũng liệt kê buổi fitness (có biểu tượng 🏋).
+- Nhập FIT hàng loạt vẫn KHÔNG tự ghép vào buổi fitness (tránh ghép nhầm buổi chạy vào buổi gym) — ghép bằng kéo thả.
+- Lõi: `T17Fitness.actualFromActivity()`. Test: +1 lõi, +1 giao diện; đã thử kéo thả thật bằng Chromium.
+
 ## 2.6.0 — 2026-11-10 (Thêm bài fitness ngay ở khung ngày + kéo thả bài tự do)
 
 Gói: `261110_T17_runtracker_v2.6.0.zip`. **Định dạng dữ liệu KHÔNG đổi** (không thêm field; chỉ dùng lại khối `fitness` hiện có) — file mới vẫn nạp được bằng v2.2.0.

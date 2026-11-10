@@ -335,6 +335,19 @@ function buildActual(prev, form, item) {
   return out;
 }
 
+/** Ghép một hoạt động ĐÃ TẬP (thẻ FIT riêng / kết quả nhập tay chưa ghép) vào buổi fitness KẾ HOẠCH.
+ *  Giữ nguyên số liệu đo của hoạt động (phút, calo, HR, fitImport…), bỏ section; bài trong buổi lấy từ kế hoạch
+ *  và đánh dấu đã tập hết (người dùng bỏ tick bài chưa tập trong ô kết quả). Không sửa đối tượng gốc. */
+function actualFromActivity(item, activityActual) {
+  if (!isFitnessWorkout(item) || !isObj(activityActual)) return null;
+  const a = JSON.parse(JSON.stringify(activityActual));
+  const sid = item.fitness?.sessionId || '';
+  const exercises = (item.fitness?.exercises || []).map(e => normalizeExercise({ ...e, done: true }, { withDone: true }));
+  const out = { ...a, status: 'done', segments: [], fitness: { schema: FITNESS_SCHEMA, sessionId: sid, exercises } };
+  out.fitness.contentHash = contentHash({ date: '', workoutName: item.workoutName || '', exercises });
+  return out;
+}
+
 /** Workout fitness → dữ liệu JSON v3 của app mobile (nạp bằng nút "Nhập file" của app).
  *  library: thư viện của người dùng T17 — app mobile THAY thư viện của nó bằng thư viện trong file, nên gửi đủ. */
 function toMobileData(item, date, library, opts = {}) {
@@ -355,7 +368,7 @@ function mobileFileName(date, name) { return `${toDate(date) || 'ngay'}_${safeFi
 function dataUrlBytes(url) { const i = str(url).indexOf(','); if (i < 0) return 0; const b64 = str(url).slice(i + 1).replace(/\s/g, ''); return Math.floor(b64.length * 3 / 4) - (b64.endsWith('==') ? 2 : b64.endsWith('=') ? 1 : 0); }
 
 const api = { safeImageData, FITNESS_SCHEMA, FITNESS_TYPE, ROW_KEYS, BUILTIN_LIBRARY, BUILTIN_TEMPLATES, newSessionId, newInstanceId, normalizeRows, normalizeLibrary, customItems, normalizeExercise, normalizeFitnessBlock, isFitnessWorkout, hasFitnessContent, sessionVolume, summaryText, contentHash, mobileKind, templateSession, fromMobile, toWorkout,
-  DEFAULT_RPE, IMAGE_MAX_BYTES, exerciseBrief, prefixInstances, sessionIdFromInstances, withNewSessionId, templateToSession, planFromTemplate, blankPlan, addExerciseToPlan, templateFromSession, repeatDates, completion, buildActual, toMobileData, safeFileName, mobileFileName, dataUrlBytes };
+  DEFAULT_RPE, IMAGE_MAX_BYTES, exerciseBrief, prefixInstances, sessionIdFromInstances, withNewSessionId, templateToSession, planFromTemplate, blankPlan, addExerciseToPlan, templateFromSession, repeatDates, completion, buildActual, actualFromActivity, toMobileData, safeFileName, mobileFileName, dataUrlBytes };
 root.T17Fitness = api;
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -235,6 +235,17 @@ window.RunPlanFITLinkStandalone=function(sourceRef,targetId,targetDate){
  const target=dest?.workouts?.find(x=>x.id===targetId);
  if(!activity?.fitStandalone||!activity?.actual||!target||target===activity||target.fitStandalone)return false;
  if(target.actual&&!confirm(`Bài “${target.workoutName}” đã có kết quả. Thay thế kết quả cũ bằng hoạt động “${activity.workoutName}”?`))return false;
+ if(T17Fitness.isFitnessWorkout(target)){
+   const merged=T17Fitness.actualFromActivity(target,activity.actual);if(!merged)return false;
+   if(activity.actual.fitImport)merged.fitImport={...merged.fitImport,linkedToPlanAt:new Date().toISOString(),linkedFromDate:sourceDay.date,sectionMode:'none'};
+   const previous=target.actual,srcIndex=sourceDay.workouts.indexOf(activity);
+   target.actual=merged;sourceDay.workouts.splice(srcIndex,1);
+   if(!saveDb()){sourceDay.workouts.splice(srcIndex,0,activity);target.actual=previous;return false;}
+   const loc=locateDate(targetDate);if(loc)currentWeek=loc.wi;
+   render();refreshViews();
+   toast(`Đã ghép “${activity.workoutName||'hoạt động'}” vào buổi fitness “${target.workoutName||'Fitness'}” — bấm thẻ để bỏ tick bài chưa tập`);
+   return true;
+ }
  const srcInfo=activity.actual.fitImport||null;
  const src=srcInfo?.sectionSource;
  let segments=[];

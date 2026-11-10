@@ -274,3 +274,14 @@ test('addExerciseToPlan: từ chối buổi đã có kết quả', () => {
   const p = { ...F.addExerciseToPlan(F.blankPlan(), F.BUILTIN_LIBRARY[0]), actual: { status: 'done' } };
   assert.equal(F.addExerciseToPlan(p, F.BUILTIN_LIBRARY[1]), null);
 });
+
+test('actualFromActivity: ghép hoạt động đã tập vào buổi fitness kế hoạch', () => {
+  const plan = F.addExerciseToPlan(F.addExerciseToPlan(F.blankPlan(), F.BUILTIN_LIBRARY[0]), F.BUILTIN_LIBRARY[1]);
+  const act = { status: 'done', km: '', minutes: 52, calories: 310, avgHr: 128, fatigue: '', segments: [{ x: 1 }], fitImport: { file: 'a.fit' } };
+  const a = F.actualFromActivity(plan, act);
+  assert.equal(a.minutes, 52); assert.equal(a.calories, 310); assert.equal(a.avgHr, 128); assert.deepEqual(a.fitImport, { file: 'a.fit' });
+  assert.deepEqual(a.segments, []); assert.equal(a.fitness.sessionId, plan.fitness.sessionId);
+  assert.deepEqual(a.fitness.exercises.map(e => e.done), [true, true]);
+  assert.deepEqual(act.segments, [{ x: 1 }], 'không sửa bản gốc');
+  assert.equal(F.actualFromActivity({ workoutType: 'Easy' }, act), null);
+});

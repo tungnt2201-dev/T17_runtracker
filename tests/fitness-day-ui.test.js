@@ -93,3 +93,27 @@ test('kéo bài chạy (dragRef) không bị ảnh hưởng: thả không có ex
   drag(w, col, 'drop', dt); await wait(10);
   assert.equal(fitItems(w).length, 0); assert.deepEqual(errors, []);
 });
+
+test('kéo thẻ FIT đã tập (chưa ghép) vào thẻ buổi fitness kế hoạch → ghép kết quả, xoá thẻ FIT', async () => {
+  const { w, doc, errors } = open(); await wait(300);
+  const date = doc.querySelector('.day-col').dataset.daycolDate;
+  w.eval(`(function(){const l=ensureDate(${JSON.stringify(date)});l.d.workouts=l.d.workouts||[];
+    l.d.workouts.push({id:genId(),...T17Fitness.addExerciseToPlan(T17Fitness.blankPlan('Gym chân'),T17Fitness.BUILTIN_LIBRARY[0])});
+    l.d.workouts.push({id:genId(),workoutName:'Easy run',workoutType:'Easy',planKm:5,planMinutes:'',description:'',actual:null});
+    l.d.workouts.push({id:genId(),fitStandalone:true,workoutName:'Garmin FIT · Strength',workoutType:'Custom',planKm:'',planMinutes:'',description:'',actual:{status:'done',km:'',minutes:45,calories:280,avgHr:121,segments:[]}});
+    saveDb();render();})()`);
+  const fitCard = doc.querySelector('.workout-card[data-fit-standalone="1"]'); assert.ok(fitCard, 'có thẻ FIT riêng');
+  const plan = doc.querySelector('.workout-card.fitness'); assert.ok(plan);
+  const dt = DT();
+  drag(w, fitCard, 'dragstart', dt);
+  const over = drag(w, plan, 'dragover', dt); assert.equal(over.defaultPrevented, true);
+  assert.ok(plan.classList.contains('fit-drop-target'), 'thẻ fitness được tô viền khi kéo qua');
+  drag(w, plan, 'drop', dt); await wait(40);
+  const ws = json(w, `locateDate(${JSON.stringify(date)}).d.workouts`);
+  assert.equal(ws.length, 2, 'thẻ FIT đã gộp vào buổi');
+  const fit = ws.find(x => x.workoutType === 'Fitness');
+  assert.equal(fit.actual.status, 'done'); assert.equal(fit.actual.minutes, 45); assert.equal(fit.actual.avgHr, 121);
+  assert.equal(fit.actual.fitness.exercises.length, 1); assert.equal(fit.actual.fitness.exercises[0].done, true);
+  assert.equal(ws.find(x => x.workoutType === 'Easy').actual, null, 'bài chạy không bị đụng');
+  assert.deepEqual(errors, []);
+});

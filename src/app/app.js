@@ -351,7 +351,7 @@ function render(opts={}){const cal=$('calendarWrap'),oldScroll=opts.preserveScro
  box.querySelectorAll('[data-edit-wi]').forEach(x=>x.onclick=e=>{e.stopPropagation();const wi=+x.dataset.editWi,di=+x.dataset.editDi,ii=+x.dataset.editIi;const day=db.weeks[wi]?.days?.[di];if(!day)return;if(T17Fitness.isFitnessWorkout(day.workouts?.[ii]))return T17FitnessUI.openPlanEditor({wi,di,ii});openBuilder(day.date,{wi,di,ii})});
  box.querySelectorAll('[data-del-wi]').forEach(x=>x.onclick=e=>{e.stopPropagation();deletePlanByRef({wi:+x.dataset.delWi,di:+x.dataset.delDi,ii:+x.dataset.delIi})});
  box.querySelectorAll('[data-copy-wi]').forEach(x=>x.onclick=async e=>{e.stopPropagation();const wi=+x.dataset.copyWi,di=+x.dataset.copyDi,ii=+x.dataset.copyIi;const day=db.weeks[wi]?.days?.[di];const item=day?.workouts?.[ii];if(!day||!item)return;const dates=await T17UI.uiDates({title:`Copy “${item.workoutName||'bài tập'}”`,message:`Từ ngày ${fmtDate(day.date)} sang các ngày được chọn (chỉ copy kế hoạch, không copy kết quả)`,suggestions:[addDaysYmd(day.date,7)]});if(!dates)return;const count=copyWorkoutToDates(item,dates);if(count){render();refreshViews();toast(`Đã copy sang ${count} ngày`)}else toast('Không có ngày hợp lệ (định dạng YYYY-MM-DD)')});
- box.querySelectorAll('[data-fit-attach-wi]').forEach(b=>b.onclick=async e=>{e.stopPropagation();const wi=+b.dataset.fitAttachWi,di=+b.dataset.fitAttachDi,ii=+b.dataset.fitAttachIi;const src=db.weeks[wi]?.days?.[di]?.workouts?.[ii],date=db.weeks[wi]?.days?.[di]?.date;if(!src||!date)return;const candidates=(db.weeks[wi].days[di].workouts||[]).filter(x=>x!==src&&!x.fitStandalone&&!T17Fitness.isFitnessWorkout(x));if(!candidates.length)return alert('Ngày này chưa có bài kế hoạch. Hãy tạo hoặc nhập bài kế hoạch trước khi ghép FIT.');const dst=await chooseFitTarget(candidates,date);if(!dst)return;window.RunPlanFITLinkStandalone?.({wi,di,ii},dst.id,date)});
+ box.querySelectorAll('[data-fit-attach-wi]').forEach(b=>b.onclick=async e=>{e.stopPropagation();const wi=+b.dataset.fitAttachWi,di=+b.dataset.fitAttachDi,ii=+b.dataset.fitAttachIi;const src=db.weeks[wi]?.days?.[di]?.workouts?.[ii],date=db.weeks[wi]?.days?.[di]?.date;if(!src||!date)return;const candidates=(db.weeks[wi].days[di].workouts||[]).filter(x=>x!==src&&!x.fitStandalone);if(!candidates.length)return alert('Ngày này chưa có bài kế hoạch. Hãy tạo hoặc nhập bài kế hoạch trước khi ghép FIT.');const dst=await chooseFitTarget(candidates,date);if(!dst)return;window.RunPlanFITLinkStandalone?.({wi,di,ii},dst.id,date)});
  box.querySelectorAll('[data-garmin-wi]').forEach(x=>x.onclick=e=>{e.stopPropagation();const it=db.weeks[+x.dataset.garminWi]?.days?.[+x.dataset.garminDi]?.workouts?.[+x.dataset.garminIi];if(it)exportGarminWorkout(it.workoutName,it.workoutStructure)});
  box.querySelectorAll('[data-create-date]').forEach(x=>x.onclick=e=>{e.stopPropagation();openBuilder(x.dataset.createDate)});
  box.querySelectorAll('[data-fitness-date]').forEach(x=>x.onclick=e=>{e.stopPropagation();if(root_fit())root_fit().addToDay(x.dataset.fitnessDate)});
@@ -596,7 +596,7 @@ $('dataMenu').querySelectorAll('.menu-panel button').forEach(b=>b.addEventListen
 async function chooseFitTarget(candidates,date){
  if(!candidates.length)return null;
  if(candidates.length===1)return candidates[0];
- return T17UI.uiChoose({title:'Ghép kết quả vào bài nào?',message:'Ngày '+fmtDate(date)+' có '+candidates.length+' bài kế hoạch',options:candidates.map(x=>({label:x.workoutName||'Bài chạy',sub:[x.planKm?x.planKm+' km':'',x.planMinutes?x.planMinutes+' phút':'',x.actual?'đã có kết quả — sẽ hỏi ghi đè':''].filter(Boolean).join(' · '),value:x}))});
+ return T17UI.uiChoose({title:'Ghép kết quả vào bài nào?',message:'Ngày '+fmtDate(date)+' có '+candidates.length+' bài kế hoạch',options:candidates.map(x=>({label:(T17Fitness.isFitnessWorkout(x)?'🏋 ':'')+(x.workoutName||'Bài chạy'),sub:[x.planKm?x.planKm+' km':'',x.planMinutes?x.planMinutes+' phút':'',x.actual?'đã có kết quả — sẽ hỏi ghi đè':''].filter(Boolean).join(' · '),value:x}))});
 }
 let dragRef=null;
 const daysBox=$('days');
@@ -622,7 +622,7 @@ daysBox.addEventListener('dragover',e=>{
  if(e.dataTransfer)try{e.dataTransfer.dropEffect=standalone?'move':((e.ctrlKey||e.metaKey)?'copy':'move')}catch(err){}
  daysBox.querySelectorAll('.fit-drop-target').forEach(x=>x.classList.remove('fit-drop-target'));
  daysBox.querySelectorAll('.fit-day-drop').forEach(x=>x.classList.remove('fit-day-drop'));
- if(standalone){const planCard=e.target.closest('.workout-card[data-fit-standalone="0"]');if(planCard)planCard.classList.add('fit-drop-target');else col.classList.add('fit-day-drop')}
+ if(standalone){const planCard=e.target.closest('.workout-card[data-fit-standalone="0"],.workout-card.fitness');if(planCard)planCard.classList.add('fit-drop-target');else col.classList.add('fit-day-drop')}
  else col.classList.add('drag-over');
 });
 daysBox.addEventListener('dragleave',e=>{
@@ -636,7 +636,7 @@ daysBox.addEventListener('drop',async e=>{
  e.preventDefault();
  col.classList.remove('drag-over');
  const newDate=col.dataset.daycolDate;
- const dropCard=e.target.closest('.workout-card[data-fit-standalone="0"]');
+ const dropCard=e.target.closest('.workout-card[data-fit-standalone="0"],.workout-card.fitness');
  const ref=dragRef;dragRef=null;
  daysBox.querySelectorAll('.fit-drop-target').forEach(x=>x.classList.remove('fit-drop-target'));
  daysBox.querySelectorAll('.fit-day-drop').forEach(x=>x.classList.remove('fit-day-drop'));
@@ -644,7 +644,7 @@ daysBox.addEventListener('drop',async e=>{
  const day=db.weeks[ref.wi]?.days?.[ref.di];const item=day?.workouts?.[ref.ii];
  if(!day||!item)return;
  if(item.fitStandalone&&item.actual){
-    const candidates=(fitDate=>locateDate(fitDate)?.d?.workouts||[])(newDate).filter(x=>x!==item&&!x.fitStandalone&&!T17Fitness.isFitnessWorkout(x));
+    const candidates=(fitDate=>locateDate(fitDate)?.d?.workouts||[])(newDate).filter(x=>x!==item&&!x.fitStandalone);
     let target=null;
     if(dropCard){const twi=+dropCard.dataset.openWi,tdi=+dropCard.dataset.openDi,tii=+dropCard.dataset.openIi;target=db.weeks[twi]?.days?.[tdi]?.workouts?.[tii];}
     if(!target&&candidates.length)target=await chooseFitTarget(candidates,newDate);
