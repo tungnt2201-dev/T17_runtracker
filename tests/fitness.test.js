@@ -248,3 +248,29 @@ test('Excel: khối chi tiết fitness — bản mới đọc lại đủ bài; 
   // Excel chỉ có chạy bộ: không có hàng/khối fitness
   assert.deepEqual(X.fitnessSectionAoa([{ date: days[0], item: run }]), []);
 });
+
+test('blankPlan: buổi trống, mỗi lần một sessionId mới', () => {
+  const a = F.blankPlan(), b = F.blankPlan('Ngực');
+  assert.equal(a.workoutType, 'Fitness'); assert.equal(a.workoutName, 'Buổi fitness'); assert.equal(b.workoutName, 'Ngực');
+  assert.deepEqual(a.fitness.exercises, []); assert.equal(a.actual, null);
+  assert.notEqual(a.fitness.sessionId, b.fitness.sessionId);
+});
+
+test('addExerciseToPlan: thêm bài tự do, giữ sessionId, đánh lại instanceId, không sửa bản gốc', () => {
+  const lib = F.BUILTIN_LIBRARY;
+  const p0 = F.blankPlan();
+  const p1 = F.addExerciseToPlan(p0, lib[0]);
+  const p2 = F.addExerciseToPlan(p1, lib[1]);
+  assert.equal(p0.fitness.exercises.length, 0);
+  assert.equal(p2.fitness.exercises.length, 2);
+  assert.equal(p2.fitness.sessionId, p0.fitness.sessionId);
+  assert.deepEqual(p2.fitness.exercises.map(e => e.instanceId), [`${p0.fitness.sessionId}:1`, `${p0.fitness.sessionId}:2`]);
+  assert.equal(p2.fitness.exercises[1].libraryId, lib[1].id);
+  assert.match(p2.description, /^Fitness · 2 bài/);
+  assert.equal(F.sessionIdFromInstances(p2.fitness.exercises), p0.fitness.sessionId);
+});
+
+test('addExerciseToPlan: từ chối buổi đã có kết quả', () => {
+  const p = { ...F.addExerciseToPlan(F.blankPlan(), F.BUILTIN_LIBRARY[0]), actual: { status: 'done' } };
+  assert.equal(F.addExerciseToPlan(p, F.BUILTIN_LIBRARY[1]), null);
+});

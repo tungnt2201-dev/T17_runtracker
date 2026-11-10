@@ -312,7 +312,7 @@ function renderPane() {
     return `<div class="lib-card fx-tpl"><div class="lib-card-head"><div class="lib-card-title">${esc(e.name)}</div><span class="lib-type-badge">${e.builtin ? 'Dựng sẵn' : 'Của bạn'}</span></div><div class="lib-meta2">${e.count} bài${e.minutes ? ' · ' + esc(e.minutes) + ' phút' : ''}</div><ol class="fx-mini">${sess.exercises.slice(0, 6).map(x => `<li>${esc(x.name)}</li>`).join('')}${sess.exercises.length > 6 ? `<li class="more">+${sess.exercises.length - 6} bài</li>` : ''}</ol><div class="lib-actions2"><button type="button" class="primary" data-fx-assign="${esc(e.key)}">📅 Giao bài</button>${e.builtin ? '' : `<button type="button" data-fx-tpl-edit="${esc(e.key)}">✎ Sửa</button>`}<button type="button" data-fx-tpl-dup="${esc(e.key)}">⧉ Nhân bản</button>${e.builtin ? '' : `<button type="button" class="danger" data-fx-tpl-del="${esc(e.key)}">Xóa</button>`}</div></div>`;
   }).join('') || '<div class="lib-empty">Không có mẫu buổi nào khớp.</div>';
   host.querySelector('[data-fx-count]').textContent = `${ex.length} / ${lib.length} bài`;
-  host.querySelector('[data-fx-ex]').innerHTML = ex.map(x => `<div class="lib-card fx-exc">${x.imageData ? `<img class="fx-thumb" src="${esc(root.T17Fitness.safeImageData(x.imageData))}" alt="">` : ''}<div class="lib-card-head"><div class="lib-card-title">${esc(x.name)}</div><span class="lib-type-badge">${x.builtin ? 'Dựng sẵn' : 'Của bạn'}</span>${x.unconfirmed ? '<span class="lib-type-badge fx-unconf" title="Bài được thêm khi nhập file app fitness — kiểm tra rồi bấm Xác nhận">Chưa xác nhận</span>' : ''}</div><div class="lib-meta2">${esc(x.category || 'Chưa phân nhóm')} · ${esc(x.plan || '—')}${x.met ? ` · MET ${x.met}` : ''}</div>${x.cue ? `<div class="fx-cue">${esc(x.cue)}</div>` : ''}<div class="lib-actions2"><button type="button" data-fx-ex-edit="${esc(x.id)}">${x.builtin ? '🖼 Ảnh / MET' : '✎ Sửa'}</button>${x.unconfirmed ? `<button type="button" class="primary" data-fx-ex-ok="${esc(x.id)}">✓ Xác nhận</button>` : ''}<button type="button" data-fx-ex-dup="${esc(x.id)}">⧉ Nhân bản</button>${x.builtin ? '' : `<button type="button" class="danger" data-fx-ex-del="${esc(x.id)}">Xóa</button>`}</div></div>`).join('') || '<div class="lib-empty">Không có bài nào khớp.</div>';
+  host.querySelector('[data-fx-ex]').innerHTML = ex.map(x => `<div class="lib-card fx-exc" draggable="true" data-fx-exid="${esc(x.id)}" title="Kéo thả vào khung ngày hoặc vào thẻ buổi fitness để thêm bài">${x.imageData ? `<img class="fx-thumb" src="${esc(root.T17Fitness.safeImageData(x.imageData))}" alt="">` : ''}<div class="lib-card-head"><div class="lib-card-title">${esc(x.name)}</div><span class="lib-type-badge">${x.builtin ? 'Dựng sẵn' : 'Của bạn'}</span>${x.unconfirmed ? '<span class="lib-type-badge fx-unconf" title="Bài được thêm khi nhập file app fitness — kiểm tra rồi bấm Xác nhận">Chưa xác nhận</span>' : ''}</div><div class="lib-meta2">${esc(x.category || 'Chưa phân nhóm')} · ${esc(x.plan || '—')}${x.met ? ` · MET ${x.met}` : ''}</div>${x.cue ? `<div class="fx-cue">${esc(x.cue)}</div>` : ''}<div class="lib-actions2"><button type="button" data-fx-ex-edit="${esc(x.id)}">${x.builtin ? '🖼 Ảnh / MET' : '✎ Sửa'}</button>${x.unconfirmed ? `<button type="button" class="primary" data-fx-ex-ok="${esc(x.id)}">✓ Xác nhận</button>` : ''}<button type="button" data-fx-ex-dup="${esc(x.id)}">⧉ Nhân bản</button>${x.builtin ? '' : `<button type="button" class="danger" data-fx-ex-del="${esc(x.id)}">Xóa</button>`}</div></div>`).join('') || '<div class="lib-empty">Không có bài nào khớp.</div>';
 }
 function setLibraryTab(tab) {
   const fit = tab === 'fitness';
@@ -322,7 +322,82 @@ function setLibraryTab(tab) {
   if (fit) renderPane();
 }
 
+/* ---------------- thêm buổi / bài ngay ở khung ngày ---------------- */
+/** Nút 🏋 Fitness ở khung ngày: chọn buổi trống hoặc một mẫu buổi. */
+async function addToDay(date) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) return null;
+  const opts = [{ label: '＋ Buổi trống', sub: 'Tự thêm từng bài từ thư viện', value: 'blank' },
+    ...templateEntries().map(e => ({ label: e.name, sub: `${e.builtin ? 'Mẫu dựng sẵn' : 'Mẫu của bạn'} · ${e.count} bài`, value: e.key }))];
+  const pick = await UI().uiChoose({ title: `Thêm buổi fitness · ${fmtDate(date)}`, message: 'Chọn buổi trống hoặc một mẫu buổi.', options: opts });
+  if (!pick) return null;
+  if (pick !== 'blank') return assign(pick, [date]);
+  const id = createBlankAt(date);
+  const r = resolveRef({ id }); if (r) await openPlanEditor(r);
+  return id;
+}
+function createBlankAt(date) {
+  const loc = ensureDate(date); loc.d.workouts = loc.d.workouts || [];
+  const rec = { id: genId(), ...F.blankPlan() };
+  loc.d.workouts.push(rec);
+  db.weeks.sort((a, b) => String(a.days?.[0]?.date || '').localeCompare(String(b.days?.[0]?.date || '')));
+  saveDb(); const l2 = locateDate(date); if (l2) currentWeek = l2.wi; render({ preserveScroll: true }); refreshViews();
+  return rec.id;
+}
+/** Thêm bài thư viện `exId` vào buổi kế hoạch tại `ref`. */
+function addExerciseTo(ref, exId) {
+  const r = freshRef(ref); const entry = library().find(x => x.id === exId);
+  if (!r || !entry) { toast('Không tìm thấy buổi hoặc bài tập.'); return false; }
+  const item = itemAt(r);
+  const next = F.addExerciseToPlan(item, entry);
+  if (!next) { toast('Buổi này đã có kết quả — chỉ thêm bài vào buổi chưa tập.'); return false; }
+  Object.assign(item, next); saveDb(); render({ preserveScroll: true }); refreshViews();
+  toast(`Đã thêm “${entry.name}” vào buổi “${item.workoutName || 'Fitness'}”`); return true;
+}
+/** Thả bài vào một ngày (không trúng thẻ cụ thể): 1 buổi chưa tập → thêm; nhiều buổi → hỏi; chưa có → tạo buổi mới. */
+async function dropExerciseOnDay(date, exId) {
+  const loc = locateDate(date); const di = loc ? loc.di : -1;
+  const plans = [];
+  if (loc) (loc.d.workouts || []).forEach((w, ii) => { if (w && F.isFitnessWorkout(w) && !w.actual) plans.push({ w, ii }); });
+  if (!plans.length) { const id = createBlankAt(date); const r = resolveRef({ id }); return r && addExerciseTo(r, exId); }
+  let target = plans[0];
+  if (plans.length > 1) {
+    const v = await UI().uiChoose({ title: 'Thêm bài vào buổi nào?', message: `Ngày ${fmtDate(date)} có ${plans.length} buổi fitness chưa tập.`, options: plans.map(x => ({ label: x.w.workoutName || 'Fitness', sub: `${(x.w.fitness?.exercises || []).length} bài`, value: x.w.id })) });
+    if (!v) return false; target = plans.find(x => x.w.id === v) || plans[0];
+  }
+  return addExerciseTo({ wi: loc.wi, di, ii: target.ii, id: target.w.id }, exId);
+}
+let exDrag = null;
+function clearDropMarks() { document.querySelectorAll('#days .fit-drop-target,#days .fit-day-drop').forEach(x => x.classList.remove('fit-drop-target', 'fit-day-drop')); }
+function initExerciseDrag() {
+  const pane = $('libFitPane'), days = $('days'); if (!pane || !days) return;
+  pane.addEventListener('dragstart', e => {
+    const c = e.target.closest && e.target.closest('.fx-exc[data-fx-exid]'); if (!c) return;
+    exDrag = c.dataset.fxExid;
+    try { e.dataTransfer.effectAllowed = 'copy'; e.dataTransfer.setData('text/plain', 'fx:' + exDrag); } catch (_) {}
+    // Để cửa sổ Thư viện "trong suốt" sau khi trình duyệt chụp ảnh kéo, cho phép thả xuống lịch phía sau.
+    setTimeout(() => { if (exDrag) document.body.classList.add('fx-dragging-ex'); }, 0);
+  });
+  pane.addEventListener('dragend', () => { exDrag = null; document.body.classList.remove('fx-dragging-ex'); clearDropMarks(); });
+  days.addEventListener('dragover', e => {
+    if (!exDrag) return;
+    const col = e.target.closest('.day-col'); if (!col) return;
+    e.preventDefault(); try { e.dataTransfer.dropEffect = 'copy'; } catch (_) {}
+    clearDropMarks();
+    const card = e.target.closest('.workout-card.fitness');
+    if (card) card.classList.add('fit-drop-target'); else col.classList.add('fit-day-drop');
+  });
+  days.addEventListener('dragleave', e => { if (!exDrag) return; const col = e.target.closest('.day-col'); if (col && !col.contains(e.relatedTarget)) col.classList.remove('fit-day-drop'); });
+  days.addEventListener('drop', async e => {
+    if (!exDrag) return; e.preventDefault();
+    const exId = exDrag; exDrag = null; document.body.classList.remove('fx-dragging-ex');
+    const card = e.target.closest('.workout-card.fitness'); const col = e.target.closest('.day-col'); clearDropMarks();
+    if (card && card.dataset.openWi != null) addExerciseTo({ wi: +card.dataset.openWi, di: +card.dataset.openDi, ii: +card.dataset.openIi }, exId);
+    else if (col) await dropExerciseOnDay(col.dataset.daycolDate, exId);
+  });
+}
+
 function init() {
+  initExerciseDrag();
   document.querySelectorAll('[data-libtab]').forEach(b => b.onclick = () => setLibraryTab(b.dataset.libtab));
   const pane = $('libFitPane'); if (!pane) return;
   pane.querySelector('[data-fx-search]').addEventListener('input', e => { paneQuery = e.target.value; renderPane(); });
@@ -344,5 +419,5 @@ function init() {
   $('days').addEventListener('click', e => { const b = e.target.closest('[data-mobile-wi]'); if (!b) return; e.stopPropagation(); exportMobile({ wi: +b.dataset.mobileWi, di: +b.dataset.mobileDi, ii: +b.dataset.mobileIi }); });
 }
 
-root.T17FitnessUI = { init, cardHtml, openPlanEditor, openResult, assign, assignDialog, editTemplate, editExercise, exportMobile, exportMobileRange, mobileFilesInRange, setLibraryTab, renderPane, compressImage };
+root.T17FitnessUI = { init, cardHtml, openPlanEditor, openResult, assign, assignDialog, addToDay, addExerciseTo, dropExerciseOnDay, editTemplate, editExercise, exportMobile, exportMobileRange, mobileFilesInRange, setLibraryTab, renderPane, compressImage };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

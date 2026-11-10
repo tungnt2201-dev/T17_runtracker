@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.6.0 — 2026-11-10 (Thêm bài fitness ngay ở khung ngày + kéo thả bài tự do)
+
+Gói: `261110_T17_runtracker_v2.6.0.zip`. **Định dạng dữ liệu KHÔNG đổi** (không thêm field; chỉ dùng lại khối `fitness` hiện có) — file mới vẫn nạp được bằng v2.2.0.
+
+- Khung ngày có nút **🏋 Fitness** (cả ngày trống lẫn dưới các thẻ có sẵn, cạnh “＋ Tạo thêm” / “📚 Từ thư viện”): chọn **Buổi trống** (mở trình sửa để thêm bài) hoặc một **mẫu buổi** (dựng sẵn / của bạn) → giao đúng ngày đó.
+- **Kéo thả bài tự do**: Thư viện → tab Fitness → kéo một thẻ bài tập thả vào (a) thẻ buổi fitness chưa tập → thêm bài vào cuối buổi; (b) khung ngày → 1 buổi chưa tập thì thêm vào đó, nhiều buổi thì hỏi chọn, chưa có buổi thì tự tạo buổi mới chứa bài đó. Buổi đã có kết quả không nhận thêm bài (báo rõ). Cửa sổ Thư viện tự mờ/xuyên thấu khi đang kéo để thả được xuống lịch phía sau.
+- Lõi: `T17Fitness.blankPlan()`, `T17Fitness.addExerciseToPlan()` (giữ `sessionId`, đánh lại `instanceId` dạng `<sessionId>:<k>`). Test: +3 lõi, +4 giao diện (jsdom). Đã thử kéo thả thật bằng Chromium.
+- **Chưa làm**: ảnh/chương 8 trong Hướng dẫn Word chưa chụp lại cho nút mới; chưa thử trên Windows thật.
+
 ## 2.5.2 — 2026-11-09 (Hướng dẫn sử dụng cho bản mới — lượt 8)
 
 Gói: `261109_T17_runtracker_v2.5.2.zip`. **Không đổi mã ứng dụng, không đổi định dạng dữ liệu** — chỉ cập nhật tài liệu đi kèm gói.

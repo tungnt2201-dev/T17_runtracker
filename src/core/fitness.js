@@ -283,6 +283,23 @@ function planFromTemplate(tpl, library) {
   const w = toWorkout({ ...s, schema: FITNESS_SCHEMA, sessionId: sid, exercises: prefixInstances(s.exercises, sid), date: '', calories: '', rpe: '', sessionNote: '' }, { status: 'plan' });
   return w;
 }
+/** Buổi fitness kế hoạch TRỐNG (chưa có bài) — dùng khi thêm buổi ngay ở khung ngày. Mỗi lần gọi là sessionId mới. */
+function blankPlan(name) {
+  const sid = newSessionId();
+  return toWorkout({ workoutName: str(name).trim() || 'Buổi fitness', schema: FITNESS_SCHEMA, sessionId: sid, templateId: '', duration: '', workoutNote: '', exercises: [], date: '', calories: '', rpe: '', sessionNote: '' }, { status: 'plan' });
+}
+/** Thêm một bài từ thư viện vào buổi KẾ HOẠCH (chưa có actual). Trả buổi mới (không sửa bản gốc); null nếu không thêm được.
+ *  Giữ sessionId, đánh lại instanceId "<sessionId>:<k>" và cập nhật mô tả tóm tắt. */
+function addExerciseToPlan(item, entry) {
+  if (!isObj(item) || !isObj(entry) || item.actual) return null;
+  const cur = isObj(item.fitness) ? item.fitness : { schema: FITNESS_SCHEMA, sessionId: '', workoutNote: '', exercises: [] };
+  const sid = str(cur.sessionId) || newSessionId();
+  const ex = normalizeExercise({ instanceId: '', libraryId: entry.id, name: entry.name, category: entry.category, plan: entry.plan, rows: normalizeRows(entry.defaultRows) });
+  if (!ex) return null;
+  const exercises = prefixInstances([...(cur.exercises || []), ex], sid);
+  return { ...item, workoutType: FITNESS_TYPE, description: summaryText(exercises), fitness: { ...cur, schema: cur.schema || FITNESS_SCHEMA, sessionId: sid, exercises } };
+}
+
 /** Mẫu người dùng (lưu trong db.templates) từ một buổi kế hoạch. */
 function templateFromSession(s) {
   const exercises = (s.exercises || []).map(e => { const o = normalizeExercise(e); o.instanceId = ''; return o; });
@@ -338,7 +355,7 @@ function mobileFileName(date, name) { return `${toDate(date) || 'ngay'}_${safeFi
 function dataUrlBytes(url) { const i = str(url).indexOf(','); if (i < 0) return 0; const b64 = str(url).slice(i + 1).replace(/\s/g, ''); return Math.floor(b64.length * 3 / 4) - (b64.endsWith('==') ? 2 : b64.endsWith('=') ? 1 : 0); }
 
 const api = { safeImageData, FITNESS_SCHEMA, FITNESS_TYPE, ROW_KEYS, BUILTIN_LIBRARY, BUILTIN_TEMPLATES, newSessionId, newInstanceId, normalizeRows, normalizeLibrary, customItems, normalizeExercise, normalizeFitnessBlock, isFitnessWorkout, hasFitnessContent, sessionVolume, summaryText, contentHash, mobileKind, templateSession, fromMobile, toWorkout,
-  DEFAULT_RPE, IMAGE_MAX_BYTES, exerciseBrief, prefixInstances, sessionIdFromInstances, withNewSessionId, templateToSession, planFromTemplate, templateFromSession, repeatDates, completion, buildActual, toMobileData, safeFileName, mobileFileName, dataUrlBytes };
+  DEFAULT_RPE, IMAGE_MAX_BYTES, exerciseBrief, prefixInstances, sessionIdFromInstances, withNewSessionId, templateToSession, planFromTemplate, blankPlan, addExerciseToPlan, templateFromSession, repeatDates, completion, buildActual, toMobileData, safeFileName, mobileFileName, dataUrlBytes };
 root.T17Fitness = api;
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
